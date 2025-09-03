@@ -1,7 +1,7 @@
 // Color Palette
-$primary: #00AE9D;
-$dark: #003641;
-$light: #FFFFFF;
+$primary: var(--primary);
+$dark: var(--dark);
+$light: var(--light);
 $success: #28a745;
 $warning: #ffc107;
 $danger: #dc3545;
@@ -42,14 +42,15 @@ body {
             justify-content: space-between;
             flex-direction: column;
         }
-        &-text{
-            margin: 0!important;
+
+        &-text {
+            margin: 0 !important;
         }
     }
 
     &.available {
         border-color: $primary;
-        background-color: lighten($primary, 63%);
+        background-color: var(--turq-200);
 
         &:hover {
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
@@ -60,11 +61,26 @@ body {
     &.occupied {
         background-color: #f8f9fa;
         border-color: #dee2e6;
+
+        .reserved {
+            color: $muted;
+        }
     }
 
     &.my-reservation {
-        border-color: $success;
-        background-color: lighten($success, 40%);
+        border-color: var(--turq-300);
+        background-color: $primary ;
+
+        .card-title {
+            color: $light;
+        }
+        .reserved{
+                color: var(--turq-500);
+        }
+    }
+
+    .reserved {
+        font-weight: bold;
     }
 }
 

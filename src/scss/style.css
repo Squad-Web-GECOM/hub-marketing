@@ -1,6 +1,6 @@
 body {
   background-color: #f8f9fa;
-  color: #003641;
+  color: var(--dark);
 }
 
 #app {
@@ -10,8 +10,8 @@ body {
 }
 
 .header {
-  background-color: #003641;
-  color: #FFFFFF;
+  background-color: var(--dark);
+  color: var(--light);
 }
 
 .desk-card {
@@ -27,8 +27,8 @@ body {
   margin: 0 !important;
 }
 .desk-card.available {
-  border-color: #00AE9D;
-  background-color: rgb(240.3, 255, 253.5637931034);
+  border-color: var(--primary);
+  background-color: var(--turq-200);
 }
 .desk-card.available:hover {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -38,14 +38,26 @@ body {
   background-color: #f8f9fa;
   border-color: #dee2e6;
 }
+.desk-card.occupied .reserved {
+  color: #6c757d;
+}
 .desk-card.my-reservation {
-  border-color: #28a745;
-  background-color: rgb(175.1304347826, 235.8695652174, 189);
+  border-color: var(--turq-300);
+  background-color: var(--primary);
+}
+.desk-card.my-reservation .card-title {
+  color: var(--light);
+}
+.desk-card.my-reservation .reserved {
+  color: var(--turq-500);
+}
+.desk-card .reserved {
+  font-weight: bold;
 }
 
 .date-selector-btn.active {
-  background-color: #00AE9D;
-  border-color: #00AE9D;
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 .map-modal .modal-dialog {

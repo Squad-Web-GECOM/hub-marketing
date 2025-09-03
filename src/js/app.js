@@ -101,13 +101,24 @@
     renderDesks();
   }
 
+  // NOVO seletor de datas
   function renderDateSelector() {
     selectedDateDisplay.text(formatDate(selectedDate));
-    const datesHtml = availableDates.map(date => `
-      <button class="btn btn-secondary date-selector-btn ${selectedDate === date ? 'active' : ''}" data-date="${date}">
-        ${formatDate(date)}
-      </button>
-    `).join('');
+
+    const datesHtml = availableDates.map(date => {
+      const active = selectedDate === date ? 'active' : '';
+      const top = formatDateShort(date); // DD/MM
+      const bottom = isToday(date) ? 'Hoje' : getWeekdayLabel(date); // Hoje ou dia da semana
+      return `
+        <button class="btn btn-secondary date-selector-btn ${active}" data-date="${date}">
+          <div class="d-flex flex-column align-items-center lh-1">
+            <span class="fw-semibold">${top}</span>
+            <small class="text-muted">${bottom}</small>
+          </div>
+        </button>
+      `;
+    }).join('');
+
     dateSelector.html(datesHtml);
     $('.date-selector-btn').on('click', handleDateSelect);
   }
@@ -133,11 +144,11 @@
 
       if (isMyReservation) {
         cardClass = 'my-reservation';
-        statusText = 'Minha Reserva';
+        statusText = '<span class="reserved">Minha Reserva<span>';
         buttonHtml = `<button class="btn btn-sm btn-danger cancel-reservation-btn" data-reservation-id="${reservation.id}">Cancelar</button>`;
       } else if (isOccupied) {
         cardClass = 'occupied';
-        statusText = `Ocupada por ${reservation.user_name}`;
+        statusText = `<span class="reserved">${reservation.user_name}<span>`;
         buttonHtml = '<button class="btn btn-sm btn-dark" disabled>Ocupada</button>';
       } else if (canBook) {
         buttonHtml = `<button class="btn btn-sm btn-primary make-reservation-btn" data-desk-number="${desk.number}">Reservar</button>`;
@@ -166,8 +177,18 @@
 
   // Eventos
   function handleDateSelect(e) {
-    selectedDate = $(e.currentTarget).data('date');
-    deskGrid.html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">&nbsp;</span></div></div>');
+    const $btn = $(e.currentTarget);
+    selectedDate = $btn.data('date');
+
+    // ativa o botão clicado e desativa os demais
+    $('.date-selector-btn').removeClass('active');
+    $btn.addClass('active');
+
+    // atualiza o cabeçalho
+    selectedDateDisplay.text(formatDate(selectedDate));
+
+    // carrega reservas e reexibe as mesas
+    deskGrid.html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visualmente-hidden">&nbsp;</span></div></div>');
     loadReservations().then(renderDesks);
   }
 
@@ -259,14 +280,49 @@
     if (visible) loader.show(); else loader.hide();
   }
 
-  function showAlert(message, type = 'info') {
-    const alertHtml =
-      `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-         ${message}
-         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-       </div>`;
-    alertContainer.html(alertHtml);
+  // Bootstrap 4 toasts com visual de alert e autohide em 3s
+function showAlert(message, type = 'info') {
+  const container = getToastContainer();
+
+  const id = `toast-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  const html = `
+    <div id="${id}" class="toast alert alert-${type} border-0"
+         role="alert" aria-live="assertive" aria-atomic="true"
+         data-autohide="true" data-delay="3000">
+      <div class="toast-body d-flex align-items-center">
+        <div class="flex-fill">${message}</div>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  container.insertAdjacentHTML('beforeend', html);
+  const $el = $(`#${id}`);
+  $el.toast({ autohide: true, delay: 3000 });
+  $el.toast('show');
+  $el.on('hidden.bs.toast', function() { $(this).remove(); });
+}
+
+function getToastContainer() {
+  let container = document.getElementById('toast-stack');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-stack';
+    // posição no canto superior direito
+    container.style.position = 'fixed';
+    container.style.bottom = '1rem';
+    container.style.right = '1rem';
+    container.style.zIndex = 1080;
+    // empilhar com espaçamento
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '.5rem';
+    document.body.appendChild(container);
   }
+  return container;
+}
 
   function generateAvailableDates() {
     const dates = [];
@@ -294,6 +350,24 @@
   function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+  }
+
+  // NOVOS helpers para o seletor
+  function formatDateShort(dateStr) {
+    const [y, m, d] = dateStr.split('-');
+    return `${d}/${m}`;
+  }
+
+  function getWeekdayLabel(dateStr) {
+    const d = new Date(dateStr);
+    const idx = d.getUTCDay();
+    const names = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    return names[idx];
+  }
+
+  function isToday(dateStr) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return dateStr === todayStr;
   }
 
   function getDeskName(deskNumber) {
