@@ -1,7 +1,4 @@
-// Este arquivo contém toda a lógica principal e compartilhada da aplicação de agendamento.
-// Ele deve ser incluído em ambas as páginas.
-
-const AppAgendamento = (function($) {
+(function($) {
   'use strict';
 
   // CONFIG
@@ -15,6 +12,7 @@ const AppAgendamento = (function($) {
   const dateSelector = $('#date-selector');
   const selectedDateDisplay = $('#selected-date-display');
   const deskGrid = $('#desk-grid');
+  const alertContainer = $('#alert-container');
 
   // Estado
   let currentUser = null;
@@ -24,9 +22,14 @@ const AppAgendamento = (function($) {
   let availableDates = [];
   let sb = null; // cliente Supabase
 
-  // Função principal da aplicação, chamada após a autenticação
-  async function init() {
+  // Inicialização
+  $(document).ready(() => {
+    appView.hide();
     showLoader(true);
+    init();
+  });
+
+  async function init() {
     try {
       await ensureSupabase();
       if (!window.supabase || !window.supabase.createClient) {
@@ -34,8 +37,9 @@ const AppAgendamento = (function($) {
       }
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+      identifyUserFromLiferay();
       if (!currentUser) {
-        showAlert('Ocorreu um erro na autenticação do usuário.', 'danger');
+        showAlert('Não foi possível identificar o usuário no Liferay.', 'danger');
         showLoader(false);
         return;
       }
@@ -52,7 +56,7 @@ const AppAgendamento = (function($) {
       showLoader(false);
     } catch (err) {
       console.error(err);
-      showAlert('Falha ao iniciar a aplicação. Verifique a conexão com o Supabase.', 'danger');
+      showAlert('Falha ao iniciar a aplicação. Verifique o carregamento do Supabase e o ThemeDisplay.', 'danger');
       showLoader(false);
     }
   }
@@ -70,18 +74,41 @@ const AppAgendamento = (function($) {
     });
   }
 
+  // Identificação via Liferay
+  function identifyUserFromLiferay() {
+    try {
+      const isSignedIn = Liferay?.ThemeDisplay?.isSignedIn?.();
+      if (!isSignedIn) {
+        currentUser = null;
+        return;
+      }
+      const email = Liferay?.ThemeDisplay?.getUserEmailAddress?.() || '';
+      const localPart = email && email.includes('@') ? email.split('@')[0] : '';
+      if (!email || !localPart) {
+        currentUser = null;
+        return;
+      }
+      currentUser = { id: email, name: localPart, email };
+    } catch (e) {
+      console.error('ThemeDisplay indisponível', e);
+      currentUser = null;
+    }
+  }
+
   // Renderização
   function renderPage() {
     renderDateSelector();
     renderDesks();
   }
 
+  // NOVO seletor de datas
   function renderDateSelector() {
     selectedDateDisplay.text(formatDate(selectedDate));
+
     const datesHtml = availableDates.map(date => {
       const active = selectedDate === date ? 'active' : '';
-      const top = formatDateShort(date);
-      const bottom = isToday(date) ? 'Hoje' : getWeekdayLabel(date);
+      const top = formatDateShort(date); // DD/MM
+      const bottom = isToday(date) ? 'Hoje' : getWeekdayLabel(date); // Hoje ou dia da semana
       return `
         <button class="btn btn-secondary date-selector-btn ${active}" data-date="${date}">
           <div class="d-flex flex-column align-items-center lh-1">
@@ -91,6 +118,7 @@ const AppAgendamento = (function($) {
         </button>
       `;
     }).join('');
+
     dateSelector.html(datesHtml);
     $('.date-selector-btn').on('click', handleDateSelect);
   }
@@ -101,13 +129,19 @@ const AppAgendamento = (function($) {
       deskGrid.html('<p class="text-center text-muted">Nenhuma mesa ativa encontrada.</p>');
       return;
     }
+
     const userReservation = reservations.find(r => r.user_id === currentUser.id);
+
     const desksHtml = desks.map(desk => {
       const reservation = reservations.find(r => r.desk_number === desk.number);
       const isOccupied = !!reservation;
       const isMyReservation = isOccupied && reservation.user_id === currentUser.id;
       const canBook = !isOccupied && !userReservation;
-      let cardClass = 'available', statusText = 'Livre', buttonHtml = '';
+
+      let cardClass = 'available';
+      let statusText = 'Livre';
+      let buttonHtml = '';
+
       if (isMyReservation) {
         cardClass = 'my-reservation';
         statusText = '<span class="reserved">Minha Reserva<span>';
@@ -122,11 +156,12 @@ const AppAgendamento = (function($) {
         cardClass = 'occupied';
         buttonHtml = '<button class="btn btn-sm btn-dark" disabled>Indisponível</button>';
       }
+
       return `
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
           <div class="card h-100 desk-card ${cardClass}">
             <div class="card-body">
-              <h5 class="card-title">${getDeskName(desk)}</h5>
+              <h5 class="card-title">${getDeskName(desk.number)}</h5>
               <p class="card-text">${statusText}</p>
               ${buttonHtml}
             </div>
@@ -134,6 +169,7 @@ const AppAgendamento = (function($) {
         </div>
       `;
     }).join('');
+
     deskGrid.html(`<div class="row gap-row-4">${desksHtml}</div>`);
     $('.make-reservation-btn').on('click', handleMakeReservation);
     $('.cancel-reservation-btn').on('click', handleCancelReservation);
@@ -143,9 +179,15 @@ const AppAgendamento = (function($) {
   function handleDateSelect(e) {
     const $btn = $(e.currentTarget);
     selectedDate = $btn.data('date');
+
+    // ativa o botão clicado e desativa os demais
     $('.date-selector-btn').removeClass('active');
     $btn.addClass('active');
+
+    // atualiza o cabeçalho
     selectedDateDisplay.text(formatDate(selectedDate));
+
+    // carrega reservas e reexibe as mesas
     deskGrid.html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visualmente-hidden">&nbsp;</span></div></div>');
     loadReservations().then(renderDesks);
   }
@@ -163,7 +205,11 @@ const AppAgendamento = (function($) {
   // Supabase
   async function loadDesks() {
     try {
-      const { data, error } = await sb.from('desks').select('*').eq('is_active', true).not('name', 'is', null).order('number');
+      const { data, error } = await sb
+        .from('desks')
+        .select('*')
+        .eq('is_active', true)
+        .order('number');
       if (error) throw error;
       desks = data || [];
     } catch (error) {
@@ -174,7 +220,11 @@ const AppAgendamento = (function($) {
 
   async function loadReservations() {
     try {
-      const { data, error } = await sb.from('reservations').select('*').eq('date', selectedDate).is('canceled_at', null);
+      const { data, error } = await sb
+        .from('reservations')
+        .select('*')
+        .eq('date', selectedDate)
+        .is('canceled_at', null);
       if (error) throw error;
       reservations = data || [];
     } catch (error) {
@@ -185,12 +235,12 @@ const AppAgendamento = (function($) {
 
   async function makeReservation(deskNumber) {
     try {
-      const desk = desks.find(d => d.number === deskNumber);
-      if (!desk) {
-        showAlert('Mesa não encontrada. Tente novamente.', 'warning');
-        return;
-      }
-      const payload = { date: selectedDate, desk_number: deskNumber, user_id: currentUser.id, user_name: currentUser.name };
+      const payload = {
+        date: selectedDate,
+        desk_number: deskNumber,
+        user_id: currentUser.id,
+        user_name: currentUser.name
+      };
       const { error } = await sb.from('reservations').insert(payload);
       if (error) {
         if (error.message && error.message.includes('reservations_date_user_id_key')) {
@@ -200,7 +250,7 @@ const AppAgendamento = (function($) {
         }
         throw error;
       }
-      showAlert(`Reserva confirmada na ${getDeskName(desk)} para ${formatDate(selectedDate)}.`, 'success');
+      showAlert(`Reserva confirmada na ${getDeskName(deskNumber)} para ${formatDate(selectedDate)}.`, 'success');
       await loadReservations();
       renderDesks();
     } catch (error) {
@@ -210,7 +260,11 @@ const AppAgendamento = (function($) {
 
   async function cancelReservation(reservationId) {
     try {
-      const { error } = await sb.from('reservations').update({ canceled_at: new Date().toISOString(), canceled_by: currentUser.id }).eq('id', reservationId).eq('user_id', currentUser.id);
+      const { error } = await sb
+        .from('reservations')
+        .update({ canceled_at: new Date().toISOString(), canceled_by: currentUser.id })
+        .eq('id', reservationId)
+        .eq('user_id', currentUser.id);
       if (error) throw error;
       showAlert('Reserva cancelada com sucesso.', 'success');
       await loadReservations();
@@ -226,38 +280,63 @@ const AppAgendamento = (function($) {
     if (visible) loader.show(); else loader.hide();
   }
 
-  function showAlert(message, type = 'info') {
-    const container = getToastContainer();
-    const id = `toast-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const html = `<div id="${id}" class="toast alert alert-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000"><div class="toast-body d-flex align-items-center"><div class="flex-fill">${message}</div><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></div>`;
-    container.insertAdjacentHTML('beforeend', html);
-    const $el = $(`#${id}`);
-    $el.toast({ autohide: true, delay: 3000 });
-    $el.toast('show');
-    $el.on('hidden.bs.toast', function() { $(this).remove(); });
-  }
+  // Bootstrap 4 toasts com visual de alert e autohide em 3s
+function showAlert(message, type = 'info') {
+  const container = getToastContainer();
 
-  function getToastContainer() {
-    let container = document.getElementById('toast-stack');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'toast-stack';
-      Object.assign(container.style, { position: 'fixed', bottom: '1rem', right: '1rem', zIndex: 1080, display: 'flex', flexDirection: 'column', gap: '.5rem' });
-      document.body.appendChild(container);
-    }
-    return container;
+  const id = `toast-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  const html = `
+    <div id="${id}" class="toast alert alert-${type} border-0"
+         role="alert" aria-live="assertive" aria-atomic="true"
+         data-autohide="true" data-delay="3000">
+      <div class="toast-body d-flex align-items-center">
+        <div class="flex-fill">${message}</div>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  container.insertAdjacentHTML('beforeend', html);
+  const $el = $(`#${id}`);
+  $el.toast({ autohide: true, delay: 3000 });
+  $el.toast('show');
+  $el.on('hidden.bs.toast', function() { $(this).remove(); });
+}
+
+function getToastContainer() {
+  let container = document.getElementById('toast-stack');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-stack';
+    // posição no canto superior direito
+    container.style.position = 'fixed';
+    container.style.bottom = '1rem';
+    container.style.right = '1rem';
+    container.style.zIndex = 1080;
+    // empilhar com espaçamento
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '.5rem';
+    document.body.appendChild(container);
   }
+  return container;
+}
 
   function generateAvailableDates() {
     const dates = [];
     const today = new Date();
-    let daysAdded = 0, i = 0;
+    let daysAdded = 0;
+    let i = 0;
+
     while (daysAdded < 6 && i < 14) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       const dayOfWeek = date.getDay();
       if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-        dates.push(date.toISOString().split('T')[0]);
+        const dateString = date.toISOString().split('T')[0];
+        dates.push(dateString);
         daysAdded++;
       }
       i++;
@@ -273,19 +352,33 @@ const AppAgendamento = (function($) {
     return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   }
 
-  function formatDateShort(dateStr) { const [,,d] = dateStr.split('-'); return `${d}/${dateStr.split('-')[1]}`; }
-  function getWeekdayLabel(dateStr) { const d = new Date(dateStr); return ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][d.getUTCDay()]; }
-  function isToday(dateStr) { return dateStr === new Date().toISOString().split('T')[0]; }
-  function getDeskName(desk) { return !desk || !desk.name ? `Mesa ${desk.number}` : `Mesa ${desk.name}`; }
+  // NOVOS helpers para o seletor
+  function formatDateShort(dateStr) {
+    const [y, m, d] = dateStr.split('-');
+    return `${d}/${m}`;
+  }
 
-  // Expõe os métodos públicos que serão usados pelos scripts de autenticação
-  return {
-    init: init,
-    setCurrentUser: function(user) {
-      currentUser = user;
-    }
-  };
+  function getWeekdayLabel(dateStr) {
+    const d = new Date(dateStr);
+    const idx = d.getUTCDay();
+    const names = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    return names[idx];
+  }
+
+  function isToday(dateStr) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return dateStr === todayStr;
+  }
+
+function getDeskName(deskNumber) {
+    if (deskNumber >= 1 && deskNumber <= 3) return `Mesa A${deskNumber}`;
+    if (deskNumber >= 4 && deskNumber <= 7) return `Mesa B${deskNumber - 3}`;
+    if (deskNumber >= 8 && deskNumber <= 12) return `Mesa C${deskNumber - 7}`;
+    if (deskNumber >= 13 && deskNumber <= 18) return `Mesa D${deskNumber - 12}`;
+    if (deskNumber >= 19 && deskNumber <= 21) return `Mesa E${deskNumber - 18}`;
+    if (deskNumber >= 22 && deskNumber <= 23) return `Mesa F${deskNumber - 21}`;
+    if (deskNumber >= 24 && deskNumber <= 24) return `Mesa G${deskNumber - 23}`;
+    return `Mesa ${deskNumber}`;
+  }
 
 })(jQuery);
-
-

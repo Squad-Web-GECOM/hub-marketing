@@ -14,6 +14,10 @@ body {
   color: var(--light);
 }
 
+#desk-grid .row .col-xl-3:nth-child(n+23) {
+  display: none;
+}
+
 .desk-card {
   transition: all 0.3s ease-in-out;
 }
@@ -58,6 +62,9 @@ body {
 .date-selector-btn.active {
   background-color: var(--primary);
   border-color: var(--primary);
+}
+.date-selector-btn.active .text-muted {
+  color: var(--light) !important;
 }
 
 .map-modal .modal-dialog {

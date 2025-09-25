@@ -32,6 +32,14 @@ body {
     color: $light;
 }
 
+#desk-grid{
+    .row {
+        .col-xl-3:nth-child(n + 23) {
+            display: none;
+        }
+    }
+}
+
 .desk-card {
     transition: all 0.3s ease-in-out;
 
@@ -69,13 +77,14 @@ body {
 
     &.my-reservation {
         border-color: var(--turq-300);
-        background-color: $primary ;
+        background-color: $primary;
 
         .card-title {
             color: $light;
         }
-        .reserved{
-                color: var(--turq-500);
+
+        .reserved {
+            color: var(--turq-500);
         }
     }
 
@@ -88,6 +97,10 @@ body {
     &.active {
         background-color: $primary;
         border-color: $primary;
+
+        .text-muted {
+            color: $light !important;
+        }
     }
 }
 
