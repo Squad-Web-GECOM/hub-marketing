@@ -1,20 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendamento de Mesas - Marketing</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="dist/css/style.css">
-</head>
-<body>
-    <div id="app">
-        <!-- App content will be rendered here by JavaScript -->
-    </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="dist/js/app.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento de Mesas - Marketing</title>
+</head>
+
+<body>
+  <!-- Loader -->
+  <div id="loader" style="display: block;">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
+
+  <section class="acland">
+    <!-- App View -->
+    <div id="app-view" style="display: none;">
+      <!-- Header -->
+      <header class="header bg-dark py-3">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+          <h4 class="c-light text-balance mb-0">Ferramenta de agendamento de mesas da área de marketing</h4>
+
+          <div class="center-s ml-auto pt-3 pt-md-0">
+            <span id="user-info-container">
+              <!-- Botão Login (Modo visualização) -->
+              <button class="btn btn-primary btn-click" id="open-login-btn" style="display: none;">Login</button>
+              <!-- Informações do usuário (Modo logado) -->
+              <span id="user-logged-container" style="display: none;">
+                <span class="me-3 nowrap text-light"> Olá,
+                  <span class="fw-800" id="user-name">
+
+                  </span>
+                  <span id="user-role-label">
+
+                  </span>
+                </span>
+              </span>
+            </span>
+          </div>
+        </div>
+      </header>
+      <!-- Main Content -->
+
+      <main class="container py-4"><!-- Tabs Admin (visível apenas para admins) -->
+        <div class="admin d-flex align-items-center justify-content-center gap-3" style="display: none !important;">
+          <button class="btn btn-primary btn-sm" id="btn-reserves" type="button">
+            📋 Reservas
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-registers" type="button">
+            📊 Registros
+          </button>
+        </div>
+        <!-- Container de Alertas -->
+
+        <div id="alert-container">&nbsp;</div>
+        <!-- Card: Seletor de Data / Filtros -->
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-header d-flex align-items-center gap-2"><span style="font-size: 2rem;">📅</span>
+
+            <h4 class="m-0">Selecionar Data</h4>
+          </div>
+
+          <div class="card-body"><!-- Renderizado dinamicamente: seletor de datas OU filtros -->
+            <div id="date-selector"><!-- Preenchido via JavaScript --></div>
+          </div>
+        </div>
+        <!-- Card: Grid de Mesas / Tabela de Logs -->
+
+        <div class="card shadow-sm">
+          <div class="card-header d-flex align-items-center gap-2"><span style="font-size: 2rem;">📍</span>
+            <!-- Título dinâmico alterado via JS -->
+
+            <h4 class="m-0">
+              <span class="bg-dark c-light px-1 py-0 border-radius-1" id="number-desks"></span>
+              Mesas
+              Disponíveis -
+              <span class="c-dark fw-800" id="selected-date-display"></span>
+            </h4>
+          </div>
+
+          <div class="card-body m-3" id="desk-grid"><!-- Renderizado dinamicamente: grid de mesas OU tabela de logs -->
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border" role="status"><span class="visually-hidden">Carregando...</span></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style-v4.css">
+
+  <!-- JavaScript v4.0 -->
+  <script src="agendamento-complete-v4.js"></script>
 </body>
+
 </html>
