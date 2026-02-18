@@ -1796,3 +1796,91 @@ a:hover {
 [data-theme=dark] .hub-search-box i {
   color: var(--athens-gray-500);
 }
+
+/* ============================================================
+   PROFILE GATE BANNER
+   Exibido acima do #app-view quando profile_complete = false
+   ============================================================ */
+.hub-profile-gate-banner {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  border: 1px solid #ffecb5;
+  border-radius: var(--border-radius-sm);
+  padding: 0.875rem 1.25rem;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.hub-profile-gate-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.hub-profile-gate-inner > i {
+  font-size: 1.35rem;
+  color: #856404;
+  flex-shrink: 0;
+}
+
+.hub-profile-gate-inner > div {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: #533f03;
+}
+
+.hub-profile-gate-inner > div strong {
+  color: #533f03;
+}
+
+.hub-profile-gate-inner > button {
+  flex-shrink: 0;
+}
+
+/* Efeito visual sutil quando gate ativo — sem bloquear interacao */
+.hub-profile-gate-active {
+  opacity: 0.85;
+  pointer-events: none;
+  filter: blur(0.5px);
+  user-select: none;
+}
+
+/* Dark mode */
+[data-theme=dark] .hub-profile-gate-banner {
+  background: linear-gradient(135deg, var(--sunshade-950) 0%, rgba(255, 170, 44, 0.15) 100%);
+  border-color: var(--sunshade-700);
+}
+[data-theme=dark] .hub-profile-gate-inner > i {
+  color: var(--sunshade-300);
+}
+[data-theme=dark] .hub-profile-gate-inner > div {
+  color: var(--sunshade-200);
+}
+[data-theme=dark] .hub-profile-gate-inner > div strong {
+  color: var(--sunshade-100);
+}
+
+/* ============================================================
+   BOTAO "EDITAR PERFIL" NO SIDEBAR
+   ============================================================ */
+.btn-editar-perfil {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-xs);
+  transition: var(--transition-1);
+}
+.btn-editar-perfil:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Quando sidebar colapsada, manter visivel */
+.hub-sidebar.collapsed .btn-editar-perfil {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

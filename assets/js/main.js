@@ -242,7 +242,7 @@
 
     requireMarketingUser: function() {
       if (!this._user || this._user.isExternal) {
-        window.location.href = '/formularios/';
+        window.location.href = BASE_PATH + '/formularios/';
         return false;
       }
       return true;
@@ -260,18 +260,39 @@
   };
 
   // ====================================================================
+  // BASE PATH — suporta GitHub Pages (/hub-marketing/) e Liferay (/)
+  // Detecta o prefixo pelo src do próprio script main.js
+  // ====================================================================
+  var BASE_PATH = (function() {
+    var scripts = document.querySelectorAll('script[src]');
+    for (var i = 0; i < scripts.length; i++) {
+      var src = scripts[i].getAttribute('src');
+      // Procura por "assets/js/main.js" no src (relativo ou absoluto)
+      var match = src.match(/^(.*?)(?:\.\.\/)*assets\/js\/main\.js/);
+      if (match) {
+        // src relativo: pegar o pathname atual menos segmentos de subpasta
+        var depth = (src.match(/\.\.\//g) || []).length;
+        var parts = window.location.pathname.replace(/\/$/, '').split('/');
+        parts = parts.slice(0, parts.length - depth);
+        return parts.join('/');
+      }
+    }
+    return '';
+  })();
+
+  // ====================================================================
   // NAV MODULE
   // ====================================================================
   var nav = {
     items: [
-      { id: 'home', label: 'Home', icon: 'fa-house', href: '/' },
-      { id: 'mesas', label: 'Mesas', icon: 'fa-chair', href: '/mesas/' },
-      { id: 'squads', label: 'Squads', icon: 'fa-users-gear', href: '/squads/' },
-      { id: 'formularios', label: 'Formularios', icon: 'fa-file-lines', href: '/formularios/' }
+      { id: 'home', label: 'Home', icon: 'fa-house', href: BASE_PATH + '/' },
+      { id: 'mesas', label: 'Mesas', icon: 'fa-chair', href: BASE_PATH + '/mesas/' },
+      { id: 'squads', label: 'Squads', icon: 'fa-users-gear', href: BASE_PATH + '/squads/' },
+      { id: 'formularios', label: 'Formularios', icon: 'fa-file-lines', href: BASE_PATH + '/formularios/' }
     ],
     adminItems: [
-      { id: 'usuarios', label: 'Usuarios', icon: 'fa-user-group', href: '/usuarios/' },
-      { id: 'admin', label: 'Admin', icon: 'fa-gear', href: '/admin/' }
+      { id: 'usuarios', label: 'Usuarios', icon: 'fa-user-group', href: BASE_PATH + '/usuarios/' },
+      { id: 'admin', label: 'Admin', icon: 'fa-gear', href: BASE_PATH + '/admin/' }
     ],
 
     render: function() {
@@ -304,6 +325,12 @@
       var userHTML;
       if (user) {
         var roleLabel = user.isAdmin ? 'Admin' : (user.isCoordenador ? 'Coordenador' : 'Marketing');
+        // "Editar Perfil" button: on usuarios page calls modal directly; elsewhere navigates there
+        var editarPerfilBtn = !user.isExternal
+          ? '<button onclick="hub.nav.openEditarPerfil()" title="Editar perfil" class="btn-editar-perfil">' +
+              '<i class="fa-solid fa-user-pen"></i>' +
+            '</button>'
+          : '';
         userHTML = '' +
           '<div class="hub-sidebar-user">' +
             '<div>' +
@@ -313,6 +340,7 @@
             '</div>' +
           '</div>' +
           '<div class="hub-sidebar-actions">' +
+            editarPerfilBtn +
             '<button onclick="hub.darkMode.toggle()" title="Alternar tema" class="btn-theme-toggle">' +
               '<i class="fa-solid fa-circle-half-stroke"></i>' +
             '</button>' +
@@ -381,6 +409,16 @@
           if (icon) icon.className = 'fa-solid fa-chevron-right';
         }
       } catch(e) {}
+    },
+
+    openEditarPerfil: function() {
+      // Se estiver na pagina usuarios e o modal estiver disponivel, abre diretamente
+      if (typeof window._openProfileModal === 'function') {
+        window._openProfileModal();
+      } else {
+        // Navega para usuarios com flag para auto-abrir modal
+        window.location.href = BASE_PATH + '/usuarios/?perfil=1';
+      }
     }
   };
 
@@ -937,21 +975,54 @@
     // Dispatch ready event
     document.dispatchEvent(new CustomEvent('hub:ready', { detail: { user: auth.getUser() } }));
 
-    // Check profile complete - show notification if needed
+    // Check profile complete - show gate or toast
     var user = auth.getUser();
-    if (user && !user.profileComplete && !user.isExternal) {
-      var page = document.documentElement.dataset.page;
-      if (page !== 'admin') {
-        utils.showToast('Complete seu cadastro para usar todas as funcionalidades', 'warning', 6000);
+    var currentPage = document.documentElement.dataset.page;
+    // 'usuarios' e 'squads' gerem seu proprio banner inline
+    var gateExcludedPages = ['admin', 'mesas', 'formularios', 'usuarios'];
+    if (user && !user.isExternal && !user.profileComplete) {
+      if (gateExcludedPages.indexOf(currentPage) === -1) {
+        _renderProfileGate();
       }
     }
 
     // If not authenticated and page requires auth
-    var currentPage = document.documentElement.dataset.page;
     var publicPages = ['mesas', 'formularios'];
     if (!auth.isAuthenticated() && publicPages.indexOf(currentPage) === -1) {
       auth.showLoginModal();
     }
+  }
+
+  // ====================================================================
+  // PROFILE GATE — bloqueia conteudo ate cadastro completo
+  // ====================================================================
+  function _renderProfileGate() {
+    // Injeta o banner de gate acima do #app-view
+    var appView = document.getElementById('app-view');
+    if (!appView) return;
+
+    // Evita duplicar
+    if (document.getElementById('profile-gate-banner')) return;
+
+    var banner = document.createElement('div');
+    banner.id = 'profile-gate-banner';
+    banner.className = 'hub-profile-gate-banner';
+    banner.innerHTML =
+      '<div class="hub-profile-gate-inner">' +
+        '<i class="fa-solid fa-circle-exclamation"></i>' +
+        '<div>' +
+          '<strong>Complete seu cadastro!</strong>' +
+          '<span> Selecione sua gerencia, coordenacao e nucleo para acessar todas as funcionalidades.</span>' +
+        '</div>' +
+        '<button class="btn btn-sm btn-warning" onclick="hub.nav.openEditarPerfil()">' +
+          '<i class="fa-solid fa-user-pen"></i> Completar Cadastro' +
+        '</button>' +
+      '</div>';
+
+    appView.parentNode.insertBefore(banner, appView);
+
+    // Adiciona classe de gate ao app-view para efeito visual (overlay suave)
+    appView.classList.add('hub-profile-gate-active');
   }
 
   // ====================================================================
@@ -963,7 +1034,7 @@
     darkMode: darkMode,
     utils: utils,
     _loginFlow: _loginFlow,
-    config: HUB_CONFIG
+    config: Object.assign({}, HUB_CONFIG, { basePath: BASE_PATH })
   };
 
   // Define supabase and sb as getters for lazy init

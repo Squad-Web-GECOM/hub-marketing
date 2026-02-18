@@ -556,7 +556,7 @@
   };
 
   window._adminEditSquad = function(squadId) {
-    var s = allSquads.find(function(x) { return x.id === squadId; });
+    var s = allSquads.find(function(x) { return String(x.id) === String(squadId); });
     if (!s) return;
 
     showEditModal('Editar Squad: ' + s.nome, squadFormHtml(s), async function() {
@@ -581,7 +581,7 @@
   };
 
   window._adminDeactivateSquad = function(squadId) {
-    var s = allSquads.find(function(x) { return x.id === squadId; });
+    var s = allSquads.find(function(x) { return String(x.id) === String(squadId); });
     showConfirm('Desativar o squad <strong>' + esc(s ? s.nome : '') + '</strong>?', async function() {
       var res = await hub.sb.from('squads').update({ is_active: false }).eq('id', squadId);
       if (res.error) {
@@ -594,7 +594,7 @@
   };
 
   window._adminManageMembers = function(squadId) {
-    var s = allSquads.find(function(x) { return x.id === squadId; });
+    var s = allSquads.find(function(x) { return String(x.id) === String(squadId); });
     if (!s) return;
 
     var members = s.squad_members || [];
@@ -737,7 +737,7 @@
   };
 
   window._adminEditCategoria = function(catId) {
-    var c = allCategories.find(function(x) { return x.id === catId; });
+    var c = allCategories.find(function(x) { return String(x.id) === String(catId); });
     if (!c) return;
 
     showEditModal('Editar Categoria', categoriaFormHtml(c), async function() {
@@ -760,7 +760,7 @@
   };
 
   window._adminDeactivateCategoria = function(catId) {
-    var c = allCategories.find(function(x) { return x.id === catId; });
+    var c = allCategories.find(function(x) { return String(x.id) === String(catId); });
     showConfirm('Desativar a categoria <strong>' + esc(c ? c.nome : '') + '</strong>?', async function() {
       var res = await hub.sb.from('squad_categories').update({ is_active: false }).eq('id', catId);
       if (res.error) {
@@ -854,7 +854,7 @@
   };
 
   window._adminEditForm = function(formId) {
-    var f = allForms.find(function(x) { return x.id === formId; });
+    var f = allForms.find(function(x) { return String(x.id) === String(formId); });
     if (!f) return;
 
     showEditModal('Editar Formulario: ' + f.nome, formFormHtml(f), async function() {
@@ -880,7 +880,7 @@
   };
 
   window._adminDeactivateForm = function(formId) {
-    var f = allForms.find(function(x) { return x.id === formId; });
+    var f = allForms.find(function(x) { return String(x.id) === String(formId); });
     showConfirm('Desativar o formulario <strong>' + esc(f ? f.nome : '') + '</strong>?', async function() {
       var res = await hub.sb.from('forms').update({ is_active: false }).eq('id', formId);
       if (res.error) {
@@ -1199,7 +1199,7 @@
   };
 
   window._adminEditLink = function(linkId) {
-    var l = allQuickLinks.find(function(x) { return x.id === linkId; });
+    var l = allQuickLinks.find(function(x) { return String(x.id) === String(linkId); });
     if (!l) return;
 
     showEditModal('Editar Link: ' + l.titulo, linkFormHtml(l), async function() {
@@ -1224,7 +1224,7 @@
   };
 
   window._adminDeactivateLink = function(linkId) {
-    var l = allQuickLinks.find(function(x) { return x.id === linkId; });
+    var l = allQuickLinks.find(function(x) { return String(x.id) === String(linkId); });
     showConfirm('Desativar o link <strong>' + esc(l ? l.titulo : '') + '</strong>?', async function() {
       var res = await hub.sb.from('quick_links').update({ is_active: false }).eq('id', linkId);
       if (res.error) {
@@ -1242,7 +1242,7 @@
   document.addEventListener('hub:ready', function(e) {
     if (!hub.auth.isAdminOrCoord()) {
       hub.utils.showToast('Acesso restrito a administradores', 'error');
-      setTimeout(function() { window.location.href = '/'; }, 2000);
+      setTimeout(function() { window.location.href = hub.config.basePath + '/'; }, 2000);
       return;
     }
     document.getElementById('app-view').style.display = 'block';
