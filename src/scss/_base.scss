@@ -1,0 +1,129 @@
+// =============================================================================
+// BASE - Resets, body, layout scaffolding, loader
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Liferay resets
+// ---------------------------------------------------------------------------
+.control-menu,
+.portlet-topper,
+.portlet-header {
+  display: none !important;
+}
+
+#wrapper {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.portlet-body {
+  padding: 0 !important;
+}
+
+.portlet-content {
+  padding: 0 !important;
+}
+
+.portlet-borderless-container {
+  margin: 0 !important;
+}
+
+// ---------------------------------------------------------------------------
+// Body
+// ---------------------------------------------------------------------------
+body {
+  background-color: #f8f9fa;
+  color: var(--dark);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ---------------------------------------------------------------------------
+// App shell
+// ---------------------------------------------------------------------------
+.hub-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// ---------------------------------------------------------------------------
+// Main content area
+// ---------------------------------------------------------------------------
+.hub-content {
+  flex: 1;
+  padding: $spacing-sm;
+  margin-left: $sidebar-width;
+  transition: $transition-cubic;
+
+  @media (max-width: $breakpoint-md - 1px) {
+    margin-left: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Page header
+// ---------------------------------------------------------------------------
+.hub-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.hub-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--verdee);
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Loader
+// ---------------------------------------------------------------------------
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba($color-white, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: $z-loader;
+
+  .spinner-border {
+    color: var(--turq);
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Selection color
+// ---------------------------------------------------------------------------
+::selection {
+  background-color: $color-turq;
+  color: $color-white;
+}
+
+::-moz-selection {
+  background-color: $color-turq;
+  color: $color-white;
+}
+
+// ---------------------------------------------------------------------------
+// Links
+// ---------------------------------------------------------------------------
+a {
+  color: var(--turq);
+  transition: $transition-fast;
+
+  &:hover {
+    color: #008c7e;
+  }
+}

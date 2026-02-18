@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-page="mesas">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <title>Mesas - Hub Marketing Sicoob</title>
+</head>
+<body>
+  <div id="hub-nav"></div>
+  <main class="acland hub-content">
+    <div id="loader"><div class="spinner-border" role="status"></div></div>
+    <div id="app-view" style="display:none;">
+      <div class="hub-page-header">
+        <h1 class="hub-page-title"><i class="fa-solid fa-chair"></i> Mesas</h1>
+        <div id="user-logged-container">
+          <button class="btn btn-sm btn-outline-primary" id="open-login-btn" style="display:none;">Fazer Login</button>
+        </div>
+      </div>
+
+      <!-- Top row: Date selector + Suggestion -->
+      <div class="row mb-3">
+        <div class="col-md-7">
+          <div class="hub-card p-3">
+            <h6 class="mb-2"><i class="fa-solid fa-calendar-days"></i> Selecionar Data</h6>
+            <div id="date-selector" class="d-flex gap-2 flex-wrap"></div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="hub-card hub-suggestion-card h-100 d-flex flex-column justify-content-between p-3" id="suggestion-card">
+            <h6 class="mb-2"><i class="fa-solid fa-lightbulb"></i> Mesa Sugerida</h6>
+            <div id="suggestion-content">Carregando...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desk grid header -->
+      <div class="hub-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="m-0"><i class="fa-solid fa-grip"></i> Mesas - <span id="selected-date-display"></span></h6>
+          <span class="hub-badge bg-turq text-white" id="free-count-badge">0 Livres</span>
+        </div>
+        <div id="desk-grid"></div>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/mesas.js"></script>
+</body>
+</html>

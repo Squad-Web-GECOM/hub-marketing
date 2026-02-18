@@ -1,0 +1,210 @@
+// =============================================================================
+// MESAS - Desk grid, desk cards, date selector, suggestion, print styles
+// ALL SOLID COLORS - NO gradients.
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Desk grid
+// ---------------------------------------------------------------------------
+#desk-grid {
+  display: grid;
+  grid-template-columns: repeat($desk-grid-cols, $desk-col-width);
+  grid-template-rows: $desk-row-height $desk-row-height $desk-corridor-height
+                      $desk-row-height $desk-row-height $desk-corridor-height
+                      $desk-row-height $desk-row-height;
+  gap: 1rem;
+  overflow: auto;
+  padding: 1.5rem;
+  background-color: $color-gray-100;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+  max-height: 80vh;
+  cursor: grab;
+  border-radius: $radius-md;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  // When grid contains a table (list view)
+  &:has(table) {
+    display: block;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+// Scrollbar do desk-grid: herdada do _scrollbar.scss global (turq, thin, rounded)
+
+// ---------------------------------------------------------------------------
+// Mobile grid
+// ---------------------------------------------------------------------------
+@media (max-width: $breakpoint-md - 1px) {
+  #desk-grid {
+    grid-template-columns: repeat($desk-grid-cols, $desk-col-width-mobile);
+    grid-template-rows: $desk-row-height-mobile $desk-row-height-mobile $desk-corridor-height
+                        $desk-row-height-mobile $desk-row-height-mobile $desk-corridor-height
+                        $desk-row-height-mobile $desk-row-height-mobile;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Desk card base
+// ---------------------------------------------------------------------------
+.desk-card {
+  border-radius: $radius-sm;
+  border: 2px solid $color-gray-300;
+  transition: $transition-cubic;
+  animation: fadeIn 0.3s ease-out both;
+  overflow: hidden;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    text-align: center;
+    height: 100%;
+  }
+
+  .card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    color: $color-verdee;
+  }
+
+  // Buttons inside desk cards
+  .btn {
+    font-size: 0.875rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background-color: var(--turq);
+    border-color: var(--turq);
+    color: $color-white;
+    background-image: none;
+
+    &:hover {
+      background-color: #008c7e;
+      border-color: #008c7e;
+      background-image: none;
+    }
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: $color-white;
+    background-image: none;
+
+    &:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+      background-image: none;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Desk card states
+// ---------------------------------------------------------------------------
+.desk-card.available {
+  border: 2px solid var(--turq);
+  background-color: var(--turq-200);
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+    transform: translateY(-4px);
+  }
+}
+
+.desk-card.occupied {
+  background-color: $color-gray-100;
+  border-color: $color-gray-300;
+}
+
+.desk-card.my-reservation {
+  border: 2px solid var(--turq);
+  background-color: var(--turq); // SOLID, no gradient
+  color: $color-white;
+
+  .card-title {
+    color: $color-white;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Date selector buttons
+// ---------------------------------------------------------------------------
+.date-selector-btn {
+  transition: $transition-fast;
+
+  &.active {
+    background-color: var(--turq); // SOLID, no gradient
+    border-color: var(--turq);
+    color: $color-white;
+    background-image: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Suggestion card
+// ---------------------------------------------------------------------------
+.hub-suggestion-card {
+  background-color: var(--turq-200);
+  border: 2px solid var(--turq);
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+}
+
+// ---------------------------------------------------------------------------
+// Free count badge
+// ---------------------------------------------------------------------------
+.hub-free-count {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba($color-turq, 0.1);
+  color: var(--turq);
+  padding: 0.25rem 0.75rem;
+  border-radius: $radius-pill;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+// ---------------------------------------------------------------------------
+// Print styles
+// ---------------------------------------------------------------------------
+@media print {
+  .hub-sidebar,
+  .hub-hamburger,
+  .hub-sidebar-overlay,
+  #toast-stack,
+  .hub-filter-bar,
+  .hub-page-header .btn {
+    display: none !important;
+  }
+
+  .hub-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  #desk-grid {
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .desk-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid $color-gray-400;
+  }
+}

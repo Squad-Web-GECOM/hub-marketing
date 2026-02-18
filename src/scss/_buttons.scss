@@ -1,0 +1,104 @@
+// =============================================================================
+// BUTTONS - All solid colors, NO gradients. Wrapped in .acland for sicoob-styles.
+// =============================================================================
+
+.acland .btn {
+  border-radius: $radius-sm;
+  font-weight: 600;
+  transition: $transition-fast;
+  letter-spacing: 0.3px;
+}
+
+// ---------------------------------------------------------------------------
+// Primary - solid turquoise
+// ---------------------------------------------------------------------------
+.acland .btn-primary {
+  background-color: var(--turq);
+  border-color: var(--turq);
+  color: $color-white;
+  background-image: none;
+
+  &:hover,
+  &:focus {
+    background-color: #008c7e;
+    border-color: #008c7e;
+    color: $color-white;
+    background-image: none;
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: #007a6e;
+    border-color: #007a6e;
+    background-image: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Secondary
+// ---------------------------------------------------------------------------
+.acland .btn-secondary {
+  background-color: $color-gray-100;
+  color: $color-gray-700;
+  border: 2px solid $color-gray-300;
+  background-image: none;
+
+  &:hover,
+  &:focus {
+    background-color: $color-gray-200;
+    color: $color-gray-700;
+    background-image: none;
+    box-shadow: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Outline primary
+// ---------------------------------------------------------------------------
+.acland .btn-outline-primary {
+  border: 2px solid var(--turq);
+  color: var(--turq);
+  background-color: transparent;
+
+  &:hover,
+  &:focus {
+    background-color: var(--turq);
+    color: $color-white;
+    box-shadow: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Danger
+// ---------------------------------------------------------------------------
+.acland .btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: $color-white;
+  background-image: none;
+
+  &:hover,
+  &:focus {
+    background-color: #c82333;
+    border-color: #c82333;
+    background-image: none;
+    box-shadow: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Size: small
+// ---------------------------------------------------------------------------
+.acland .btn-sm {
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.75rem;
+}
+
+// ---------------------------------------------------------------------------
+// Icon button
+// ---------------------------------------------------------------------------
+.acland .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-page="formularios">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <title>Formulários - Hub Marketing Sicoob</title>
+</head>
+<body>
+  <div id="hub-nav"></div>
+  <main class="acland hub-content">
+    <div id="loader"><div class="spinner-border" role="status"></div></div>
+
+    <div id="app-view" style="display:none;">
+      <div class="hub-page-header">
+        <h1 class="hub-page-title"><i class="fa-solid fa-file-lines"></i> Formulários</h1>
+      </div>
+
+      <!-- Search bar -->
+      <div class="hub-filter-bar">
+        <div class="hub-filter-group" style="flex:1; max-width:400px;">
+          <div class="hub-search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="form-control" id="filter-search" placeholder="Buscar formulário...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Forms grid -->
+      <div class="row" id="forms-grid"></div>
+
+      <!-- Empty state -->
+      <div class="hub-empty-state d-none" id="empty-state">
+        <i class="fa-solid fa-file-circle-question"></i>
+        <p>Nenhum formulário encontrado</p>
+      </div>
+    </div>
+
+    <!-- Detail modal -->
+    <div class="hub-modal-overlay" id="detail-modal-overlay">
+      <div class="hub-modal">
+        <div class="hub-modal-header">
+          <h4 id="detail-modal-title">Detalhes</h4>
+          <button class="hub-modal-close" onclick="document.getElementById('detail-modal-overlay').classList.remove('show')">&times;</button>
+        </div>
+        <div class="hub-modal-body" id="detail-modal-body"></div>
+        <div class="hub-modal-footer">
+          <a href="#" class="btn btn-primary" id="detail-modal-link" target="_blank">
+            <i class="fa-solid fa-external-link"></i> Abrir Formulário
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/formularios.js"></script>
+</body>
+</html>

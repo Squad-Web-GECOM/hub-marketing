@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-page="squads">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <title>Squads - Hub Marketing Sicoob</title>
+</head>
+<body>
+  <div id="hub-nav"></div>
+  <main class="acland hub-content">
+    <div id="loader">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div id="app-view" style="display:none;">
+      <!-- Page header -->
+      <div class="hub-page-header">
+        <h1 class="hub-page-title"><i class="fa-solid fa-layer-group"></i> Squads</h1>
+      </div>
+
+      <!-- Search bar -->
+      <div class="hub-filter-bar">
+        <div class="hub-filter-group" style="flex:2;">
+          <label>Buscar</label>
+          <div class="hub-search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="form-control" id="filter-search" placeholder="Nome do squad, descricao ou membro...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Category filter buttons -->
+      <div class="mb-3" style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+        <div id="category-buttons" class="d-flex flex-nowrap" style="gap:0.5rem; padding-bottom:4px;">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+
+      <!-- Results count -->
+      <div class="mb-3 text-muted" id="results-count"></div>
+
+      <!-- Squads grid -->
+      <div id="squads-grid" class="row">
+        <!-- Cards rendered by JS -->
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="text-center py-5" style="display:none;">
+        <div class="mb-3">
+          <i class="fa-solid fa-magnifying-glass fa-3x text-muted"></i>
+        </div>
+        <h5 class="text-muted">Nenhum squad encontrado</h5>
+        <p class="text-muted">Tente buscar por outro nome ou categoria.</p>
+        <button class="btn btn-sm btn-outline-primary" id="btn-clear-filters">Limpar filtros</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/squads.js"></script>
+</body>
+</html>

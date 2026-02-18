@@ -1,0 +1,296 @@
+// =============================================================================
+// MODALS - Login overlay/modal + generic hub modals. NO gradients.
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Login overlay
+// ---------------------------------------------------------------------------
+#login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: $z-modal;
+  backdrop-filter: blur(5px);
+
+  &.show {
+    display: flex !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Login modal
+// Estrutura gerada pelo main.js: #login-modal > .modal-icon, h3, .subtitle,
+// #choice-step > .login-choice-buttons > .login-choice-btn
+// inputs soltos, .btn-group > .btn-action.btn-primary/.btn-secondary
+// .alert-box.alert-error/.alert-success
+// ---------------------------------------------------------------------------
+#login-modal {
+  background: $color-white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: $shadow-modal;
+  text-align: center;
+  width: 90%;
+  max-width: 480px;
+  animation: modalFadeIn 0.3s ease-out;
+
+  // Ícone de cadeado no topo
+  .modal-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    display: inline-block;
+    transition: $transition-fast;
+    user-select: none;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  h3 {
+    color: var(--verdee);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: $color-gray-600;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  // Inputs soltos (em steps de username/código)
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    margin-bottom: 0.5rem;
+    border: 2px solid $color-gray-300;
+    border-radius: $radius-sm;
+    font-size: 1rem;
+    transition: $transition-fast;
+    outline: none;
+
+    &:focus {
+      border-color: var(--turq);
+      box-shadow: 0 0 0 3px rgba($color-turq, 0.1);
+    }
+
+    &::placeholder {
+      color: $color-gray-400;
+    }
+  }
+
+  // Grupo de botões (Voltar + Continuar/Entrar)
+  .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  button.btn-action {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: $transition-fast;
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  button.btn-primary {
+    background-color: var(--turq);
+    color: $color-white;
+
+    &:hover {
+      background-color: #008c7e;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($color-turq, 0.3);
+    }
+  }
+
+  button.btn-secondary {
+    background: $color-gray-100;
+    color: $color-gray-700;
+    border: 2px solid $color-gray-200;
+
+    &:hover {
+      background: $color-gray-200;
+    }
+  }
+
+  // Botão cancelar (width: 100% via inline)
+  #cancel-choice-btn {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  // Botões de escolha de tipo de acesso
+  .login-choice-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .login-choice-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1.1rem 1.25rem;
+    background: $color-white;
+    border: 2px solid $color-gray-200;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: $transition-fast;
+
+    .icon {
+      font-size: 1.4rem;
+    }
+
+    &:hover {
+      border-color: var(--turq);
+      background: rgba($color-turq, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba($color-turq, 0.15);
+    }
+
+    &.sisbr {
+      color: var(--verdee);
+      &:hover {
+        border-color: var(--verdee);
+        background: rgba($color-verdee, 0.05);
+      }
+    }
+
+    &.admin {
+      color: var(--turq);
+    }
+
+    &.external {
+      color: var(--verdem);
+      &:hover {
+        border-color: var(--verdem);
+        background: rgba($color-verdem, 0.05);
+      }
+    }
+  }
+
+  // Alertas de erro/sucesso
+  .alert-box {
+    margin-top: 1rem;
+    display: none;
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    border-radius: $radius-sm;
+    text-align: left;
+  }
+
+  .alert-error {
+    color: #842029;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+  }
+
+  .alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border: 1px solid #badbcc;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Generic hub modal
+// ---------------------------------------------------------------------------
+.hub-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: $z-modal;
+  backdrop-filter: blur(5px);
+
+  &.show {
+    display: flex !important;
+  }
+}
+
+.hub-modal {
+  background: $color-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-modal;
+  max-width: 600px;
+  width: 90%;
+  // Altura máxima com margem de respiro — conteúdo longo rola internamente
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.hub-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm;
+  border-bottom: 1px solid $color-gray-200;
+  // Header fixo no topo — não rola
+  flex-shrink: 0;
+}
+
+.hub-modal-body {
+  padding: $spacing-sm;
+  // Scroll interno — header e footer ficam fixos
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  // Scroll sempre começa do topo (controlado pelo JS ao abrir)
+  scroll-behavior: smooth;
+}
+
+.hub-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-nano;
+  padding: $spacing-xs $spacing-sm;
+  border-top: 1px solid $color-gray-200;
+  // Footer fixo na base — não rola
+  flex-shrink: 0;
+}
+
+.hub-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: $color-gray-500;
+  line-height: 1;
+  padding: 0;
+
+  &:hover {
+    color: $color-gray-900;
+  }
+}

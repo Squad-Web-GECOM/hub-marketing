@@ -1,0 +1,57 @@
+// =============================================================================
+// SCROLLBAR - Personalização global da barra de rolagem
+// Aplica em todos os elementos com scroll: body, modais, tabelas, desk-grid
+// Usando apenas variáveis do sicoob-styles
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Webkit (Chrome, Edge, Safari) — scrollbar global
+// ---------------------------------------------------------------------------
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 174, 157, 0.4); // var(--turq) com 40% opacidade
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--turq);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+// ---------------------------------------------------------------------------
+// Firefox — scrollbar global (suporte limitado, mas funciona em FF 64+)
+// ---------------------------------------------------------------------------
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 174, 157, 0.4) transparent;
+}
+
+// ---------------------------------------------------------------------------
+// Dark mode — polpa da scrollbar um pouco mais visível no fundo escuro
+// ---------------------------------------------------------------------------
+[data-theme="dark"] {
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 174, 157, 0.35);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--persian-green-400); // #1de4c9 — mais claro no dark
+  }
+
+  * {
+    scrollbar-color: rgba(0, 174, 157, 0.35) transparent;
+  }
+}

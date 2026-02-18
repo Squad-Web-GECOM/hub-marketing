@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-page="usuarios">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <title>Usuarios - Hub Marketing Sicoob</title>
+</head>
+<body>
+  <div id="hub-nav"></div>
+  <main class="acland hub-content">
+    <div id="loader">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div id="app-view" style="display:none;">
+      <!-- Page header with title + copy emails button -->
+      <div class="hub-page-header">
+        <h1 class="hub-page-title"><i class="fa-solid fa-user-group"></i> Usuarios</h1>
+        <div>
+          <button class="btn btn-sm btn-outline-primary btn-icon" id="btn-copy-emails">
+            <i class="fa-solid fa-copy"></i> Copiar Emails
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile complete banner (shown if user hasn't completed profile) -->
+      <div id="profile-banner" class="alert alert-warning d-none" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <strong>Complete seu cadastro!</strong> Selecione sua gerencia, coordenacao e nucleo.
+        <button class="btn btn-sm btn-warning ml-2" id="btn-complete-profile">Completar agora</button>
+      </div>
+
+      <!-- Filters bar -->
+      <div class="hub-filter-bar">
+        <div class="hub-filter-group" style="flex:2;">
+          <label>Buscar</label>
+          <div class="hub-search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="form-control" id="filter-search" placeholder="Nome, apelido ou email...">
+          </div>
+        </div>
+        <div class="hub-filter-group">
+          <label>Gerencia</label>
+          <select class="form-control" id="filter-gerencia">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="hub-filter-group">
+          <label>Coordenacao</label>
+          <select class="form-control" id="filter-coordenacao">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="hub-filter-group">
+          <label>Nucleo</label>
+          <select class="form-control" id="filter-nucleo">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="hub-filter-group">
+          <label>Bairro</label>
+          <select class="form-control" id="filter-bairro">
+            <option value="">Todos</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Users table -->
+      <div class="hub-table-wrapper">
+        <table class="hub-table table">
+          <thead>
+            <tr>
+              <th data-sort="nome">Nome <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="apelido">Apelido <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="user_name">Usuario <i class="fa-solid fa-sort"></i></th>
+              <th>Gerencia</th>
+              <th>Coordenacao</th>
+              <th>Nucleo</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th data-sort="data_nascimento">Aniversario <i class="fa-solid fa-sort"></i></th>
+              <th>Endereco</th>
+              <th data-sort="bairro">Bairro <i class="fa-solid fa-sort"></i></th>
+              <th>Terceirizado</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Results count -->
+      <div class="mt-2 text-muted" id="results-count"></div>
+    </div>
+
+    <!-- Profile Complete Modal -->
+    <div class="hub-modal-overlay" id="profile-modal-overlay">
+      <div class="hub-modal">
+        <div class="hub-modal-header">
+          <h4>Complete seu Cadastro</h4>
+          <button class="hub-modal-close" onclick="document.getElementById('profile-modal-overlay').classList.remove('show')">&times;</button>
+        </div>
+        <div class="hub-modal-body">
+          <div class="form-group">
+            <label class="form-label">Gerencia</label>
+            <select class="form-control" id="profile-gerencia"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Coordenacao</label>
+            <select class="form-control" id="profile-coordenacao"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nucleo</label>
+            <select class="form-control" id="profile-nucleo">
+              <option value="">Nenhum (ainda nao definido)</option>
+            </select>
+          </div>
+        </div>
+        <div class="hub-modal-footer">
+          <button class="btn btn-secondary" onclick="document.getElementById('profile-modal-overlay').classList.remove('show')">Depois</button>
+          <button class="btn btn-primary" id="btn-save-profile">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/usuarios.js"></script>
+</body>
+</html>

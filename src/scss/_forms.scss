@@ -1,0 +1,73 @@
+// =============================================================================
+// FORMS - Labels, inputs, selects, search box, filter bar
+// =============================================================================
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--verdee);
+}
+
+.form-select,
+.form-control {
+  border: 2px solid $color-gray-300;
+  border-radius: $radius-sm;
+  padding: 0.5rem 1rem;
+  transition: $transition-fast;
+
+  &:focus {
+    border-color: var(--turq);
+    box-shadow: 0 0 0 3px rgba($color-turq, 0.1);
+    outline: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Search box with icon
+// ---------------------------------------------------------------------------
+.hub-search-box {
+  position: relative;
+
+  input {
+    padding-left: 2.5rem;
+  }
+
+  i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $color-gray-500;
+    pointer-events: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Filter bar
+// ---------------------------------------------------------------------------
+.hub-filter-bar {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: $spacing-sm;
+  // Container visual consistente com o dark mode
+  background-color: $color-white;
+  border: 1px solid $color-gray-200;
+  border-radius: $radius-sm;
+  padding: 1rem;
+}
+
+.hub-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $color-gray-600;
+  }
+}

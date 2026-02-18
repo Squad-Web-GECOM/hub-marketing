@@ -1,0 +1,125 @@
+// =============================================================================
+// VARIABLES - Hub Marketing
+// Mapeamento de CSS custom properties do sicoob-styles + SCSS tokens
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Breakpoints
+// -----------------------------------------------------------------------------
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+$breakpoints: (
+  sm: $breakpoint-sm,
+  md: $breakpoint-md,
+  lg: $breakpoint-lg,
+  xl: $breakpoint-xl,
+);
+
+// -----------------------------------------------------------------------------
+// Z-Index Scale
+// -----------------------------------------------------------------------------
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-sidebar: 400;
+$z-modal-backdrop: 500;
+$z-modal: 600;
+$z-toast: 700;
+$z-loader: 9999;
+
+// -----------------------------------------------------------------------------
+// Sidebar
+// -----------------------------------------------------------------------------
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 0px;
+
+// -----------------------------------------------------------------------------
+// Desk Grid
+// -----------------------------------------------------------------------------
+$desk-grid-cols: 8;
+$desk-col-width: 160px;
+$desk-col-width-mobile: 140px;
+$desk-row-height: 140px;
+$desk-row-height-mobile: 130px;
+$desk-corridor-height: 2rem;
+
+// -----------------------------------------------------------------------------
+// SCSS color aliases (for use in Sass functions like rgba, darken, etc.)
+// For direct CSS output, always prefer var(--turq), var(--verdee), etc.
+// -----------------------------------------------------------------------------
+$color-turq: #00ae9d;
+$color-verdee: #003641;
+$color-verdem: #7db61c;
+$color-verdec: #c9d200;
+$color-roxo: #49479d;
+
+// Neutrals (for Sass calculations only)
+$color-white: #ffffff;
+$color-gray-100: #f8f9fa;
+$color-gray-200: #e9ecef;
+$color-gray-300: #dee2e6;
+$color-gray-400: #ced4da;
+$color-gray-500: #adb5bd;
+$color-gray-600: #6c757d;
+$color-gray-700: #495057;
+$color-gray-800: #343a40;
+$color-gray-900: #212529;
+
+// -----------------------------------------------------------------------------
+// Typography helpers
+// -----------------------------------------------------------------------------
+$font-family-base: var(--font-sans);
+$font-size-xs: var(--font-size-xs);
+$font-size-sm: var(--font-size-sm);
+$font-size-md: var(--font-size-md);
+$font-size-lg: var(--font-size-lg);
+$font-size-xl: var(--font-size-xl);
+
+// -----------------------------------------------------------------------------
+// Spacing helpers (maps to sicoob spacing tokens)
+// -----------------------------------------------------------------------------
+$spacing-quarck: 4px;
+$spacing-nano: 8px;
+$spacing-xs: 16px;
+$spacing-sm: 24px;
+$spacing-md: 32px;
+$spacing-lg: 40px;
+
+// -----------------------------------------------------------------------------
+// Border radius aliases
+// -----------------------------------------------------------------------------
+$radius-xs: var(--border-radius-xs); // 6px
+$radius-sm: var(--border-radius-sm); // 8px
+$radius-md: var(--border-radius-md); // 12px
+$radius-lg: 16px;
+$radius-pill: var(--border-radius-pill); // 1000px
+
+// -----------------------------------------------------------------------------
+// Shadows (use CSS vars in output, SCSS vars for reference)
+// -----------------------------------------------------------------------------
+$shadow-1: var(--box-shadow-1);
+$shadow-2: var(--box-shadow-2);
+$shadow-3: var(--box-shadow-3);
+$shadow-4: var(--box-shadow-4);
+
+// Specific component shadows (Sass-only for rgba usage)
+$shadow-card-hover: 0 8px 24px rgba($color-turq, 0.20);
+$shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.4);
+$shadow-toast: 0 4px 16px rgba(0, 0, 0, 0.15);
+$shadow-header: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+// -----------------------------------------------------------------------------
+// Transitions
+// -----------------------------------------------------------------------------
+$transition-fast: var(--transition-1); // 0.3s
+$transition-normal: var(--transition-2); // 0.5s
+$transition-cubic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// -----------------------------------------------------------------------------
+// Toast widths
+// -----------------------------------------------------------------------------
+$toast-min-width: 300px;
+$toast-max-width: 420px;

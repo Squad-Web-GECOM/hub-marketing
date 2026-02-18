@@ -1,0 +1,77 @@
+// =============================================================================
+// TOASTS - Notification stack, toast variants, exit animation
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Toast stack container
+// ---------------------------------------------------------------------------
+#toast-stack {
+  position: fixed;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  z-index: $z-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-nano;
+}
+
+// ---------------------------------------------------------------------------
+// Base toast
+// ---------------------------------------------------------------------------
+.hub-toast {
+  min-width: $toast-min-width;
+  max-width: $toast-max-width;
+  padding: 1rem 1.25rem;
+  border-radius: $radius-sm;
+  box-shadow: $shadow-toast;
+  animation: fadeIn 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Toast variants
+// ---------------------------------------------------------------------------
+.hub-toast-success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.hub-toast-error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+  color: #721c24;
+}
+
+.hub-toast-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffecb5;
+  color: #856404;
+}
+
+.hub-toast-info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+// ---------------------------------------------------------------------------
+// Exit animation
+// ---------------------------------------------------------------------------
+.hub-toast-exit {
+  animation: fadeOut 0.3s ease-in forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+}

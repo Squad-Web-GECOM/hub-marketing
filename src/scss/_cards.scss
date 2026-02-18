@@ -1,0 +1,162 @@
+// =============================================================================
+// CARDS - Hub card components, stat cards
+// =============================================================================
+
+.hub-card {
+  background-color: $color-white;
+  border-radius: $radius-md;
+  box-shadow: $shadow-1;
+  border: none;
+  overflow: hidden;
+  transition: $transition-cubic;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+    transform: translateY(-2px);
+  }
+}
+
+.hub-card-header {
+  padding: $spacing-xs $spacing-sm;
+  border-bottom: 1px solid $color-gray-200;
+}
+
+.hub-card-body {
+  padding: $spacing-sm;
+}
+
+.hub-card-footer {
+  padding: $spacing-xs $spacing-sm;
+  border-top: 1px solid $color-gray-200;
+  background-color: $color-gray-100;
+}
+
+// ---------------------------------------------------------------------------
+// Stat card — home page, 3 colunas
+// ---------------------------------------------------------------------------
+.hub-stat-card {
+  padding: $spacing-sm $spacing-sm $spacing-sm calc(#{$spacing-sm} + 4px);
+  border-left: 4px solid transparent; // cor injetada inline pelo JS
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  text-decoration: none;
+  color: inherit;
+
+  .stat-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.35rem;
+    // cor de fundo injetada inline
+  }
+
+  .stat-body {
+    min-width: 0;
+
+    .stat-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: $color-gray-500;
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: $color-gray-900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--turq);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: $color-gray-600;
+  }
+
+  .stat-icon {
+    font-size: 1.5rem;
+    color: var(--turq);
+    margin-bottom: $spacing-nano;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Link card — quick links da home
+// ---------------------------------------------------------------------------
+.hub-link-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-nano;
+  padding: $spacing-xs $spacing-sm;
+  text-decoration: none;
+  color: inherit;
+  border-radius: $radius-md;
+  background-color: $color-white;
+  box-shadow: $shadow-1;
+  transition: $transition-cubic;
+  overflow: hidden;
+
+  &:hover {
+    text-decoration: none;
+    color: inherit;
+    box-shadow: $shadow-card-hover;
+    transform: translateY(-2px);
+  }
+
+  .link-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-xs;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+
+  .link-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $color-gray-800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .link-arrow {
+    color: $color-gray-400;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Card link wrapper
+// ---------------------------------------------------------------------------
+.hub-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+
+  &:hover {
+    text-decoration: none;
+    color: inherit;
+  }
+}

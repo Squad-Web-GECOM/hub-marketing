@@ -45,7 +45,7 @@
   
   const EXTERNAL_USERS = [
     'guilherme.duarte', 'lara.pacheco', 'jonathan.araujo',
-    'fabiola.souza', 'guilherme.rezende', 'pedrov.rodrigues'
+    'fabiola.souza', 'guilherme.rezende', 'danillo.neves'
   ];
 
   // ============================================================================

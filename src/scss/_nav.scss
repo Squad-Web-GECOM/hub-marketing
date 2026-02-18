@@ -1,0 +1,325 @@
+// =============================================================================
+// NAV - Sidebar navigation, hamburger, overlay
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Sidebar
+// ---------------------------------------------------------------------------
+.hub-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: $sidebar-width;
+  height: 100vh;
+  background-color: var(--verdee);
+  color: $color-white;
+  z-index: $z-sidebar;
+  overflow-y: auto;
+  transition: $transition-cubic;
+  display: flex;
+  flex-direction: column;
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar header
+// ---------------------------------------------------------------------------
+.hub-sidebar-header {
+  padding: $spacing-sm;
+  border-bottom: 1px solid rgba($color-white, 0.1);
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: $color-white;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar navigation
+// ---------------------------------------------------------------------------
+.hub-sidebar-nav {
+  flex: 1;
+  padding: $spacing-nano 0;
+  list-style: none;
+  margin: 0;
+
+  li a {
+    display: flex;
+    align-items: center;
+    gap: $spacing-nano;
+    padding: $spacing-nano $spacing-sm;
+    color: rgba($color-white, 0.7);
+    text-decoration: none;
+    transition: $transition-fast;
+    border-left: 3px solid transparent;
+
+    &:hover {
+      color: $color-white;
+      background-color: rgba($color-white, 0.05);
+      border-left-color: var(--turq);
+      text-decoration: none;
+    }
+
+    &.active {
+      color: $color-white;
+      background-color: rgba($color-white, 0.1);
+      border-left-color: var(--turq);
+      font-weight: 600;
+    }
+
+    i {
+      width: 20px;
+      text-align: center;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar footer
+// ---------------------------------------------------------------------------
+.hub-sidebar-footer {
+  padding: $spacing-sm;
+  border-top: 1px solid rgba($color-white, 0.1);
+}
+
+// ---------------------------------------------------------------------------
+// User info
+// ---------------------------------------------------------------------------
+.hub-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: $spacing-nano;
+  margin-bottom: $spacing-nano;
+
+  .user-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .user-username {
+    font-size: 0.7rem;
+    color: rgba($color-white, 0.5);
+    letter-spacing: 0.01em;
+  }
+
+  .user-role {
+    font-size: 0.75rem;
+    color: rgba($color-white, 0.6);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar action buttons
+// ---------------------------------------------------------------------------
+.hub-sidebar-actions {
+  display: flex;
+  gap: $spacing-nano;
+
+  button {
+    background: transparent;
+    border: none;
+    color: rgba($color-white, 0.6);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: $radius-xs;
+    transition: $transition-fast;
+
+    &:hover {
+      color: $color-white;
+      background-color: rgba($color-white, 0.1);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hamburger (mobile)
+// ---------------------------------------------------------------------------
+.hub-hamburger {
+  display: none;
+  position: fixed;
+  top: $spacing-nano;
+  left: $spacing-nano;
+  z-index: $z-sidebar + 1;
+  background-color: var(--verdee);
+  color: $color-white;
+  border: none;
+  border-radius: $radius-sm;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+
+  @media (max-width: $breakpoint-md - 1px) {
+    display: flex;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Overlay (mobile)
+// ---------------------------------------------------------------------------
+.hub-sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: $z-sidebar - 1;
+
+  &.show {
+    display: block;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Admin tabs wrapper — scroll horizontal em telas pequenas
+// ---------------------------------------------------------------------------
+.admin-tabs-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  // Esconde scrollbar mas mantém funcionalidade
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  #admin-tabs {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+
+    .nav-item {
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar collapse button (desktop) — fecha/abre sidebar pelo botão no topo
+// ---------------------------------------------------------------------------
+.hub-sidebar-collapse {
+  display: none; // visível apenas em desktop via media query abaixo
+  background: transparent;
+  border: none;
+  color: rgba($color-white, 0.6);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: $radius-xs;
+  transition: $transition-fast;
+  font-size: 1rem;
+
+  &:hover {
+    color: $color-white;
+    background-color: rgba($color-white, 0.1);
+  }
+
+  @media (min-width: $breakpoint-md) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Sidebar colapsada (desktop)
+.hub-sidebar.collapsed {
+  width: 60px;
+
+  .hub-sidebar-nav li a span,
+  .hub-sidebar-header h2 span,
+  .hub-sidebar-footer .hub-sidebar-user,
+  .hub-sidebar-footer .hub-sidebar-actions button:not(.btn-theme-toggle):not([onclick*="logout"]),
+  .hub-sidebar-footer .btn {
+    display: none;
+  }
+
+  .hub-sidebar-nav li a {
+    justify-content: center;
+    padding: $spacing-nano;
+
+    i {
+      width: auto;
+    }
+  }
+
+  .hub-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-nano;
+  }
+
+  .hub-sidebar-footer {
+    padding: $spacing-nano;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-nano;
+  }
+
+  .hub-sidebar-actions {
+    flex-direction: column;
+  }
+}
+
+// Content shift quando sidebar está colapsada
+.hub-content.sidebar-collapsed {
+  @media (min-width: $breakpoint-md) {
+    margin-left: 60px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Admin tabs (#admin-tabs) — nav-pills com container visual
+// Mesmo tratamento visual do dark mode, apenas cores diferentes
+// ---------------------------------------------------------------------------
+#admin-tabs {
+  background-color: $color-gray-100;
+  border-radius: $radius-sm;
+  padding: 0.35rem;
+
+  .nav-link {
+    color: $color-gray-700;
+    border-radius: $radius-xs;
+    font-size: 0.85rem;
+
+    i {
+      color: $color-gray-500;
+    }
+
+    &:hover {
+      background-color: rgba($color-turq, 0.08);
+      color: var(--verdee);
+
+      i {
+        color: var(--turq);
+      }
+    }
+
+    &.active {
+      background-color: var(--turq);
+      color: $color-white;
+
+      i {
+        color: $color-white;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mobile responsive
+// ---------------------------------------------------------------------------
+@media (max-width: $breakpoint-md - 1px) {
+  .hub-sidebar {
+    transform: translateX(-100%);
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+
+  .hub-content {
+    margin-left: 0;
+  }
+}

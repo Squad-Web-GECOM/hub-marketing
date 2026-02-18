@@ -1,0 +1,149 @@
+// =============================================================================
+// UTILITIES - Gaps, text helpers, badges, colors, dividers, empty states
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Gap utilities
+// ---------------------------------------------------------------------------
+.gap-1 { gap: $spacing-quarck; }
+.gap-2 { gap: $spacing-nano; }
+.gap-3 { gap: $spacing-xs; }
+.gap-4 { gap: $spacing-sm; }
+
+// ---------------------------------------------------------------------------
+// Text utilities
+// ---------------------------------------------------------------------------
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ---------------------------------------------------------------------------
+// Color backgrounds
+// ---------------------------------------------------------------------------
+.bg-turq-50 {
+  background-color: rgba($color-turq, 0.05);
+}
+
+.bg-turq-100 {
+  background-color: rgba($color-turq, 0.1);
+}
+
+.bg-turq-200 {
+  background-color: rgba($color-turq, 0.15);
+}
+
+// ---------------------------------------------------------------------------
+// Text colors
+// ---------------------------------------------------------------------------
+.text-turq {
+  color: var(--turq);
+}
+
+.text-verdee {
+  color: var(--verdee);
+}
+
+.text-verdem {
+  color: var(--verdem);
+}
+
+// ---------------------------------------------------------------------------
+// Border
+// ---------------------------------------------------------------------------
+.border-turq {
+  border-color: var(--turq) !important;
+}
+
+// ---------------------------------------------------------------------------
+// Border radius
+// ---------------------------------------------------------------------------
+.rounded-xs { border-radius: $radius-xs; }
+.rounded-sm { border-radius: $radius-sm; }
+.rounded-md { border-radius: $radius-md; }
+.rounded-lg { border-radius: $radius-lg; }
+
+// ---------------------------------------------------------------------------
+// Badges
+// ---------------------------------------------------------------------------
+.hub-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: $radius-pill;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hub-badge-primary {
+  background-color: rgba($color-turq, 0.1);
+  color: var(--turq);
+}
+
+.hub-badge-success {
+  background-color: var(--lima-50);
+  color: var(--lima-700);
+}
+
+.hub-badge-warning {
+  background-color: var(--sunshade-50);
+  color: var(--sunshade-700);
+}
+
+.hub-badge-danger {
+  background-color: var(--violet-red-50);
+  color: var(--violet-red-700);
+}
+
+// ---------------------------------------------------------------------------
+// Divider (linha separadora simples)
+// ---------------------------------------------------------------------------
+.hub-divider {
+  height: 1px;
+  background-color: $color-gray-200;
+  margin: $spacing-xs 0;
+}
+
+// ---------------------------------------------------------------------------
+// Section title (substitui h5.hub-divider nas seções da home)
+// Exibe o texto do título + linha decorativa abaixo, sem virar uma linha fina
+// ---------------------------------------------------------------------------
+.hub-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--verdee);
+  margin: 0 0 $spacing-nano 0;
+  padding-bottom: $spacing-nano;
+  border-bottom: 2px solid $color-gray-200;
+  display: block;
+}
+
+// ---------------------------------------------------------------------------
+// Empty state
+// ---------------------------------------------------------------------------
+.hub-empty-state {
+  text-align: center;
+  padding: $spacing-lg;
+  color: $color-gray-500;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: $spacing-xs;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cursor and interaction
+// ---------------------------------------------------------------------------
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.no-select {
+  user-select: none;
+}

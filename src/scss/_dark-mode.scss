@@ -1,0 +1,510 @@
+// =============================================================================
+// DARK MODE - [data-theme="dark"] overrides para todos os componentes
+//
+// PALETA USADA — apenas variáveis do sicoob-styles:
+//   Fundo body:    var(--athens-gray-950)  = #22272f
+//   Superfície:    var(--athens-gray-900)  = #343a46
+//   Elevação:      var(--athens-gray-800)  = #3a4452
+//   Borda:         var(--athens-gray-700)  = #434e61
+//   Sidebar:       var(--cyprus-900)       = #002a33
+//   Texto primário:  var(--mine-shaft-50)  = #ffffff
+//   Texto secundário: var(--athens-gray-300) = #b1bbc8
+//   Texto muted:   var(--athens-gray-400)  = #8695aa
+//   Acento turq:   var(--turq)             = #00ae9d
+//   Acento claro:  var(--persian-green-400) = #1de4c9
+// =============================================================================
+
+[data-theme="dark"] {
+
+  // -------------------------------------------------------------------------
+  // Body e layout base
+  // -------------------------------------------------------------------------
+  body {
+    background-color: var(--athens-gray-950);
+    color: var(--mine-shaft-50);
+  }
+
+  .hub-content {
+    background-color: var(--athens-gray-950);
+  }
+
+  // -------------------------------------------------------------------------
+  // Headings — sobrescreve color: var(--verdee) que fica ilegível no escuro
+  // -------------------------------------------------------------------------
+  .hub-page-title,
+  .hub-section-title,
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--mine-shaft-50);
+  }
+
+  // Parágrafos e texto corrido dentro de cards
+  p {
+    color: var(--athens-gray-300);
+  }
+
+  // -------------------------------------------------------------------------
+  // Cards — fundo elevado, borda sutil, texto claro
+  // -------------------------------------------------------------------------
+  .hub-card,
+  .card {
+    background-color: var(--athens-gray-900);
+    border-color: var(--athens-gray-700);
+    color: var(--mine-shaft-50);
+
+    // Parágrafo dentro de card (ex: .hub-card p)
+    p {
+      color: var(--athens-gray-300);
+    }
+  }
+
+  .hub-card-header {
+    border-bottom-color: var(--athens-gray-700);
+    color: var(--mine-shaft-50);
+  }
+
+  .hub-card-body {
+    color: var(--mine-shaft-50);
+
+    // Textos inline com color hardcoded nos cards de squad
+    // Coordenação, membros (gerados por JS com style="color:#495057")
+    // Sobrescrevemos via cascade no nível do body
+  }
+
+  .hub-card-footer {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-top-color: var(--athens-gray-700);
+  }
+
+  // Stat cards (home)
+  .hub-stat-card {
+    .stat-body .stat-value { color: var(--mine-shaft-50); }
+    .stat-body .stat-title { color: var(--athens-gray-400); }
+  }
+
+  // Link cards (quick links)
+  .hub-link-card {
+    background-color: var(--athens-gray-900);
+    color: var(--mine-shaft-50);
+
+    .link-title { color: var(--athens-gray-300); }
+    .link-arrow { color: var(--athens-gray-600); }
+
+    &:hover {
+      color: var(--mine-shaft-50);
+      background-color: var(--athens-gray-800);
+    }
+  }
+
+  // Stat card — título h5 e texto .text-muted internos
+  .hub-stat-card {
+    color: var(--mine-shaft-50);
+
+    h5, h6 {
+      color: var(--mine-shaft-50);
+    }
+
+    .stat-label {
+      color: var(--athens-gray-400);
+    }
+  }
+
+  // Suggestion card (mesas)
+  .hub-suggestion-card {
+    background-color: var(--athens-gray-900);
+    border-color: rgba(0, 174, 157, 0.4); // turq com opacidade
+    color: var(--mine-shaft-50);
+  }
+
+  // Card com .card-title (Bootstrap) — mesas, reservas
+  .card-title {
+    color: var(--mine-shaft-50);
+  }
+
+  // Nome do reservado nas mesas
+  .reserved-name,
+  .desk-occupant {
+    color: var(--athens-gray-300);
+  }
+
+  // -------------------------------------------------------------------------
+  // Tabelas
+  // -------------------------------------------------------------------------
+  .hub-table thead th {
+    background-color: var(--cyprus-900);
+    color: var(--mine-shaft-50);
+  }
+
+  .hub-table tbody td {
+    color: var(--mine-shaft-50);
+    border-bottom-color: var(--athens-gray-700);
+  }
+
+  .hub-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .hub-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+  }
+
+  // -------------------------------------------------------------------------
+  // Formulários — inputs, selects, labels
+  // -------------------------------------------------------------------------
+  .form-control,
+  .form-select,
+  select.form-control,
+  input.form-control,
+  textarea.form-control {
+    background-color: var(--athens-gray-900);
+    border-color: var(--athens-gray-700);
+    color: var(--mine-shaft-50);
+
+    &:focus {
+      background-color: var(--athens-gray-800);
+      border-color: var(--turq);
+      color: var(--mine-shaft-50);
+      box-shadow: 0 0 0 3px rgba(0, 174, 157, 0.15);
+    }
+
+    &::placeholder {
+      color: var(--athens-gray-500);
+    }
+  }
+
+  label,
+  .form-label {
+    color: var(--athens-gray-300);
+  }
+
+  // Select options (não estilizados no webkit, mas cobre Firefox)
+  option {
+    background-color: var(--athens-gray-900);
+    color: var(--mine-shaft-50);
+  }
+
+  // -------------------------------------------------------------------------
+  // Login modal — classes alinhadas com o HTML do main.js
+  // -------------------------------------------------------------------------
+  #login-modal {
+    background-color: var(--athens-gray-900);
+    color: var(--mine-shaft-50);
+
+    h3 {
+      color: var(--persian-green-400);
+    }
+
+    .subtitle {
+      color: var(--athens-gray-300);
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      background-color: var(--athens-gray-950);
+      border-color: var(--athens-gray-700);
+      color: var(--mine-shaft-50);
+
+      &::placeholder {
+        color: var(--athens-gray-500);
+      }
+
+      &:focus {
+        border-color: var(--turq);
+      }
+    }
+
+    button.btn-secondary {
+      background-color: var(--athens-gray-800);
+      color: var(--athens-gray-300);
+      border-color: var(--athens-gray-700);
+
+      &:hover {
+        background-color: var(--athens-gray-700);
+        color: var(--mine-shaft-50);
+      }
+    }
+
+    .login-choice-btn {
+      background-color: var(--athens-gray-800);
+      border-color: var(--athens-gray-700);
+      color: var(--mine-shaft-50);
+
+      &:hover {
+        border-color: var(--turq);
+        background-color: rgba(0, 174, 157, 0.1);
+      }
+
+      &.sisbr { color: var(--persian-green-400); }
+      &.admin { color: var(--turq); }
+      &.external { color: var(--persian-green-400); }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Loader
+  // -------------------------------------------------------------------------
+  #loader {
+    background: rgba(34, 39, 47, 0.95); // athens-gray-950 com opacidade
+  }
+
+  // -------------------------------------------------------------------------
+  // Sidebar — usa cyprus-900 (#002a33) que é uma variável Sicoob
+  // -------------------------------------------------------------------------
+  .hub-sidebar {
+    background-color: var(--cyprus-900);
+  }
+
+  // -------------------------------------------------------------------------
+  // Modal genérico — header, body, footer e textos internos
+  // -------------------------------------------------------------------------
+  .hub-modal {
+    background-color: var(--athens-gray-900);
+    color: var(--mine-shaft-50);
+
+    h4, h5, h6 {
+      color: var(--mine-shaft-50);
+    }
+
+    p {
+      color: var(--athens-gray-300);
+    }
+  }
+
+  .hub-modal-header {
+    border-bottom-color: var(--athens-gray-700);
+  }
+
+  .hub-modal-footer {
+    border-top-color: var(--athens-gray-700);
+  }
+
+  .hub-modal-close {
+    color: var(--athens-gray-400);
+
+    &:hover {
+      color: var(--mine-shaft-50);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Desk grid e cards — Página Mesas
+  // -------------------------------------------------------------------------
+  #desk-grid {
+    background-color: var(--athens-gray-800);
+    box-shadow: none;
+  }
+
+  .desk-card.occupied {
+    background-color: var(--athens-gray-950);
+    border-color: var(--athens-gray-700);
+    color: var(--mine-shaft-50);
+  }
+
+  .desk-card.available {
+    background-color: rgba(0, 174, 157, 0.15);
+    border-color: var(--turq);
+  }
+
+  // Minha reserva — reforça sobre os overrides genéricos de .card no dark mode
+  .desk-card.my-reservation {
+    background-color: var(--turq) !important;
+    border-color: var(--turq) !important;
+    color: var(--mine-shaft-50) !important;
+    box-shadow: 0 0 0 3px rgba(0, 174, 157, 0.45), 0 4px 16px rgba(0, 174, 157, 0.35) !important;
+
+    .card-title,
+    .reserved-name,
+    p,
+    small {
+      color: var(--mine-shaft-50) !important;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Admin tabs (#admin-tabs) — nav-pills com contraste adequado
+  // -------------------------------------------------------------------------
+  #admin-tabs {
+    background-color: var(--athens-gray-900);
+    border-radius: var(--border-radius-sm);
+    padding: 0.35rem;
+
+    .nav-link {
+      color: var(--athens-gray-300);
+      border-radius: var(--border-radius-xs);
+      font-size: 0.85rem;
+
+      i {
+        color: var(--athens-gray-400);
+      }
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: var(--mine-shaft-50);
+
+        i {
+          color: var(--turq);
+        }
+      }
+
+      &.active {
+        background-color: var(--turq);
+        color: var(--mine-shaft-50);
+
+        i {
+          color: var(--mine-shaft-50);
+        }
+      }
+    }
+  }
+
+  // Nav pills genérico (fora do #admin-tabs)
+  .nav-pills:not(#admin-tabs) .nav-link {
+    color: var(--athens-gray-300);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--mine-shaft-50);
+    }
+
+    &.active {
+      background-color: var(--turq);
+      color: var(--mine-shaft-50);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Badges — corrige texto escuro ilegível em fundo escuro
+  // -------------------------------------------------------------------------
+  .hub-badge-primary {
+    background-color: rgba(0, 174, 157, 0.2);
+    color: var(--persian-green-400);
+  }
+
+  .hub-badge-success {
+    background-color: rgba(125, 182, 28, 0.2);
+    color: var(--lima-300);
+  }
+
+  .hub-badge-warning {
+    background-color: rgba(255, 170, 44, 0.2);
+    color: var(--sunshade-300);
+  }
+
+  .hub-badge-danger {
+    background-color: rgba(247, 64, 108, 0.2);
+    color: var(--violet-red-300);
+  }
+
+  // Bootstrap .badge com cores legíveis em fundo escuro
+  .badge-success {
+    background-color: rgba(125, 182, 28, 0.25) !important;
+    color: var(--lima-300) !important;
+  }
+
+  .badge-warning {
+    background-color: rgba(255, 170, 44, 0.25) !important;
+    color: var(--sunshade-300) !important;
+  }
+
+  .badge-danger {
+    background-color: rgba(247, 64, 108, 0.25) !important;
+    color: var(--violet-red-300) !important;
+  }
+
+  .badge-info {
+    background-color: rgba(0, 144, 224, 0.25) !important;
+    color: var(--cerulean-300) !important;
+  }
+
+  .badge-secondary {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: var(--athens-gray-300) !important;
+  }
+
+  // -------------------------------------------------------------------------
+  // Toasts
+  // -------------------------------------------------------------------------
+  .hub-toast-success {
+    background-color: var(--lima-950);
+    border-color: var(--lima-700);
+    color: var(--lima-300);
+  }
+
+  .hub-toast-error {
+    background-color: var(--violet-red-950);
+    border-color: var(--violet-red-700);
+    color: var(--violet-red-300);
+  }
+
+  .hub-toast-warning {
+    background-color: var(--sunshade-950);
+    border-color: var(--sunshade-700);
+    color: var(--sunshade-300);
+  }
+
+  .hub-toast-info {
+    background-color: var(--cerulean-950);
+    border-color: var(--cerulean-700);
+    color: var(--cerulean-300);
+  }
+
+  // -------------------------------------------------------------------------
+  // Texto e misc
+  // -------------------------------------------------------------------------
+  .text-muted {
+    color: var(--athens-gray-400) !important;
+  }
+
+  .text-dark {
+    color: var(--mine-shaft-50) !important;
+  }
+
+  .text-body {
+    color: var(--mine-shaft-50) !important;
+  }
+
+  .text-verdee {
+    color: var(--persian-green-400) !important;
+  }
+
+  a {
+    color: var(--persian-green-400);
+
+    &:hover {
+      color: var(--persian-green-300);
+    }
+  }
+
+  // Dividers e títulos de seção
+  .hub-divider {
+    background-color: var(--athens-gray-700);
+  }
+
+  .hub-section-title {
+    color: var(--mine-shaft-50);
+    border-bottom-color: var(--athens-gray-700);
+  }
+
+  .hub-empty-state {
+    color: var(--athens-gray-500);
+  }
+
+  // -------------------------------------------------------------------------
+  // Filter bar — padding, borda e fundo no dark
+  // -------------------------------------------------------------------------
+  .hub-filter-bar {
+    background-color: var(--athens-gray-900);
+    border: 1px solid var(--athens-gray-700);
+    border-radius: var(--border-radius-sm);
+    padding: 1rem;
+  }
+
+  .hub-filter-group label {
+    color: var(--athens-gray-300);
+  }
+
+  .hub-search-box {
+    i {
+      color: var(--athens-gray-500);
+    }
+  }
+}
