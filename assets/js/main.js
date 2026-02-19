@@ -412,13 +412,7 @@
     },
 
     openEditarPerfil: function() {
-      // Se estiver na pagina usuarios e o modal estiver disponivel, abre diretamente
-      if (typeof window._openProfileModal === 'function') {
-        window._openProfileModal();
-      } else {
-        // Navega para usuarios com flag para auto-abrir modal
-        window.location.href = BASE_PATH + '/usuarios/?perfil=1';
-      }
+      window.location.href = BASE_PATH + '/perfil/';
     }
   };
 
@@ -686,15 +680,15 @@
               '<span>Usuario Externo</span>' +
             '</button>' +
           '</div>' +
-          '<button id="cancel-choice-btn" class="btn-secondary btn-action" style="width:100%;margin-top:1rem;">Cancelar</button>' +
+          '<button id="cancel-choice-btn" class="btn btn-secondary btn-action" style="width:100%;margin-top:1rem;">Cancelar</button>' +
         '</div>' +
 
         // ── admin-input step ──
         '<div id="admin-input-step" style="display:none;">' +
           '<input type="text" id="admin-username-input" placeholder="Digite seu usuario admin" autocomplete="username">' +
           '<div class="btn-group">' +
-            '<button id="back-from-admin-btn" class="btn-secondary btn-action">Voltar</button>' +
-            '<button id="next-admin-btn" class="btn-primary btn-action">Continuar</button>' +
+            '<button id="back-from-admin-btn" class="btn btn-secondary btn-action">Voltar</button>' +
+            '<button id="next-admin-btn" class="btn btn-primary btn-action">Continuar</button>' +
           '</div>' +
         '</div>' +
 
@@ -702,8 +696,8 @@
         '<div id="external-input-step" style="display:none;">' +
           '<input type="text" id="external-username-input" placeholder="Digite seu usuario" autocomplete="username">' +
           '<div class="btn-group">' +
-            '<button id="back-from-external-btn" class="btn-secondary btn-action">Voltar</button>' +
-            '<button id="next-external-btn" class="btn-primary btn-action">Continuar</button>' +
+            '<button id="back-from-external-btn" class="btn btn-secondary btn-action">Voltar</button>' +
+            '<button id="next-external-btn" class="btn btn-primary btn-action">Continuar</button>' +
           '</div>' +
         '</div>' +
 
@@ -711,8 +705,8 @@
         '<div id="code-step" style="display:none;">' +
           '<input type="password" id="code-input" placeholder="Digite o codigo de acesso" autocomplete="off">' +
           '<div class="btn-group">' +
-            '<button id="back-from-code-btn" class="btn-secondary btn-action">Voltar</button>' +
-            '<button id="login-final-btn" class="btn-primary btn-action">Entrar</button>' +
+            '<button id="back-from-code-btn" class="btn btn-secondary btn-action">Voltar</button>' +
+            '<button id="login-final-btn" class="btn btn-primary btn-action">Entrar</button>' +
           '</div>' +
         '</div>' +
 
@@ -720,8 +714,8 @@
         '<div id="secret-input-step" style="display:none;">' +
           '<input type="text" id="secret-username-input" placeholder="Digite seu usuario" autocomplete="username">' +
           '<div class="btn-group">' +
-            '<button id="back-from-secret-btn" class="btn-secondary btn-action">Voltar</button>' +
-            '<button id="secret-login-btn" class="btn-primary btn-action">Entrar</button>' +
+            '<button id="back-from-secret-btn" class="btn btn-secondary btn-action">Voltar</button>' +
+            '<button id="secret-login-btn" class="btn btn-primary btn-action">Entrar</button>' +
           '</div>' +
         '</div>' +
 

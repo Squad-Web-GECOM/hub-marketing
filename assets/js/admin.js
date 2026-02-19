@@ -66,6 +66,11 @@
     // Volta scroll para o topo ao abrir o modal
     body.scrollTop = 0;
     document.getElementById('edit-modal-overlay').classList.add('show');
+    // Mostra preview dos ícones já preenchidos ao abrir o modal
+    ICON_INPUT_IDS.forEach(function(id) {
+      var inp = document.getElementById(id);
+      if (inp && inp.value) updateIconPreview(id, inp.value.trim());
+    });
     var saveBtn = document.getElementById('edit-modal-save');
     var newBtn = saveBtn.cloneNode(true);
     saveBtn.parentNode.replaceChild(newBtn, saveBtn);
@@ -146,14 +151,15 @@
     }
     allUsers = result.data || [];
 
-    var html = '<div class="d-flex justify-content-between align-items-center mb-3">' +
-      '<h5 class="mb-0">' + allUsers.filter(function(u){ return u.is_active !== false; }).length + ' usuarios ativos</h5>' +
-      '<div><label class="mr-2"><input type="checkbox" id="chk-show-inactive-users"> Mostrar inativos</label></div>' +
+    var activeCount = allUsers.filter(function(u){ return u.is_active !== false; }).length;
+    var html = '<div class="admin-panel-header">' +
+      '<h5 class="admin-panel-title"><i class="fa-solid fa-users"></i> Usuários <span class="count-badge">' + activeCount + '</span></h5>' +
+      '<label class="d-flex align-items-center gap-1 mb-0" style="font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="chk-show-inactive-users" class="mr-1"> Mostrar inativos</label>' +
       '</div>';
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
-      '<th>Nome</th><th>Apelido</th><th>Usuario</th><th>Email</th>' +
-      '<th>Gerencia</th><th>Coord.</th><th>Nucleo</th>' +
-      '<th>Admin</th><th>Coord</th><th>Acoes</th>' +
+      '<th>Ações</th><th>Nome</th><th>Apelido</th><th>Usuário</th><th>Email</th>' +
+      '<th>Gerência</th><th>Coord.</th><th>Núcleo</th>' +
+      '<th>Admin</th><th>Coord</th>' +
       '</tr></thead><tbody id="usuarios-tbody"></tbody></table></div>';
 
     panel.innerHTML = html;
@@ -171,21 +177,22 @@
       if (!showInactive && u.is_active === false) return;
       var inactiveClass = u.is_active === false ? ' style="opacity:0.5;"' : '';
       rows += '<tr' + inactiveClass + '>' +
+        '<td class="td-acoes">' +
+          '<button class="btn btn-icon-sm btn-secondary mr-1" title="Editar" onclick="window._adminEditUser(' + u.id + ')"><i class="fa-solid fa-pen"></i></button>' +
+          (u.is_active !== false ?
+            '<button class="btn btn-icon-sm btn-outline-danger" title="Desativar" onclick="window._adminDeactivateUser(' + u.id + ')"><i class="fa-solid fa-ban"></i></button>' :
+            '<button class="btn btn-icon-sm btn-outline-success" title="Reativar" onclick="window._adminReactivateUser(' + u.id + ')"><i class="fa-solid fa-check"></i></button>') +
+        '</td>' +
         '<td>' + esc(u.nome) + '</td>' +
         '<td>' + esc(u.apelido) + '</td>' +
-        '<td>' + esc(u.user_name) + '</td>' +
+        '<td><code style="font-size:0.78rem;">' + esc(u.user_name) + '</code></td>' +
         '<td>' + esc(u.email) + '</td>' +
-        '<td>' + esc(orgName(u.gerencia_id)) + '</td>' +
-        '<td>' + esc(orgName(u.coordenacao_id)) + '</td>' +
-        '<td>' + esc(orgName(u.nucleo_id)) + '</td>' +
-        '<td>' + (u.is_admin ? '<span class="badge badge-success">Sim</span>' : '') + '</td>' +
-        '<td>' + (u.is_coordenador ? '<span class="badge badge-info">Sim</span>' : '') + '</td>' +
-        '<td class="text-nowrap">' +
-          '<button class="btn btn-sm btn-outline-primary mr-1" onclick="window._adminEditUser(' + u.id + ')"><i class="fa-solid fa-pen"></i></button>' +
-          (u.is_active !== false ?
-            '<button class="btn btn-sm btn-outline-danger" onclick="window._adminDeactivateUser(' + u.id + ')"><i class="fa-solid fa-ban"></i></button>' :
-            '<button class="btn btn-sm btn-outline-success" onclick="window._adminReactivateUser(' + u.id + ')"><i class="fa-solid fa-check"></i></button>') +
-        '</td></tr>';
+        '<td class="td-truncate">' + esc(orgName(u.gerencia_id)) + '</td>' +
+        '<td class="td-truncate">' + esc(orgName(u.coordenacao_id)) + '</td>' +
+        '<td class="td-truncate">' + esc(orgName(u.nucleo_id)) + '</td>' +
+        '<td>' + (u.is_admin ? '<span class="badge badge-success">Admin</span>' : '') + '</td>' +
+        '<td>' + (u.is_coordenador ? '<span class="badge badge-info">Coord</span>' : '') + '</td>' +
+        '</tr>';
     });
     tbody.innerHTML = rows || '<tr><td colspan="10" class="text-center text-muted">Nenhum usuario encontrado</td></tr>';
   }
@@ -308,8 +315,8 @@
       html += '<div class="card-header d-flex justify-content-between align-items-center py-2" data-toggle="collapse" data-target="#org-g-' + g.id + '" style="cursor:pointer;">';
       html += '<span><i class="fa-solid fa-building mr-2"></i><strong>' + esc(g.nome) + '</strong></span>';
       html += '<span>' +
-        '<button class="btn btn-sm btn-outline-secondary mr-1" onclick="event.stopPropagation(); window._adminAddOrg(\'coordenacao\', \'' + g.id + '\')"><i class="fa-solid fa-plus"></i> Coord</button>' +
-        '<button class="btn btn-sm btn-outline-primary mr-1" onclick="event.stopPropagation(); window._adminEditOrg(\'' + g.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+        '<button class="btn btn-sm btn-primary mr-1" onclick="event.stopPropagation(); window._adminAddOrg(\'coordenacao\', \'' + g.id + '\')"><i class="fa-solid fa-plus"></i> Coord</button>' +
+        '<button class="btn btn-sm btn-secondary mr-1" onclick="event.stopPropagation(); window._adminEditOrg(\'' + g.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
         '<button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); window._adminDeactivateOrg(\'' + g.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
         '</span></div>';
       html += '<div class="collapse show" id="org-g-' + g.id + '">';
@@ -323,8 +330,8 @@
         html += '<div class="d-flex justify-content-between align-items-center">';
         html += '<span><i class="fa-solid fa-sitemap mr-1"></i> ' + esc(c.nome) + '</span>';
         html += '<span>' +
-          '<button class="btn btn-xs btn-outline-secondary mr-1" onclick="window._adminAddOrg(\'nucleo\', \'' + c.id + '\')"><i class="fa-solid fa-plus"></i> Nucleo</button>' +
-          '<button class="btn btn-xs btn-outline-primary mr-1" onclick="window._adminEditOrg(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+          '<button class="btn btn-xs btn-primary mr-1" onclick="window._adminAddOrg(\'nucleo\', \'' + c.id + '\')"><i class="fa-solid fa-plus"></i> Nucleo</button>' +
+          '<button class="btn btn-xs btn-secondary mr-1" onclick="window._adminEditOrg(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
           '<button class="btn btn-xs btn-outline-danger" onclick="window._adminDeactivateOrg(\'' + c.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
           '</span></div>';
         if (nucleos.length > 0) {
@@ -333,7 +340,7 @@
             html += '<div class="d-flex justify-content-between align-items-center py-1">';
             html += '<span><i class="fa-solid fa-circle fa-xs mr-1 text-muted"></i> ' + esc(n.nome) + '</span>';
             html += '<span>' +
-              '<button class="btn btn-xs btn-outline-primary mr-1" onclick="window._adminEditOrg(\'' + n.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+              '<button class="btn btn-xs btn-secondary mr-1" onclick="window._adminEditOrg(\'' + n.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
               '<button class="btn btn-xs btn-outline-danger" onclick="window._adminDeactivateOrg(\'' + n.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
               '</span></div>';
           });
@@ -374,7 +381,7 @@
       html += '<div class="card-header d-flex justify-content-between align-items-center py-2" data-toggle="collapse" data-target="#org-g-' + g.id + '" style="cursor:pointer;">';
       html += '<span><i class="fa-solid fa-building mr-2"></i><strong>' + esc(g.nome) + '</strong>' + (g.is_active === false ? ' <span class="badge badge-secondary">Inativo</span>' : '') + '</span>';
       html += '<span>' +
-        '<button class="btn btn-sm btn-outline-primary mr-1" onclick="event.stopPropagation(); window._adminEditOrg(\'' + g.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+        '<button class="btn btn-sm btn-secondary mr-1" onclick="event.stopPropagation(); window._adminEditOrg(\'' + g.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
         '</span></div>';
       html += '<div class="collapse show" id="org-g-' + g.id + '"><div class="card-body py-2 pl-4">';
       coords.forEach(function(c) {
@@ -502,13 +509,14 @@
       allUsers = uResult.data || [];
     }
 
-    var html = '<div class="d-flex justify-content-between align-items-center mb-3">' +
-      '<h5 class="mb-0">Squads (' + allSquads.filter(function(s) { return s.is_active !== false; }).length + ')</h5>' +
-      '<button class="btn btn-sm btn-primary" onclick="window._adminAddSquad()"><i class="fa-solid fa-plus"></i> Novo Squad</button>' +
+    var squadCount = allSquads.filter(function(s) { return s.is_active !== false; }).length;
+    var html = '<div class="admin-panel-header">' +
+      '<h5 class="admin-panel-title"><i class="fa-solid fa-users-gear"></i> Squads <span class="count-badge">' + squadCount + '</span></h5>' +
+      '<button class="btn btn-sm btn-primary" onclick="window._adminAddSquad()"><i class="fa-solid fa-plus mr-1"></i>Novo Squad</button>' +
       '</div>';
 
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
-      '<th>Nome</th><th>Categoria</th><th>Icone</th><th>Descricao</th><th>Membros</th><th>Acoes</th>' +
+      '<th>Ações</th><th>Nome</th><th>Categoria</th><th>Ícone</th><th>Descrição</th><th>Membros</th>' +
       '</tr></thead><tbody>';
 
     allSquads.forEach(function(s) {
@@ -519,16 +527,17 @@
       var memberCount = s.squad_members ? s.squad_members.length : 0;
 
       html += '<tr>' +
-        '<td>' + esc(s.nome) + '</td>' +
+        '<td class="td-acoes">' +
+          '<button class="btn btn-icon-sm btn-secondary mr-1" title="Editar" onclick="window._adminEditSquad(\'' + s.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+          '<button class="btn btn-icon-sm btn-outline-info mr-1" title="Membros" onclick="window._adminManageMembers(\'' + s.id + '\')"><i class="fa-solid fa-user-group"></i></button>' +
+          '<button class="btn btn-icon-sm btn-outline-danger" title="Desativar" onclick="window._adminDeactivateSquad(\'' + s.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
+        '</td>' +
+        '<td><strong>' + esc(s.nome) + '</strong></td>' +
         '<td>' + esc(catName) + '</td>' +
-        '<td><i class="' + hub.utils.normalizeIcon(s.icone, 'fa-solid fa-users') + '"></i> ' + esc(s.icone) + '</td>' +
-        '<td>' + esc(s.descricao ? s.descricao.substring(0, 50) : '') + '</td>' +
+        '<td><i class="' + hub.utils.normalizeIcon(s.icone, 'fa-solid fa-users') + ' mr-1"></i><code style="font-size:0.75rem;">' + esc(s.icone) + '</code></td>' +
+        '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(s.descricao ? s.descricao.substring(0, 60) : '') + '</td>' +
         '<td><span class="badge badge-primary">' + memberCount + '</span></td>' +
-        '<td class="text-nowrap">' +
-          '<button class="btn btn-sm btn-outline-primary mr-1" onclick="window._adminEditSquad(\'' + s.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
-          '<button class="btn btn-sm btn-outline-info mr-1" onclick="window._adminManageMembers(\'' + s.id + '\')"><i class="fa-solid fa-user-group"></i></button>' +
-          '<button class="btn btn-sm btn-outline-danger" onclick="window._adminDeactivateSquad(\'' + s.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
-        '</td></tr>';
+        '</tr>';
     });
 
     html += '</tbody></table></div>';
@@ -545,9 +554,10 @@
     return '' +
       '<div class="form-group"><label>Nome</label><input class="form-control" id="sq-nome" value="' + esc(s.nome) + '"></div>' +
       '<div class="form-group"><label>Categoria</label><select class="form-control" id="sq-categoria">' + catOpts + '</select></div>' +
-      '<div class="form-group"><label>Link Wrike</label><input class="form-control" id="sq-wrike" value="' + esc(s.link_wrike) + '"></div>' +
+      '<div class="form-group"><label>Link</label><input class="form-control" id="sq-link" value="' + esc(s.link || s.link_wrike) + '" placeholder="https://..."></div>' +
+      '<div class="form-group"><label>Texto do botão</label><input class="form-control" id="sq-link-label" value="' + esc(s.link_label || '') + '" placeholder="Ex: Wrike, Notion, Drive..."></div>' +
       '<div class="form-group"><label>Descricao</label><textarea class="form-control" id="sq-descricao" rows="2">' + esc(s.descricao) + '</textarea></div>' +
-      '<div class="form-group"><label>Icone (FontAwesome class, ex: fa-users)</label><input class="form-control" id="sq-icone" value="' + esc(s.icone) + '"></div>';
+      '<div class="form-group"><label>Ícone</label><div class="icon-input-wrap"><input class="form-control" id="sq-icone" value="' + esc(s.icone) + '" placeholder="fa-solid fa-users" autocomplete="off"><span class="icon-preview" id="icon-preview-sq-icone" style="display:none"></span></div></div>';
   }
 
   window._adminAddSquad = function() {
@@ -555,7 +565,8 @@
       var row = {
         nome: document.getElementById('sq-nome').value.trim(),
         categoria_id: document.getElementById('sq-categoria').value || null,
-        link_wrike: document.getElementById('sq-wrike').value.trim(),
+        link: document.getElementById('sq-link').value.trim(),
+        link_label: document.getElementById('sq-link-label').value.trim() || null,
         descricao: document.getElementById('sq-descricao').value.trim(),
         icone: document.getElementById('sq-icone').value.trim(),
         is_active: true
@@ -581,7 +592,8 @@
       var updates = {
         nome: document.getElementById('sq-nome').value.trim(),
         categoria_id: document.getElementById('sq-categoria').value || null,
-        link_wrike: document.getElementById('sq-wrike').value.trim(),
+        link: document.getElementById('sq-link').value.trim(),
+        link_label: document.getElementById('sq-link-label').value.trim() || null,
         descricao: document.getElementById('sq-descricao').value.trim(),
         icone: document.getElementById('sq-icone').value.trim()
       };
@@ -700,25 +712,26 @@
     }
     allCategories = result.data || [];
 
-    var html = '<div class="d-flex justify-content-between align-items-center mb-3">' +
-      '<h5 class="mb-0">Categorias de Squad</h5>' +
-      '<button class="btn btn-sm btn-primary" onclick="window._adminAddCategoria()"><i class="fa-solid fa-plus"></i> Nova Categoria</button>' +
+    var html = '<div class="admin-panel-header">' +
+      '<h5 class="admin-panel-title"><i class="fa-solid fa-tags"></i> Categorias de Squad</h5>' +
+      '<button class="btn btn-sm btn-primary" onclick="window._adminAddCategoria()"><i class="fa-solid fa-plus mr-1"></i>Nova Categoria</button>' +
       '</div>';
 
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
-      '<th>Nome</th><th>Icone</th><th>Cor</th><th>Acoes</th>' +
+      '<th>Ações</th><th>Nome</th><th>Ícone</th><th>Cor</th>' +
       '</tr></thead><tbody>';
 
     allCategories.forEach(function(c) {
       if (c.is_active === false) return;
       html += '<tr>' +
-        '<td>' + esc(c.nome) + '</td>' +
-        '<td><i class="' + hub.utils.normalizeIcon(c.icone, 'fa-solid fa-tag') + '"></i> ' + esc(c.icone) + '</td>' +
-        '<td><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:' + esc(c.cor || '#ccc') + ';vertical-align:middle;"></span> ' + esc(c.cor) + '</td>' +
-        '<td class="text-nowrap">' +
-          '<button class="btn btn-sm btn-outline-primary mr-1" onclick="window._adminEditCategoria(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
-          '<button class="btn btn-sm btn-outline-danger" onclick="window._adminDeactivateCategoria(\'' + c.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
-        '</td></tr>';
+        '<td class="td-acoes">' +
+          '<button class="btn btn-icon-sm btn-secondary mr-1" title="Editar" onclick="window._adminEditCategoria(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+          '<button class="btn btn-icon-sm btn-outline-danger" title="Desativar" onclick="window._adminDeactivateCategoria(\'' + c.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
+        '</td>' +
+        '<td><strong>' + esc(c.nome) + '</strong></td>' +
+        '<td><i class="' + hub.utils.normalizeIcon(c.icone, 'fa-solid fa-tag') + ' mr-1"></i><code style="font-size:0.75rem;">' + esc(c.icone) + '</code></td>' +
+        '<td><span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:' + esc(c.cor || '#ccc') + ';vertical-align:middle;border:1px solid rgba(0,0,0,0.1);"></span> <code style="font-size:0.75rem;">' + esc(c.cor) + '</code></td>' +
+        '</tr>';
     });
 
     html += '</tbody></table></div>';
@@ -729,7 +742,7 @@
     c = c || {};
     return '' +
       '<div class="form-group"><label>Nome</label><input class="form-control" id="cat-nome" value="' + esc(c.nome) + '"></div>' +
-      '<div class="form-group"><label>Icone (FontAwesome class)</label><input class="form-control" id="cat-icone" value="' + esc(c.icone) + '" placeholder="fa-tag"></div>' +
+      '<div class="form-group"><label>Ícone</label><div class="icon-input-wrap"><input class="form-control" id="cat-icone" value="' + esc(c.icone) + '" placeholder="fa-solid fa-tag" autocomplete="off"><span class="icon-preview" id="icon-preview-cat-icone" style="display:none"></span></div></div>' +
       '<div class="form-group"><label>Cor</label><input type="color" class="form-control" id="cat-cor" value="' + (c.cor || '#3b82f6') + '" style="height:40px;"></div>';
   }
 
@@ -804,26 +817,28 @@
     }
     allForms = result.data || [];
 
-    var html = '<div class="d-flex justify-content-between align-items-center mb-3">' +
-      '<h5 class="mb-0">Formularios (' + allForms.filter(function(f) { return f.is_active !== false; }).length + ')</h5>' +
-      '<button class="btn btn-sm btn-primary" onclick="window._adminAddForm()"><i class="fa-solid fa-plus"></i> Novo Formulario</button>' +
+    var formCount = allForms.filter(function(f) { return f.is_active !== false; }).length;
+    var html = '<div class="admin-panel-header">' +
+      '<h5 class="admin-panel-title"><i class="fa-solid fa-file-lines"></i> Formulários <span class="count-badge">' + formCount + '</span></h5>' +
+      '<button class="btn btn-sm btn-primary" onclick="window._adminAddForm()"><i class="fa-solid fa-plus mr-1"></i>Novo Formulário</button>' +
       '</div>';
 
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
-      '<th>Nome</th><th>Descricao</th><th>Link</th><th>Tipo</th><th>Acoes</th>' +
+      '<th>Ações</th><th>Nome</th><th>Descrição</th><th>Link</th><th>Tipo</th>' +
       '</tr></thead><tbody>';
 
     allForms.forEach(function(f) {
       if (f.is_active === false) return;
       html += '<tr>' +
-        '<td>' + esc(f.nome) + '</td>' +
-        '<td>' + esc(f.descricao_breve ? f.descricao_breve.substring(0, 60) : '') + '</td>' +
-        '<td>' + (f.link ? '<a href="' + esc(f.link) + '" target="_blank" class="text-truncate d-inline-block" style="max-width:200px;">' + esc(f.link) + '</a>' : '') + '</td>' +
+        '<td class="td-acoes">' +
+          '<button class="btn btn-icon-sm btn-secondary mr-1" title="Editar" onclick="window._adminEditForm(\'' + f.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+          '<button class="btn btn-icon-sm btn-outline-danger" title="Desativar" onclick="window._adminDeactivateForm(\'' + f.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
+        '</td>' +
+        '<td><strong>' + esc(f.nome) + '</strong></td>' +
+        '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(f.descricao_breve ? f.descricao_breve.substring(0, 60) : '') + '</td>' +
+        '<td>' + (f.link ? '<a href="' + esc(f.link) + '" target="_blank" title="' + esc(f.link) + '"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>' : '') + '</td>' +
         '<td><span class="badge badge-' + (f.tipo === 'interno' ? 'primary' : 'secondary') + '">' + esc(f.tipo || 'interno') + '</span></td>' +
-        '<td class="text-nowrap">' +
-          '<button class="btn btn-sm btn-outline-primary mr-1" onclick="window._adminEditForm(\'' + f.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
-          '<button class="btn btn-sm btn-outline-danger" onclick="window._adminDeactivateForm(\'' + f.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
-        '</td></tr>';
+        '</tr>';
     });
 
     html += '</tbody></table></div>';
@@ -844,7 +859,7 @@
         '<option value="interno"' + tipoIntSel + '>Interno</option>' +
         '<option value="externo"' + tipoExtSel + '>Externo</option>' +
       '</select></div>' +
-      '<div class="form-group"><label>Icone (FontAwesome class)</label><input class="form-control" id="fm-icone" value="' + esc(f.icone) + '" placeholder="fa-file-lines"></div>';
+      '<div class="form-group"><label>Ícone</label><div class="icon-input-wrap"><input class="form-control" id="fm-icone" value="' + esc(f.icone) + '" placeholder="fa-solid fa-file-lines" autocomplete="off"><span class="icon-preview" id="icon-preview-fm-icone" style="display:none"></span></div></div>';
   }
 
   window._adminAddForm = function() {
@@ -930,13 +945,13 @@
       allUsers = uResult.data || [];
     }
 
-    var html = '<div class="d-flex justify-content-between align-items-center mb-3">' +
-      '<h5 class="mb-0">Mesas (' + allDesks.length + ')</h5>' +
-      '<button class="btn btn-sm btn-primary" onclick="window._adminAddDesk()"><i class="fa-solid fa-plus"></i> Nova Mesa</button>' +
+    var html = '<div class="admin-panel-header">' +
+      '<h5 class="admin-panel-title"><i class="fa-solid fa-chair"></i> Mesas <span class="count-badge">' + allDesks.length + '</span></h5>' +
+      '<button class="btn btn-sm btn-primary" onclick="window._adminAddDesk()"><i class="fa-solid fa-plus mr-1"></i>Nova Mesa</button>' +
       '</div>';
 
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
-      '<th>Numero</th><th>Nome</th><th>Grid Row</th><th>Grid Col</th><th>Row Span</th><th>Col Span</th><th>Reserva Fixa</th><th>Ativo</th><th>Acoes</th>' +
+      '<th>Ações</th><th>Nº</th><th>Nome</th><th>Linha</th><th>Col</th><th>RowSpan</th><th>ColSpan</th><th>Reserva Fixa</th><th>Ativo</th>' +
       '</tr></thead><tbody>';
 
     allDesks.forEach(function(d) {
@@ -947,17 +962,18 @@
       }
 
       html += '<tr' + (d.is_active === false ? ' style="opacity:0.5;"' : '') + '>' +
-        '<td>' + (d.number || '') + '</td>' +
+        '<td class="td-acoes">' +
+          '<button class="btn btn-icon-sm btn-secondary" title="Editar" onclick="window._adminEditDesk(' + d.id + ')"><i class="fa-solid fa-pen"></i></button>' +
+        '</td>' +
+        '<td><strong>' + (d.number || '') + '</strong></td>' +
         '<td>' + esc(d.desk_name) + '</td>' +
         '<td>' + (d.grid_row || '') + '</td>' +
         '<td>' + (d.grid_col || '') + '</td>' +
         '<td>' + (d.row_span || 1) + '</td>' +
         '<td>' + (d.col_span || 1) + '</td>' +
         '<td>' + esc(fixedUser) + '</td>' +
-        '<td>' + (d.is_active !== false ? '<span class="badge badge-success">Sim</span>' : '<span class="badge badge-secondary">Nao</span>') + '</td>' +
-        '<td class="text-nowrap">' +
-          '<button class="btn btn-sm btn-outline-primary" onclick="window._adminEditDesk(' + d.id + ')"><i class="fa-solid fa-pen"></i></button>' +
-        '</td></tr>';
+        '<td>' + (d.is_active !== false ? '<span class="badge badge-success">Sim</span>' : '<span class="badge badge-secondary">Não</span>') + '</td>' +
+        '</tr>';
     });
 
     html += '</tbody></table></div>';
@@ -1156,27 +1172,29 @@
     }
     allQuickLinks = result.data || [];
 
-    var html = '<div class="d-flex justify-content-between align-items-center mb-3">' +
-      '<h5 class="mb-0">Links Rapidos (' + allQuickLinks.filter(function(l) { return l.is_active !== false; }).length + ')</h5>' +
-      '<button class="btn btn-sm btn-primary" onclick="window._adminAddLink()"><i class="fa-solid fa-plus"></i> Novo Link</button>' +
+    var linkCount = allQuickLinks.filter(function(l) { return l.is_active !== false; }).length;
+    var html = '<div class="admin-panel-header">' +
+      '<h5 class="admin-panel-title"><i class="fa-solid fa-link"></i> Links Rápidos <span class="count-badge">' + linkCount + '</span></h5>' +
+      '<button class="btn btn-sm btn-primary" onclick="window._adminAddLink()"><i class="fa-solid fa-plus mr-1"></i>Novo Link</button>' +
       '</div>';
 
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
-      '<th>Titulo</th><th>URL</th><th>Icone</th><th>Secao</th><th>Ordem</th><th>Acoes</th>' +
+      '<th>Ações</th><th>Título</th><th>Ícone</th><th>Seção</th><th>Ord.</th><th>Link</th>' +
       '</tr></thead><tbody>';
 
     allQuickLinks.forEach(function(l) {
       if (l.is_active === false) return;
       html += '<tr>' +
-        '<td>' + esc(l.titulo) + '</td>' +
-        '<td><a href="' + esc(l.url) + '" target="_blank" class="text-truncate d-inline-block" style="max-width:250px;">' + esc(l.url) + '</a></td>' +
-        '<td><i class="' + hub.utils.normalizeIcon(l.icone, 'fa-solid fa-link') + '"></i> ' + esc(l.icone) + '</td>' +
+        '<td class="td-acoes">' +
+          '<button class="btn btn-icon-sm btn-secondary mr-1" title="Editar" onclick="window._adminEditLink(\'' + l.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+          '<button class="btn btn-icon-sm btn-outline-danger" title="Desativar" onclick="window._adminDeactivateLink(\'' + l.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
+        '</td>' +
+        '<td><strong>' + esc(l.titulo) + '</strong></td>' +
+        '<td><i class="' + hub.utils.normalizeIcon(l.icone, 'fa-solid fa-link') + ' mr-1"></i><code style="font-size:0.75rem;">' + esc(l.icone) + '</code></td>' +
         '<td>' + esc(l.secao) + '</td>' +
         '<td>' + (l.ordem || 0) + '</td>' +
-        '<td class="text-nowrap">' +
-          '<button class="btn btn-sm btn-outline-primary mr-1" onclick="window._adminEditLink(\'' + l.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
-          '<button class="btn btn-sm btn-outline-danger" onclick="window._adminDeactivateLink(\'' + l.id + '\')"><i class="fa-solid fa-ban"></i></button>' +
-        '</td></tr>';
+        '<td><a href="' + esc(l.url) + '" target="_blank" title="' + esc(l.url) + '"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>' +
+        '</tr>';
     });
 
     html += '</tbody></table></div>';
@@ -1188,7 +1206,7 @@
     return '' +
       '<div class="form-group"><label>Titulo</label><input class="form-control" id="lk-titulo" value="' + esc(l.titulo) + '"></div>' +
       '<div class="form-group"><label>URL</label><input class="form-control" id="lk-url" value="' + esc(l.url) + '" placeholder="https://..."></div>' +
-      '<div class="form-group"><label>Icone (FontAwesome class)</label><input class="form-control" id="lk-icone" value="' + esc(l.icone) + '" placeholder="fa-link"></div>' +
+      '<div class="form-group"><label>Ícone</label><div class="icon-input-wrap"><input class="form-control" id="lk-icone" value="' + esc(l.icone) + '" placeholder="fa-solid fa-link" autocomplete="off"><span class="icon-preview" id="icon-preview-lk-icone" style="display:none"></span></div></div>' +
       '<div class="form-group"><label>Secao</label><input class="form-control" id="lk-secao" value="' + esc(l.secao) + '" placeholder="Ex: ferramentas, comunicacao"></div>' +
       '<div class="form-group"><label>Ordem</label><input type="number" class="form-control" id="lk-ordem" value="' + (l.ordem || 0) + '"></div>';
   }
@@ -1255,6 +1273,529 @@
   };
 
   // ====================================================================
+  // MODAL DE ÍCONES — consulta flutuante
+  // ====================================================================
+  var ICON_LIST = (function() {
+    var solid = [
+      'fa-address-book','fa-address-card','fa-align-center','fa-align-justify','fa-align-left',
+      'fa-align-right','fa-anchor','fa-angle-down','fa-angle-left','fa-angle-right','fa-angle-up',
+      'fa-angles-down','fa-angles-left','fa-angles-right','fa-angles-up',
+      'fa-arrow-down','fa-arrow-left','fa-arrow-right','fa-arrow-up',
+      'fa-arrow-down-long','fa-arrow-up-long','fa-arrow-rotate-left','fa-arrow-rotate-right',
+      'fa-arrows-rotate','fa-asterisk','fa-at','fa-award',
+      'fa-ban','fa-bars','fa-bell','fa-bell-slash','fa-bolt','fa-book','fa-book-open',
+      'fa-bookmark','fa-box','fa-box-open','fa-boxes-stacked','fa-briefcase','fa-bug',
+      'fa-building','fa-bullhorn','fa-bullseye',
+      'fa-cake-candles','fa-calculator','fa-calendar','fa-calendar-check','fa-calendar-days',
+      'fa-calendar-minus','fa-calendar-plus','fa-calendar-xmark',
+      'fa-camera','fa-chart-bar','fa-chart-line','fa-chart-pie','fa-check','fa-check-circle',
+      'fa-check-double','fa-check-square','fa-chevron-down','fa-chevron-left','fa-chevron-right',
+      'fa-chevron-up','fa-circle','fa-circle-check','fa-circle-dot','fa-circle-exclamation',
+      'fa-circle-info','fa-circle-minus','fa-circle-plus','fa-circle-question','fa-circle-user',
+      'fa-circle-xmark','fa-clipboard','fa-clipboard-check','fa-clipboard-list','fa-clock',
+      'fa-cloud','fa-cloud-arrow-down','fa-cloud-arrow-up','fa-code','fa-code-branch',
+      'fa-comment','fa-comment-dots','fa-comments','fa-compass','fa-copy','fa-crown',
+      'fa-cube','fa-cubes',
+      'fa-database','fa-diagram-project','fa-diamond','fa-display',
+      'fa-download','fa-droplet',
+      'fa-earth-americas','fa-edit','fa-ellipsis','fa-ellipsis-vertical','fa-envelope',
+      'fa-envelope-open','fa-eraser','fa-exclamation','fa-expand','fa-eye','fa-eye-slash',
+      'fa-file','fa-file-arrow-down','fa-file-arrow-up','fa-file-code','fa-file-csv',
+      'fa-file-excel','fa-file-image','fa-file-lines','fa-file-pdf','fa-file-powerpoint',
+      'fa-file-word','fa-film','fa-filter','fa-fingerprint','fa-flag','fa-floppy-disk',
+      'fa-folder','fa-folder-open','fa-font','fa-forward','fa-futbol',
+      'fa-gamepad','fa-gauge','fa-gear','fa-gears','fa-gift','fa-globe','fa-graduation-cap',
+      'fa-grip','fa-grip-vertical',
+      'fa-hand','fa-hand-pointer','fa-handshake','fa-hashtag','fa-headphones','fa-heart',
+      'fa-home','fa-house','fa-hourglass',
+      'fa-icons','fa-id-badge','fa-id-card','fa-image','fa-images','fa-inbox','fa-info',
+      'fa-key','fa-keyboard',
+      'fa-laptop','fa-layer-group','fa-leaf','fa-link','fa-list','fa-list-check',
+      'fa-list-ol','fa-list-ul','fa-location-dot','fa-lock','fa-lock-open',
+      'fa-magnifying-glass','fa-map','fa-map-location-dot','fa-map-pin','fa-medal',
+      'fa-microphone','fa-minus','fa-mobile','fa-money-bill','fa-moon','fa-music',
+      'fa-network-wired','fa-newspaper',
+      'fa-palette','fa-paper-plane','fa-paperclip','fa-pen','fa-pen-to-square',
+      'fa-pencil','fa-people-group','fa-percent','fa-phone','fa-phone-slash',
+      'fa-photo-film','fa-play','fa-plug','fa-plus','fa-power-off','fa-print',
+      'fa-puzzle-piece',
+      'fa-question','fa-quote-left',
+      'fa-rectangle-list','fa-reply','fa-robot','fa-rocket','fa-rotate',
+      'fa-save','fa-scale-balanced','fa-screwdriver-wrench','fa-search','fa-server',
+      'fa-share','fa-share-nodes','fa-shield','fa-shield-halved','fa-shuffle',
+      'fa-sitemap','fa-sliders','fa-sort','fa-sort-down','fa-sort-up','fa-spinner',
+      'fa-square','fa-square-check','fa-square-minus','fa-square-plus','fa-star',
+      'fa-star-half','fa-sun','fa-swatchbook',
+      'fa-table','fa-table-cells','fa-table-list','fa-tablet','fa-tag','fa-tags',
+      'fa-thumbs-down','fa-thumbs-up','fa-ticket','fa-timeline','fa-toggle-off',
+      'fa-toggle-on','fa-toolbox','fa-trash','fa-trash-arrow-up','fa-trophy',
+      'fa-truck','fa-tv',
+      'fa-upload','fa-user','fa-user-check','fa-user-clock','fa-user-gear',
+      'fa-user-group','fa-user-minus','fa-user-pen','fa-user-plus','fa-user-shield',
+      'fa-user-slash','fa-user-tag','fa-user-tie','fa-users','fa-users-gear',
+      'fa-users-line','fa-utensils',
+      'fa-video','fa-volume-high','fa-volume-low','fa-volume-xmark',
+      'fa-wallet','fa-wifi','fa-wrench','fa-xmark'
+    ];
+    var brands = [
+      'fa-behance','fa-discord','fa-dribbble','fa-facebook','fa-figma',
+      'fa-github','fa-gitlab','fa-google','fa-google-drive','fa-instagram',
+      'fa-jira','fa-linkedin','fa-microsoft','fa-notion','fa-slack',
+      'fa-spotify','fa-telegram','fa-tiktok','fa-trello','fa-twitch',
+      'fa-twitter','fa-whatsapp','fa-x-twitter','fa-youtube'
+    ];
+    return {
+      'fa-solid':  solid.map(function(n)  { return { prefix: 'fa-solid',  name: n }; }),
+      'fa-brands': brands.map(function(n) { return { prefix: 'fa-brands', name: n }; })
+    };
+  })();
+
+  // ====================================================================
+  // AUTOCOMPLETE DE ÍCONES nos inputs de admin
+  // ====================================================================
+  var ICON_INPUT_IDS = ['sq-icone', 'cat-icone', 'fm-icone', 'lk-icone'];
+  var _autocompleteOpen = null; // id do input com dropdown aberto
+
+  function initIconAutocomplete() {
+    // Usa event delegation no edit-modal-body (gerado dinamicamente)
+    var modalBody = document.getElementById('edit-modal-body');
+    if (!modalBody) return;
+
+    modalBody.addEventListener('input', function(e) {
+      var id = e.target && e.target.id;
+      if (ICON_INPUT_IDS.indexOf(id) === -1) return;
+      renderIconAutocomplete(e.target);
+    });
+
+    modalBody.addEventListener('focusout', function(e) {
+      var id = e.target && e.target.id;
+      if (ICON_INPUT_IDS.indexOf(id) === -1) return;
+      // Pequeno delay para permitir clique no dropdown antes de fechar
+      setTimeout(function() { closeIconDropdown(id); }, 200);
+    });
+
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', function(e) {
+      if (!_autocompleteOpen) return;
+      var dropdown = document.getElementById('icon-ac-' + _autocompleteOpen);
+      var input    = document.getElementById(_autocompleteOpen);
+      if (dropdown && !dropdown.contains(e.target) && e.target !== input) {
+        closeIconDropdown(_autocompleteOpen);
+      }
+    });
+  }
+
+  function renderIconAutocomplete(input) {
+    var id  = input.id;
+    var val = (input.value || '').toLowerCase().trim();
+
+    // Remove dropdown anterior
+    closeIconDropdown(id);
+
+    if (val.length < 2) {
+      updateIconPreview(id, input.value.trim());
+      return;
+    }
+
+    // Busca em solid + brands (com suporte PT)
+    var allIcons = ICON_LIST['fa-solid'].concat(ICON_LIST['fa-brands']);
+    var matches  = filterIcons(allIcons, val).slice(0, 24);
+
+    if (matches.length === 0) {
+      updateIconPreview(id, input.value.trim());
+      return;
+    }
+
+    var dropdown = document.createElement('div');
+    dropdown.id        = 'icon-ac-' + id;
+    dropdown.className = 'icon-ac-dropdown';
+
+    matches.forEach(function(ic) {
+      var fullClass = ic.prefix + ' ' + ic.name;
+      var item = document.createElement('div');
+      item.className = 'icon-ac-item';
+      item.innerHTML = '<i class="' + fullClass + '"></i><span>' + ic.name.replace('fa-', '') + '</span>';
+      item.addEventListener('mousedown', function(e) {
+        e.preventDefault(); // evita blur no input
+        input.value = fullClass;
+        updateIconPreview(id, fullClass);
+        closeIconDropdown(id);
+      });
+      dropdown.appendChild(item);
+    });
+
+    // Posicionar relativo ao wrapper do input
+    var wrapper = input.parentNode;
+    wrapper.style.position = 'relative';
+    wrapper.appendChild(dropdown);
+    _autocompleteOpen = id;
+
+    updateIconPreview(id, input.value.trim());
+  }
+
+  function closeIconDropdown(id) {
+    var existing = document.getElementById('icon-ac-' + id);
+    if (existing) existing.parentNode.removeChild(existing);
+    if (_autocompleteOpen === id) _autocompleteOpen = null;
+  }
+
+  function updateIconPreview(inputId, value) {
+    var previewId = 'icon-preview-' + inputId;
+    var preview   = document.getElementById(previewId);
+    if (!preview) return;
+    if (value && value.indexOf('fa-') !== -1) {
+      preview.innerHTML = '<i class="' + value + '"></i>';
+      preview.style.display = 'inline-flex';
+    } else {
+      preview.innerHTML = '';
+      preview.style.display = 'none';
+    }
+  }
+
+  // Dicionário PT → termos de busca nos nomes dos ícones
+  // Cada chave é um termo em português; o valor é array de fragmentos que batem com nomes FA
+  var ICON_PT_DICT = {
+    // Pessoas e usuários
+    'pessoa':       ['user','people','person'],
+    'pessoas':      ['users','people','group'],
+    'usuario':      ['user'],
+    'usuarios':     ['users','user-group'],
+    'grupo':        ['group','users','people'],
+    'equipe':       ['users','people','group','team'],
+    'time':         ['users','people','group'],
+    'gestor':       ['user-tie','user-gear'],
+    'lider':        ['user-tie','crown'],
+    'coordenador':  ['sitemap','user-tie'],
+    'gerente':      ['user-tie','briefcase'],
+    'perfil':       ['circle-user','id-card','id-badge','user'],
+    // Comunicação
+    'mensagem':     ['comment','envelope','paper-plane'],
+    'email':        ['envelope','at'],
+    'telefone':     ['phone','mobile'],
+    'celular':      ['mobile','phone'],
+    'notificacao':  ['bell'],
+    'alerta':       ['bell','exclamation','circle-exclamation'],
+    'chat':         ['comments','comment-dots','comment'],
+    'reuniao':      ['calendar','people-group','video'],
+    'anuncio':      ['bullhorn','megaphone'],
+    // Navegação e ações
+    'seta':         ['arrow','chevron','angle'],
+    'voltar':       ['arrow-left','arrow-rotate-left','chevron-left'],
+    'avancar':      ['arrow-right','chevron-right','forward'],
+    'cima':         ['arrow-up','chevron-up','angle-up'],
+    'baixo':        ['arrow-down','chevron-down','angle-down'],
+    'buscar':       ['magnifying-glass','search'],
+    'pesquisa':     ['magnifying-glass','search'],
+    'procurar':     ['magnifying-glass','search'],
+    'filtro':       ['filter','sliders'],
+    'ordenar':      ['sort','sliders'],
+    'atualizar':    ['arrows-rotate','rotate'],
+    'recarregar':   ['arrows-rotate','rotate'],
+    'fechar':       ['xmark','circle-xmark'],
+    'apagar':       ['trash','eraser','xmark'],
+    'deletar':      ['trash'],
+    'editar':       ['pen-to-square','pencil','pen','edit'],
+    'salvar':       ['floppy-disk','save'],
+    'copiar':       ['copy','clipboard'],
+    'colar':        ['clipboard'],
+    'compartilhar': ['share','share-nodes'],
+    'expandir':     ['expand','maximize'],
+    'adicionar':    ['plus','circle-plus','square-plus'],
+    'remover':      ['minus','circle-minus','square-minus'],
+    'confirmar':    ['check','circle-check','check-double'],
+    'cancelar':     ['xmark','ban'],
+    'bloquear':     ['ban','lock','shield'],
+    'desbloquear':  ['lock-open'],
+    // Arquivos e documentos
+    'arquivo':      ['file','folder'],
+    'documento':    ['file-lines','file','clipboard'],
+    'pasta':        ['folder','folder-open'],
+    'pdf':          ['file-pdf'],
+    'planilha':     ['file-excel','table'],
+    'apresentacao': ['file-powerpoint','display'],
+    'imagem':       ['image','photo-film','file-image'],
+    'foto':         ['camera','image','photo-film'],
+    'video':        ['video','film','photo-film'],
+    'relatorio':    ['chart-bar','chart-line','file-lines','clipboard-list'],
+    'formulario':   ['file-lines','clipboard','rectangle-list'],
+    'lista':        ['list','list-ul','list-ol','clipboard-list'],
+    'tabela':       ['table','table-cells','table-list'],
+    // Gráficos e dados
+    'grafico':      ['chart-bar','chart-line','chart-pie'],
+    'pizza':        ['chart-pie'],
+    'dados':        ['database','server'],
+    'banco':        ['database','server','building'],
+    'servidor':     ['server','database'],
+    // Configurações e ferramentas
+    'configuracao': ['gear','gears','sliders','screwdriver-wrench'],
+    'ferramenta':   ['wrench','screwdriver-wrench','toolbox'],
+    'chave':        ['key','wrench'],
+    'engrenagem':   ['gear','gears'],
+    'ajuste':       ['sliders','gear'],
+    'painel':       ['gauge','sliders','display'],
+    // Organização
+    'estrutura':    ['sitemap','diagram-project','network-wired'],
+    'hierarquia':   ['sitemap','diagram-project'],
+    'mapa':         ['map','map-location-dot','sitemap'],
+    'tag':          ['tag','tags'],
+    'categoria':    ['tag','tags'],
+    'marcador':     ['bookmark','tag','flag'],
+    'bandeira':     ['flag'],
+    // Localização
+    'localizacao':  ['location-dot','map-pin','map'],
+    'endereco':     ['location-dot','map','house'],
+    'casa':         ['house','home'],
+    'predio':       ['building'],
+    'escritorio':   ['building','briefcase'],
+    // Tempo e calendário
+    'calendario':   ['calendar','calendar-days','calendar-check'],
+    'relogio':      ['clock','hourglass'],
+    'hora':         ['clock'],
+    'data':         ['calendar','calendar-days'],
+    'prazo':        ['calendar','clock','hourglass'],
+    'aniversario':  ['cake-candles','gift'],
+    // Dinheiro e negócios
+    'dinheiro':     ['money-bill','wallet','coin'],
+    'financeiro':   ['money-bill','wallet','chart-line'],
+    'pagamento':    ['money-bill','wallet','credit-card'],
+    'contrato':     ['file-lines','handshake','briefcase'],
+    'parceria':     ['handshake'],
+    // Redes e tecnologia
+    'internet':     ['globe','wifi','network-wired'],
+    'rede':         ['network-wired','globe','wifi'],
+    'nuvem':        ['cloud','cloud-arrow-up','cloud-arrow-down'],
+    'codigo':       ['code','code-branch'],
+    'programacao':  ['code','laptop','display'],
+    'computador':   ['laptop','display','desktop'],
+    'celulares':    ['mobile','tablet'],
+    'impressora':   ['print'],
+    'impressao':    ['print'],
+    // Status e feedback
+    'sucesso':      ['check','circle-check','trophy'],
+    'erro':         ['xmark','circle-xmark','exclamation'],
+    'aviso':        ['exclamation','circle-exclamation','triangle-exclamation'],
+    'informacao':   ['info','circle-info'],
+    'ajuda':        ['question','circle-question'],
+    'novo':         ['plus','star','bolt'],
+    'favorito':     ['star','heart','bookmark'],
+    'curtir':       ['heart','thumbs-up'],
+    'nao-curtir':   ['thumbs-down'],
+    // Conteúdo e mídia
+    'livro':        ['book','book-open'],
+    'leitura':      ['book-open','book'],
+    'musica':       ['music','headphones'],
+    'som':          ['volume-high','music','headphones'],
+    'mudo':         ['volume-xmark'],
+    'jogar':        ['play','gamepad'],
+    'jogo':         ['gamepad','puzzle-piece'],
+    'futebol':      ['futbol','trophy'],
+    'trofeu':       ['trophy','medal','award'],
+    'medalha':      ['medal','award'],
+    'premio':       ['trophy','medal','award','gift'],
+    // Social e marcas
+    'social':       ['share-nodes','hashtag','at'],
+    'link':         ['link','share','globe'],
+    'site':         ['globe','link','earth-americas'],
+    'mundo':        ['globe','earth-americas'],
+    // Segurança
+    'seguranca':    ['shield','lock','key','fingerprint'],
+    'privacidade':  ['lock','shield','eye-slash'],
+    'senha':        ['lock','key','fingerprint'],
+    'protegido':    ['shield','shield-halved','lock'],
+    // Outros comuns
+    'sol':          ['sun'],
+    'lua':          ['moon'],
+    'noticias':     ['newspaper'],
+    'jornal':       ['newspaper'],
+    'foguete':      ['rocket'],
+    'ideia':        ['lightbulb'],
+    'lampada':      ['lightbulb'],
+    'coracoes':     ['heart'],
+    'coracao':      ['heart'],
+    'diploma':      ['graduation-cap','award'],
+    'formatura':    ['graduation-cap'],
+    'caminhao':     ['truck'],
+    'entrega':      ['truck','box'],
+    'caixa':        ['box','box-open'],
+    'presente':     ['gift'],
+    'mesa':         ['chair','table'],
+    'cadeira':      ['chair'],
+    'quadro':       ['display','tv'],
+    'televisao':    ['tv','display']
+  };
+
+  // Remove acentos e normaliza para comparação
+  function normalizeStr(s) {
+    return (s || '').toLowerCase()
+      .replace(/[áàãâä]/g,'a').replace(/[éèêë]/g,'e')
+      .replace(/[íìîï]/g,'i').replace(/[óòõôö]/g,'o')
+      .replace(/[úùûü]/g,'u').replace(/[ç]/g,'c')
+      .replace(/[ñ]/g,'n').replace(/[-_\s]/g,'');
+  }
+
+  // Expande termo de busca usando o dicionário PT (com normalização e correspondência parcial)
+  function expandSearchTerms(val) {
+    var normVal = normalizeStr(val);
+    var terms   = [val]; // sempre inclui o original
+
+    Object.keys(ICON_PT_DICT).forEach(function(ptWord) {
+      var normKey = normalizeStr(ptWord);
+      // Corresponde se: o termo bate com a chave (ou vice-versa), ou um é prefixo do outro
+      var match = normKey.indexOf(normVal) !== -1 ||
+                  normVal.indexOf(normKey) !== -1 ||
+                  (normVal.length >= 3 && normKey.startsWith(normVal.slice(0,3)));
+      if (match) {
+        ICON_PT_DICT[ptWord].forEach(function(t) {
+          if (terms.indexOf(t) === -1) terms.push(t);
+        });
+      }
+    });
+    return terms;
+  }
+
+  // Filtra lista de ícones por múltiplos termos (OR), com normalização
+  function filterIcons(list, val) {
+    if (!val || val.length < 2) return list;
+    var normVal = normalizeStr(val);
+    var terms   = expandSearchTerms(normVal);
+    return list.filter(function(ic) {
+      var haystack = normalizeStr(ic.prefix + ' ' + ic.name);
+      return terms.some(function(t) { return haystack.indexOf(normalizeStr(t)) !== -1; });
+    });
+  }
+
+  var _iconesActivePrefix = 'fa-solid';
+  var _iconesSearchTerm   = '';
+
+  function initIconesModal() {
+    var btnOpen  = document.getElementById('btn-open-icones');
+    var btnClose = document.getElementById('btn-close-icones');
+    var overlay  = document.getElementById('icones-modal-overlay');
+    var search   = document.getElementById('icones-search');
+    var filterBtns = document.querySelectorAll('#icones-modal-overlay [data-prefix]');
+
+    if (!btnOpen) return;
+
+    btnOpen.addEventListener('click', function() {
+      overlay.classList.add('show');
+      search.focus();
+      renderIconesGrid();
+    });
+
+    btnClose.addEventListener('click', function() {
+      overlay.classList.remove('show');
+    });
+
+    // Fechar ao clicar fora do modal (sem fechar modais subjacentes)
+    overlay.addEventListener('mousedown', function(e) {
+      if (e.target === overlay) overlay.classList.remove('show');
+    });
+
+    // Busca
+    search.addEventListener('input', function() {
+      _iconesSearchTerm = this.value.toLowerCase().trim();
+      renderIconesGrid();
+    });
+
+    // Filtro solid/brands
+    filterBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        _iconesActivePrefix = btn.dataset.prefix;
+        renderIconesGrid();
+      });
+    });
+  }
+
+  function renderIconesGrid() {
+    var grid = document.getElementById('icones-grid');
+    if (!grid) return;
+
+    var list = ICON_LIST[_iconesActivePrefix] || [];
+    if (_iconesSearchTerm) {
+      list = filterIcons(list, _iconesSearchTerm);
+    }
+
+    if (list.length === 0) {
+      grid.innerHTML = '<p class="icones-empty">Nenhum ícone encontrado.</p>';
+      return;
+    }
+
+    var html = '';
+    list.forEach(function(ic) {
+      var fullClass = ic.prefix + ' ' + ic.name;
+      var label     = ic.name.replace('fa-', '');
+      html += '<div class="icone-card" onclick="window._copyIconName(\'' + fullClass + '\')" title="' + fullClass + '">' +
+        '<i class="' + fullClass + '"></i>' +
+        '<span>' + label + '</span>' +
+      '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  window._copyIconName = function(fullClass) {
+    navigator.clipboard.writeText(fullClass).then(function() {
+      hub.utils.showToast('Copiado: ' + fullClass, 'success');
+    }).catch(function() {
+      // Fallback
+      var ta = document.createElement('textarea');
+      ta.value = fullClass;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      hub.utils.showToast('Copiado: ' + fullClass, 'success');
+    });
+  };
+
+  // ====================================================================
+  // SCROLL DOS TABS COM SETAS
+  // ====================================================================
+  function initTabsScroll() {
+    var wrapper   = document.getElementById('admin-tabs-wrapper');
+    var container = wrapper && wrapper.parentElement;
+    var btnLeft   = document.getElementById('tabs-scroll-left');
+    var btnRight  = document.getElementById('tabs-scroll-right');
+
+    if (!wrapper || !btnLeft || !btnRight) return;
+
+    var STEP = 160; // px por clique
+
+    function updateArrows() {
+      var sl  = wrapper.scrollLeft;
+      var max = wrapper.scrollWidth - wrapper.clientWidth;
+
+      var canLeft  = sl > 2;
+      var canRight = sl < max - 2;
+
+      btnLeft.classList.toggle('visible', canLeft);
+      btnRight.classList.toggle('visible', canRight);
+      container.classList.toggle('can-scroll-left',  canLeft);
+      container.classList.toggle('can-scroll-right', canRight);
+    }
+
+    btnLeft.addEventListener('click', function() {
+      wrapper.scrollBy({ left: -STEP, behavior: 'smooth' });
+    });
+    btnRight.addEventListener('click', function() {
+      wrapper.scrollBy({ left: STEP, behavior: 'smooth' });
+    });
+
+    wrapper.addEventListener('scroll', updateArrows, { passive: true });
+
+    // Observa redimensionamento para recalcular
+    if (window.ResizeObserver) {
+      new ResizeObserver(updateArrows).observe(wrapper);
+    } else {
+      window.addEventListener('resize', updateArrows);
+    }
+
+    // Estado inicial (tabs podem já estar overflowing)
+    updateArrows();
+  }
+
+  // ====================================================================
   // INIT
   // ====================================================================
   document.addEventListener('hub:ready', function(e) {
@@ -1264,6 +1805,9 @@
       return;
     }
     document.getElementById('app-view').style.display = 'block';
+    initTabsScroll();
+    initIconesModal();
+    initIconAutocomplete();
 
     // Pre-load org_structure for reuse across tabs
     hub.sb.from('org_structure').select('*').order('tipo').order('nome').then(function(result) {

@@ -27,9 +27,28 @@
         <!-- 3 stat cards injected by JS -->
       </div>
 
-      <!-- Quick links sections -->
-      <div id="quick-links-container">
-        <!-- Sections injected by JS -->
+      <!-- Quick links + Aniversariantes -->
+      <div class="row">
+        <div class="col-12 col-lg-8">
+          <div id="quick-links-container">
+            <!-- Sections injected by JS -->
+          </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="hub-card" id="birthday-panel">
+            <div class="hub-card-header d-flex flex-column gap-2 align-items-center justify-content-between">
+              <span><i class="fa-solid fa-cake-candles mr-2"></i>Aniversariantes</span>
+              <div class="d-flex align-items-center gap-1">
+                <button class="btn btn-sm btn-secondary" id="birthday-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="birthday-month-label" class="mx-2 font-weight-600" style="font-size:0.875rem; min-width:80px; text-align:center;"></span>
+                <button class="btn btn-sm btn-secondary" id="birthday-next"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+            <div class="hub-card-body" id="birthday-list">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>

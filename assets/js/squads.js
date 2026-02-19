@@ -271,8 +271,8 @@
     for (var i = 0; i < allSquads.length; i++) {
       var squad = allSquads[i];
 
-      // Category filter
-      if (activeCategory && squad.categoria_id !== activeCategory) continue;
+      // Category filter (String coercion: categoria_id é int, activeCategory é string do data-category)
+      if (activeCategory && String(squad.categoria_id) !== String(activeCategory)) continue;
 
       // Text search
       if (search) {
@@ -340,16 +340,18 @@
 
     // Wrike link
     var wrikeHtml = '';
-    if (squad.link_wrike) {
+    var squadLink = squad.link || squad.link_wrike;
+    if (squadLink) {
+      var linkLabel = squad.link_label || 'Wrike';
       wrikeHtml = '<div class="hub-card-footer">' +
-        '<a href="' + esc(squad.link_wrike) + '" target="_blank" rel="noopener noreferrer" ' +
-        'class="btn btn-sm btn-outline-primary btn-icon">' +
-        '<i class="fa-solid fa-external-link-alt"></i> Wrike</a></div>';
+        '<a href="' + esc(squadLink) + '" target="_blank" rel="noopener noreferrer" ' +
+        'class="btn btn-sm btn-secondary btn-icon">' +
+        '<i class="fa-solid fa-external-link-alt"></i> ' + esc(linkLabel) + '</a></div>';
     }
 
     // Description
     var descHtml = descricao ?
-      '<p style="font-size:0.875rem; color:#6c757d; margin:0 0 0.75rem 0;">' + descricao + '</p>' : '';
+      '<p class="squad-desc">' + descricao + '</p>' : '';
 
     return '' +
       '<div class="col-12 col-md-6 col-xl-4 mb-4">' +
@@ -359,7 +361,7 @@
               '<i class="' + icon + '" style="color:' + catCor + '; font-size:1rem;"></i>' +
             '</div>' +
             '<div style="flex:1; min-width:0;">' +
-              '<h6 style="margin:0; font-weight:700; font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + nome + '</h6>' +
+              '<h6 class="squad-card-title">' + nome + '</h6>' +
               (catName ? '<span class="badge" style="background-color:' + catCor + '; color:#fff; font-size:0.7rem; font-weight:600;">' + catName + '</span>' : '') +
             '</div>' +
           '</div>' +
@@ -374,7 +376,7 @@
 
   function renderMembersSection(grouped) {
     if (grouped.length === 0) {
-      return '<p class="text-muted" style="font-size:0.8125rem; margin:0;">Nenhum membro atribuido</p>';
+      return '<p class="squad-members-empty">Nenhum membro atribuido</p>';
     }
 
     var html = '';
@@ -382,9 +384,9 @@
       var coordGroup = grouped[c];
       var coordName = hub.utils.escapeHtml(coordGroup.coordName || 'Sem coordenacao');
 
-      html += '<div style="margin-bottom:0.625rem;">';
-      html += '<div style="font-size:0.75rem; font-weight:700; color:#495057; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.25rem;">' +
-        '<i class="fa-solid fa-sitemap" style="font-size:0.625rem; margin-right:0.25rem; opacity:0.6;"></i>' +
+      html += '<div class="squad-coord-group">';
+      html += '<div class="squad-coord-label">' +
+        '<i class="fa-solid fa-sitemap squad-coord-icon"></i>' +
         coordName + '</div>';
 
       for (var n = 0; n < coordGroup.nucleos.length; n++) {
@@ -395,10 +397,12 @@
           var user = users[u];
           var displayName = hub.utils.escapeHtml(user.apelido || user.nome || '');
           var nucleoLabel = nucleoGroup.nucleoName ?
-            ' <span style="font-size:0.7rem; color:#adb5bd;">(' + hub.utils.escapeHtml(nucleoGroup.nucleoName) + ')</span>' : '';
+            ' <span class="squad-nucleo-label">(' + hub.utils.escapeHtml(nucleoGroup.nucleoName) + ')</span>' : '';
+          var nameHtml = user.user_name
+            ? '<a href="' + hub.config.basePath + '/perfil/?u=' + hub.utils.escapeHtml(user.user_name) + '" class="squad-member-link">' + displayName + '</a>'
+            : displayName;
 
-          html += '<div style="font-size:0.8125rem; padding:0.125rem 0 0.125rem 1rem; color:#343a40;">' +
-            displayName + nucleoLabel + '</div>';
+          html += '<div class="squad-member-row">' + nameHtml + nucleoLabel + '</div>';
         }
       }
 

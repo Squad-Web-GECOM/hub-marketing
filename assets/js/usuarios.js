@@ -222,16 +222,16 @@
     var html = '';
     filteredUsers.forEach(function(u) {
       html += '<tr>' +
-        '<td>' + hub.utils.escapeHtml(u.nome || '-') + '</td>' +
+        '<td>' + (u.user_name ? '<a href="' + hub.config.basePath + '/perfil/?u=' + hub.utils.escapeHtml(u.user_name) + '">' + hub.utils.escapeHtml(u.nome || '-') + '</a>' : hub.utils.escapeHtml(u.nome || '-')) + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.apelido || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.user_name || '-') + '</td>' +
-        '<td>' + hub.utils.escapeHtml(getOrgName(u.gerencia_id)) + '</td>' +
-        '<td>' + hub.utils.escapeHtml(getOrgName(u.coordenacao_id)) + '</td>' +
-        '<td>' + hub.utils.escapeHtml(getOrgName(u.nucleo_id)) + '</td>' +
+        '<td class="td-truncate">' + hub.utils.escapeHtml(getOrgName(u.gerencia_id)) + '</td>' +
+        '<td class="td-truncate">' + hub.utils.escapeHtml(getOrgName(u.coordenacao_id)) + '</td>' +
+        '<td class="td-truncate">' + hub.utils.escapeHtml(getOrgName(u.nucleo_id)) + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.email || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.telefone || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.aniversario ? hub.utils.formatDate(u.aniversario) : '-') + '</td>' +
-        '<td>' + hub.utils.escapeHtml(u.endereco || '-') + '</td>' +
+        '<td class="td-truncate">' + hub.utils.escapeHtml(u.endereco || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.bairro || '-') + '</td>' +
         '<td>' + (u.terceirizado ? '<span class="hub-badge hub-badge-warning">Sim</span>' : '<span class="hub-badge hub-badge-success">Nao</span>') + '</td>' +
         '</tr>';

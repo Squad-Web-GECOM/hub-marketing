@@ -17,20 +17,49 @@
     <div id="app-view" style="display:none;">
       <div class="hub-page-header">
         <h1 class="hub-page-title"><i class="fa-solid fa-gear"></i> Admin</h1>
+        <button class="btn btn-secondary btn-sm" id="btn-open-icones" title="Consultar ícones">
+          <i class="fa-solid fa-icons mr-1"></i>Ícones
+        </button>
       </div>
 
-      <!-- Tab Navigation using Bootstrap nav-pills — wrapper com scroll horizontal no mobile -->
-      <div class="admin-tabs-wrapper mb-4">
-      <ul class="nav nav-pills" id="admin-tabs">
-        <li class="nav-item"><a class="nav-link" href="#usuarios" data-tab="usuarios"><i class="fa-solid fa-users"></i> Usuarios</a></li>
-        <li class="nav-item"><a class="nav-link" href="#estrutura" data-tab="estrutura"><i class="fa-solid fa-sitemap"></i> Estrutura</a></li>
-        <li class="nav-item"><a class="nav-link" href="#squads" data-tab="squads"><i class="fa-solid fa-users-gear"></i> Squads</a></li>
-        <li class="nav-item"><a class="nav-link" href="#categorias" data-tab="categorias"><i class="fa-solid fa-tags"></i> Categorias</a></li>
-        <li class="nav-item"><a class="nav-link" href="#formularios" data-tab="formularios"><i class="fa-solid fa-file-lines"></i> Formularios</a></li>
-        <li class="nav-item"><a class="nav-link" href="#mesas" data-tab="mesas"><i class="fa-solid fa-chair"></i> Mesas</a></li>
-        <li class="nav-item"><a class="nav-link" href="#registros" data-tab="registros"><i class="fa-solid fa-clipboard-list"></i> Registros</a></li>
-        <li class="nav-item"><a class="nav-link" href="#links" data-tab="links"><i class="fa-solid fa-link"></i> Links</a></li>
-      </ul>
+      <!-- Modal flutuante de consulta de ícones -->
+      <div id="icones-modal-overlay" class="icones-modal-overlay">
+        <div class="icones-modal" id="icones-modal">
+          <div class="icones-modal-header">
+            <span><i class="fa-solid fa-icons mr-2"></i>Referência de Ícones</span>
+            <button class="hub-modal-close" id="btn-close-icones">&times;</button>
+          </div>
+          <div class="icones-modal-search">
+            <input type="text" id="icones-search" class="form-control form-control-sm" placeholder="Buscar ícone...">
+            <div class="icones-filter-btns">
+              <button class="btn btn-sm btn-secondary active" data-prefix="fa-solid">Solid</button>
+              <button class="btn btn-sm btn-secondary" data-prefix="fa-brands">Brands</button>
+            </div>
+          </div>
+          <div class="icones-modal-body" id="icones-grid"></div>
+        </div>
+      </div>
+
+      <!-- Tab Navigation com setas de scroll -->
+      <div class="admin-tabs-container mb-4">
+        <button class="tabs-scroll-btn tabs-scroll-left" id="tabs-scroll-left" aria-label="Rolar esquerda">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="admin-tabs-wrapper" id="admin-tabs-wrapper">
+          <ul class="nav nav-pills" id="admin-tabs">
+            <li class="nav-item"><a class="nav-link" href="#usuarios" data-tab="usuarios"><i class="fa-solid fa-users"></i> Usuários</a></li>
+            <li class="nav-item"><a class="nav-link" href="#estrutura" data-tab="estrutura"><i class="fa-solid fa-sitemap"></i> Estrutura</a></li>
+            <li class="nav-item"><a class="nav-link" href="#squads" data-tab="squads"><i class="fa-solid fa-users-gear"></i> Squads</a></li>
+            <li class="nav-item"><a class="nav-link" href="#categorias" data-tab="categorias"><i class="fa-solid fa-tags"></i> Categorias</a></li>
+            <li class="nav-item"><a class="nav-link" href="#formularios" data-tab="formularios"><i class="fa-solid fa-file-lines"></i> Formulários</a></li>
+            <li class="nav-item"><a class="nav-link" href="#mesas" data-tab="mesas"><i class="fa-solid fa-chair"></i> Mesas</a></li>
+            <li class="nav-item"><a class="nav-link" href="#registros" data-tab="registros"><i class="fa-solid fa-clipboard-list"></i> Registros</a></li>
+            <li class="nav-item"><a class="nav-link" href="#links" data-tab="links"><i class="fa-solid fa-link"></i> Links</a></li>
+          </ul>
+        </div>
+        <button class="tabs-scroll-btn tabs-scroll-right" id="tabs-scroll-right" aria-label="Rolar direita">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
 
       <!-- Tab content panels -->

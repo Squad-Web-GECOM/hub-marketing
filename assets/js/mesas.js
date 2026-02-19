@@ -242,7 +242,7 @@
 
       return '' +
         '<div class="card desk-card ' + cardClass + '" style="' + style + '">' +
-          '<div class="card-body p-2 d-flex flex-column justify-content-between text-center">' +
+          '<div class="card-body p-3 d-flex flex-column justify-content-between text-center">' +
             '<h6 class="card-title mb-1">' + desk.desk_name + '</h6>' +
             '<span class="reserved-name small text-truncate">' + statusText + '</span>' +
             btnHtml +
