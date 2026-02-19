@@ -248,7 +248,7 @@
         html += '<div class="row">';
 
         sections[secao].forEach(function(link) {
-          var icon = hub.utils.escapeHtml(link.icone || 'fa-link');
+          var icon = hub.utils.normalizeIcon(link.icone, 'fa-solid fa-link');
           html += '' +
             '<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-2">' +
               '<a href="' + hub.utils.escapeHtml(link.url) + '" target="_blank" class="hub-link-card animate-fadeIn">' +

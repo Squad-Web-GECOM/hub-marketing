@@ -57,7 +57,7 @@
         <div class="hub-card h-100">
           <div class="hub-card-body d-flex flex-column">
             <div class="mb-3">
-              <i class="fa-solid ${hub.utils.escapeHtml(form.icone || 'fa-file-lines')} text-turq" style="font-size:2rem;"></i>
+              <i class="${hub.utils.normalizeIcon(form.icone, 'fa-solid fa-file-lines')} text-turq" style="font-size:2rem;"></i>
             </div>
             <h5 class="mb-2">${hub.utils.escapeHtml(form.nome)}</h5>
             <p class="text-muted flex-grow-1" style="font-size:0.9rem;">${hub.utils.escapeHtml(form.descricao_breve || '')}</p>

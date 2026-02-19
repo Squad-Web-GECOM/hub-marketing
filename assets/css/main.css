@@ -1838,12 +1838,9 @@ a:hover {
   flex-shrink: 0;
 }
 
-/* Efeito visual sutil quando gate ativo — sem bloquear interacao */
+/* Efeito visual sutil quando gate ativo — SEM bloquear interacao */
 .hub-profile-gate-active {
-  opacity: 0.85;
-  pointer-events: none;
-  filter: blur(0.5px);
-  user-select: none;
+  opacity: 0.75;
 }
 
 /* Dark mode */

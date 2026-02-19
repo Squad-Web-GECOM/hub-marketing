@@ -319,21 +319,9 @@
     grid.innerHTML = html;
   }
 
-  /**
-   * Normaliza uma classe de ícone FontAwesome.
-   * Garante que sempre tenha um prefixo de estilo (fa-solid, fa-brands, fa-regular).
-   * Ex: "fa-globe" → "fa-solid fa-globe"
-   *     "fa-brands fa-github" → "fa-brands fa-github" (mantém)
-   *     "fa-solid fa-users" → "fa-solid fa-users" (mantém)
-   */
+  // Wrapper local para hub.utils.normalizeIcon com fallback de squad
   function normalizeIcon(icon) {
-    if (!icon) return 'fa-solid fa-users';
-    var prefixes = ['fa-solid', 'fa-brands', 'fa-regular', 'fa-light', 'fa-thin', 'fa-duotone', 'fas', 'far', 'fab'];
-    for (var p = 0; p < prefixes.length; p++) {
-      if (icon.indexOf(prefixes[p]) !== -1) return icon; // já tem prefixo
-    }
-    // Sem prefixo — adiciona fa-solid por padrão
-    return 'fa-solid ' + icon;
+    return hub.utils.normalizeIcon(icon, 'fa-solid fa-users');
   }
 
   function renderCard(squad, index) {

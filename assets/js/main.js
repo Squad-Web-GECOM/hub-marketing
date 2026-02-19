@@ -557,6 +557,82 @@
     hideLoader: function() {
       var loader = document.getElementById('loader');
       if (loader) loader.style.display = 'none';
+    },
+
+    /**
+     * Normaliza classe de icone FontAwesome.
+     * - Garante prefixo de estilo correto (fa-solid / fa-brands / fa-regular).
+     * - Icones de marcas conhecidos recebem 'fa-brands' automaticamente.
+     * - Mapeia icones Pro inexistentes no Free para substitutos Free.
+     * Ex: "fa-linkedin"      → "fa-brands fa-linkedin"
+     *     "fa-calendar-star" → "fa-solid fa-calendar-days"  (Pro → Free fallback)
+     *     "fa-globe"         → "fa-solid fa-globe"
+     *     "fa-brands fa-github" → "fa-brands fa-github"  (mantém)
+     */
+    normalizeIcon: function(icon, fallback) {
+      fallback = fallback || 'fa-solid fa-circle';
+      if (!icon || !icon.trim()) return fallback;
+      icon = icon.trim();
+
+      // Mapa de icones Pro → substituto Free equivalente
+      var proToFree = {
+        'fa-calendar-star':    'fa-calendar-days',
+        'fa-calendar-plus':    'fa-calendar-plus',  // free
+        'fa-calendar-clock':   'fa-calendar',
+        'fa-ballot':           'fa-list-check',
+        'fa-books':            'fa-book',
+        'fa-memo':             'fa-file-lines',
+        'fa-sidebar':          'fa-table-columns',
+        'fa-badge-check':      'fa-circle-check',
+        'fa-star-sharp':       'fa-star',
+        'fa-bell-ring':        'fa-bell',
+        'fa-pen-circle':       'fa-pen',
+        'fa-chart-pie-simple': 'fa-chart-pie',
+        'fa-phone-rotary':     'fa-phone'
+      };
+
+      // Icones de marcas que precisam de 'fa-brands'
+      var brandIcons = [
+        'fa-linkedin','fa-linkedin-in','fa-github','fa-github-alt','fa-twitter',
+        'fa-instagram','fa-facebook','fa-facebook-f','fa-youtube','fa-tiktok',
+        'fa-whatsapp','fa-discord','fa-slack','fa-google','fa-microsoft',
+        'fa-apple','fa-android','fa-windows','fa-figma','fa-trello',
+        'fa-jira','fa-confluence','fa-notion','fa-aws','fa-docker',
+        'fa-node','fa-node-js','fa-npm','fa-react','fa-vuejs','fa-angular',
+        'fa-python','fa-java','fa-php','fa-js','fa-css3','fa-html5'
+      ];
+
+      var stylePrefixes = ['fa-solid','fa-brands','fa-regular','fa-light','fa-thin','fa-duotone','fas','far','fab'];
+
+      // Ja tem prefixo — apenas checar Pro→Free
+      var hasPrefix = false;
+      for (var p = 0; p < stylePrefixes.length; p++) {
+        if (icon.indexOf(stylePrefixes[p]) !== -1) { hasPrefix = true; break; }
+      }
+
+      if (hasPrefix) {
+        // Substitui icone Pro dentro da string
+        for (var proKey in proToFree) {
+          if (icon.indexOf(proKey) !== -1) {
+            icon = icon.replace(proKey, proToFree[proKey]);
+          }
+        }
+        return icon;
+      }
+
+      // Sem prefixo — aplicar Pro→Free primeiro
+      var iconName = icon;
+      if (proToFree[iconName]) {
+        iconName = proToFree[iconName];
+      }
+
+      // Checar se e icone de marca
+      for (var b = 0; b < brandIcons.length; b++) {
+        if (iconName === brandIcons[b]) return 'fa-brands ' + iconName;
+      }
+
+      // Default: fa-solid
+      return 'fa-solid ' + iconName;
     }
   };
 

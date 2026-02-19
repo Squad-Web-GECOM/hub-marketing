@@ -633,8 +633,11 @@
 
     grid.addEventListener('mousedown', function(e) {
       if (e.target.closest('button')) return;
+      e.preventDefault(); // impede selecao de texto ao arrastar
       isDown = true;
       grid.style.cursor = 'grabbing';
+      grid.style.userSelect = 'none';
+      grid.style.webkitUserSelect = 'none';
       startX = e.pageX - grid.offsetLeft;
       startY = e.pageY - grid.offsetTop;
       scrollLeft = grid.scrollLeft;
@@ -644,11 +647,15 @@
     grid.addEventListener('mouseleave', function() {
       isDown = false;
       grid.style.cursor = 'grab';
+      grid.style.userSelect = '';
+      grid.style.webkitUserSelect = '';
     });
 
     grid.addEventListener('mouseup', function() {
       isDown = false;
       grid.style.cursor = 'grab';
+      grid.style.userSelect = '';
+      grid.style.webkitUserSelect = '';
     });
 
     grid.addEventListener('mousemove', function(e) {

@@ -429,17 +429,35 @@
   };
 
   window._adminEditOrg = function(orgId) {
-    var o = orgStructure.find(function(x) { return x.id === orgId; });
-    if (!o) return;
+    console.log('[Admin] _adminEditOrg called, id:', orgId, '| orgStructure.length:', orgStructure.length);
+    var o = orgStructure.find(function(x) { return String(x.id) === String(orgId); });
+    if (!o) {
+      console.warn('[Admin] Org not found in cache, re-fetching...');
+      // Tenta recarregar orgStructure e tentar novamente
+      hub.sb.from('org_structure').select('*').then(function(r) {
+        if (r.data) {
+          orgStructure = r.data;
+          var o2 = orgStructure.find(function(x) { return String(x.id) === String(orgId); });
+          if (!o2) { hub.utils.showToast('Org nao encontrada (id: ' + orgId + ')', 'error'); return; }
+          _adminEditOrgRun(o2, orgId);
+        }
+      });
+      return;
+    }
+    _adminEditOrgRun(o, orgId);
+  };
+
+  function _adminEditOrgRun(o, orgId) {
     var formHtml = '<div class="form-group"><label>Nome</label><input class="form-control" id="org-nome" value="' + esc(o.nome) + '"></div>';
 
     showEditModal('Editar ' + o.tipo, formHtml, async function() {
       var nome = document.getElementById('org-nome').value.trim();
       if (!nome) { hub.utils.showToast('Preencha o nome', 'warning'); return; }
 
-      var res = await hub.sb.from('org_structure').update({ nome: nome }).eq('id', orgId);
+      var res = await hub.sb.from('org_structure').update({ nome: nome }).eq('id', orgId).select();
+      console.log('[Admin] org_structure update result:', res);
       if (res.error) {
-        hub.utils.showToast('Erro: ' + res.error.message, 'error');
+        hub.utils.showToast('Erro ao salvar: ' + res.error.message, 'error');
       } else {
         hub.utils.showToast('Atualizado com sucesso', 'success');
         hideEditModal();
@@ -449,7 +467,7 @@
   };
 
   window._adminDeactivateOrg = function(orgId) {
-    var o = orgStructure.find(function(x) { return x.id === orgId; });
+    var o = orgStructure.find(function(x) { return String(x.id) === String(orgId); });
     showConfirm('Desativar <strong>' + esc(o ? o.nome : '') + '</strong>?', async function() {
       var res = await hub.sb.from('org_structure').update({ is_active: false }).eq('id', orgId);
       if (res.error) {
@@ -503,7 +521,7 @@
       html += '<tr>' +
         '<td>' + esc(s.nome) + '</td>' +
         '<td>' + esc(catName) + '</td>' +
-        '<td><i class="fa-solid ' + esc(s.icone || 'fa-users') + '"></i> ' + esc(s.icone) + '</td>' +
+        '<td><i class="' + hub.utils.normalizeIcon(s.icone, 'fa-solid fa-users') + '"></i> ' + esc(s.icone) + '</td>' +
         '<td>' + esc(s.descricao ? s.descricao.substring(0, 50) : '') + '</td>' +
         '<td><span class="badge badge-primary">' + memberCount + '</span></td>' +
         '<td class="text-nowrap">' +
@@ -695,7 +713,7 @@
       if (c.is_active === false) return;
       html += '<tr>' +
         '<td>' + esc(c.nome) + '</td>' +
-        '<td><i class="fa-solid ' + esc(c.icone || 'fa-tag') + '"></i> ' + esc(c.icone) + '</td>' +
+        '<td><i class="' + hub.utils.normalizeIcon(c.icone, 'fa-solid fa-tag') + '"></i> ' + esc(c.icone) + '</td>' +
         '<td><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:' + esc(c.cor || '#ccc') + ';vertical-align:middle;"></span> ' + esc(c.cor) + '</td>' +
         '<td class="text-nowrap">' +
           '<button class="btn btn-sm btn-outline-primary mr-1" onclick="window._adminEditCategoria(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
@@ -1152,7 +1170,7 @@
       html += '<tr>' +
         '<td>' + esc(l.titulo) + '</td>' +
         '<td><a href="' + esc(l.url) + '" target="_blank" class="text-truncate d-inline-block" style="max-width:250px;">' + esc(l.url) + '</a></td>' +
-        '<td><i class="fa-solid ' + esc(l.icone || 'fa-link') + '"></i> ' + esc(l.icone) + '</td>' +
+        '<td><i class="' + hub.utils.normalizeIcon(l.icone, 'fa-solid fa-link') + '"></i> ' + esc(l.icone) + '</td>' +
         '<td>' + esc(l.secao) + '</td>' +
         '<td>' + (l.ordem || 0) + '</td>' +
         '<td class="text-nowrap">' +
