@@ -183,7 +183,7 @@
 
       this._role = {
         isAdmin: data.is_admin,
-        isCoordenador: data.is_coordenador
+        isCoordenador: data.is_gestor  // coluna renomeada de is_coordenador para is_gestor
       };
 
       return true;

@@ -159,7 +159,7 @@
     html += '<div class="hub-table-wrapper"><table class="hub-table table table-sm"><thead><tr>' +
       '<th>Ações</th><th>Nome</th><th>Apelido</th><th>Usuário</th><th>Email</th>' +
       '<th>Gerência</th><th>Coord.</th><th>Núcleo</th>' +
-      '<th>Admin</th><th>Coord</th>' +
+      '<th>Senioridade</th><th>Admin</th><th>Gestor</th>' +
       '</tr></thead><tbody id="usuarios-tbody"></tbody></table></div>';
 
     panel.innerHTML = html;
@@ -190,11 +190,12 @@
         '<td class="td-truncate">' + esc(orgName(u.gerencia_id)) + '</td>' +
         '<td class="td-truncate">' + esc(orgName(u.coordenacao_id)) + '</td>' +
         '<td class="td-truncate">' + esc(orgName(u.nucleo_id)) + '</td>' +
+        '<td>' + esc(u.senioridade || '') + '</td>' +
         '<td>' + (u.is_admin ? '<span class="badge badge-success">Admin</span>' : '') + '</td>' +
-        '<td>' + (u.is_coordenador ? '<span class="badge badge-info">Coord</span>' : '') + '</td>' +
+        '<td>' + (u.is_gestor ? '<span class="badge badge-info">Gestor</span>' : '') + '</td>' +
         '</tr>';
     });
-    tbody.innerHTML = rows || '<tr><td colspan="10" class="text-center text-muted">Nenhum usuario encontrado</td></tr>';
+    tbody.innerHTML = rows || '<tr><td colspan="11" class="text-center text-muted">Nenhum usuario encontrado</td></tr>';
   }
 
   window._adminEditUser = function(userId) {
@@ -215,9 +216,15 @@
       '<div class="form-group"><label>Gerencia</label><select class="form-control" id="eu-gerencia">' + gerenciaOptions(u.gerencia_id) + '</select></div>' +
       '<div class="form-group"><label>Coordenacao</label><select class="form-control" id="eu-coordenacao">' + coordenacaoOptions(u.gerencia_id, u.coordenacao_id) + '</select></div>' +
       '<div class="form-group"><label>Nucleo</label><select class="form-control" id="eu-nucleo">' + nucleoOptions(u.coordenacao_id, u.nucleo_id) + '</select></div>' +
+      '<div class="form-group"><label>Senioridade</label><select class="form-control" id="eu-senioridade">' +
+        '<option value="">— Não definida —</option>' +
+        ['Gerente','Coordenador','Especialista','Sênior','Pleno','Júnior','Assistente','Estagiário','Jovem Aprendiz'].map(function(s) {
+          return '<option value="' + s + '"' + (u.senioridade === s ? ' selected' : '') + '>' + s + '</option>';
+        }).join('') +
+      '</select></div>' +
       '<div class="form-check mb-2"><input type="checkbox" class="form-check-input" id="eu-terceirizado"' + (u.terceirizado ? ' checked' : '') + '><label class="form-check-label" for="eu-terceirizado">Terceirizado</label></div>' +
       (isAdmin ? '<div class="form-check mb-2"><input type="checkbox" class="form-check-input" id="eu-is-admin"' + (u.is_admin ? ' checked' : '') + '><label class="form-check-label" for="eu-is-admin">Admin</label></div>' +
-        '<div class="form-check mb-2"><input type="checkbox" class="form-check-input" id="eu-is-coord"' + (u.is_coordenador ? ' checked' : '') + '><label class="form-check-label" for="eu-is-coord">Coordenador</label></div>' : '');
+        '<div class="form-check mb-2"><input type="checkbox" class="form-check-input" id="eu-is-gestor"' + (u.is_gestor ? ' checked' : '') + '><label class="form-check-label" for="eu-is-gestor">Gestor</label></div>' : '');
 
     showEditModal('Editar Usuario: ' + u.nome, formHtml, async function() {
       var updates = {
@@ -232,11 +239,12 @@
         gerencia_id: document.getElementById('eu-gerencia').value || null,
         coordenacao_id: document.getElementById('eu-coordenacao').value || null,
         nucleo_id: document.getElementById('eu-nucleo').value || null,
-        terceirizado: document.getElementById('eu-terceirizado').checked
+        terceirizado: document.getElementById('eu-terceirizado').checked,
+        senioridade: document.getElementById('eu-senioridade').value || null
       };
       if (isAdmin) {
-        updates.is_admin = document.getElementById('eu-is-admin').checked;
-        updates.is_coordenador = document.getElementById('eu-is-coord').checked;
+        updates.is_admin   = document.getElementById('eu-is-admin').checked;
+        updates.is_gestor  = document.getElementById('eu-is-gestor').checked;
       }
 
       var res = await hub.sb.from('users').update(updates).eq('id', userId);
@@ -1203,11 +1211,22 @@
 
   function linkFormHtml(l) {
     l = l || {};
+    // Seções únicas já existentes para o datalist
+    var secoes = [];
+    (allQuickLinks || []).forEach(function(lk) {
+      if (lk.secao && lk.is_active !== false && secoes.indexOf(lk.secao) === -1) {
+        secoes.push(lk.secao);
+      }
+    });
+    secoes.sort();
+    var datalistHtml = '<datalist id="lk-secao-list">' +
+      secoes.map(function(s) { return '<option value="' + esc(s) + '">'; }).join('') +
+      '</datalist>';
     return '' +
       '<div class="form-group"><label>Titulo</label><input class="form-control" id="lk-titulo" value="' + esc(l.titulo) + '"></div>' +
       '<div class="form-group"><label>URL</label><input class="form-control" id="lk-url" value="' + esc(l.url) + '" placeholder="https://..."></div>' +
       '<div class="form-group"><label>Ícone</label><div class="icon-input-wrap"><input class="form-control" id="lk-icone" value="' + esc(l.icone) + '" placeholder="fa-solid fa-link" autocomplete="off"><span class="icon-preview" id="icon-preview-lk-icone" style="display:none"></span></div></div>' +
-      '<div class="form-group"><label>Secao</label><input class="form-control" id="lk-secao" value="' + esc(l.secao) + '" placeholder="Ex: ferramentas, comunicacao"></div>' +
+      '<div class="form-group"><label>Seção</label>' + datalistHtml + '<input class="form-control" id="lk-secao" value="' + esc(l.secao) + '" list="lk-secao-list" placeholder="Ex: ferramentas, comunicacao" autocomplete="off"></div>' +
       '<div class="form-group"><label>Ordem</label><input type="number" class="form-control" id="lk-ordem" value="' + (l.ordem || 0) + '"></div>';
   }
 

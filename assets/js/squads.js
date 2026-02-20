@@ -342,7 +342,7 @@
     var wrikeHtml = '';
     var squadLink = squad.link || squad.link_wrike;
     if (squadLink) {
-      var linkLabel = squad.link_label || 'Wrike';
+      var linkLabel = squad.link_label || 'Link';
       wrikeHtml = '<div class="hub-card-footer">' +
         '<a href="' + esc(squadLink) + '" target="_blank" rel="noopener noreferrer" ' +
         'class="btn btn-sm btn-secondary btn-icon">' +

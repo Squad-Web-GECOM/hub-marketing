@@ -1803,6 +1803,18 @@ a:hover {
 [data-theme=dark] .hub-modal-close:hover {
   color: var(--mine-shaft-50);
 }
+
+/* Bootstrap list-group — dark mode override */
+[data-theme=dark] .list-group-item {
+  background-color: var(--athens-gray-900);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--mine-shaft-50);
+}
+[data-theme=dark] .list-group-item:hover {
+  background-color: var(--athens-gray-800);
+  color: var(--mine-shaft-50);
+}
+
 [data-theme=dark] #desk-grid {
   background-color: var(--athens-gray-800);
   box-shadow: none;
@@ -2202,16 +2214,73 @@ a:hover {
 }
 
 /* ====================================================================
-   PERFIL
+   PERFIL — Layout Bento
    ==================================================================== */
+
+/* ── Bento Grid principal ───────────────────────────────────────────── */
+/*
+   Col tracks: [gostos=4] [squads=4] [sobre=4]   (12 colunas Bootstrap)
+   Linha 1: foto(8) + org(4)
+   Linha 2: gostos(4) + squads(4) + sobre(4)
+   Linha 3: gostos(4, cont) + dados(8)
+*/
+.perfil-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: 1rem;
+}
+
+/* Linha 1 */
+.perfil-bento-foto  { grid-column: 1 / 9;  grid-row: 1; }
+.perfil-bento-org   { grid-column: 9 / 13; grid-row: 1; }
+
+/* Linhas 2-3 */
+.perfil-bento-gostos { grid-column: 1 / 5;  grid-row: 2 / 4; }
+.perfil-bento-squads { grid-column: 5 / 9;  grid-row: 2; }
+.perfil-bento-sobre  { grid-column: 9 / 13; grid-row: 2; }
+.perfil-bento-dados  { grid-column: 5 / 13; grid-row: 3; }
+
+/* Mobile: tudo em coluna única */
+@media (max-width: 767px) {
+  .perfil-bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .perfil-bento-foto,
+  .perfil-bento-org,
+  .perfil-bento-gostos,
+  .perfil-bento-squads,
+  .perfil-bento-sobre,
+  .perfil-bento-dados {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
+/* Card de foto: layout interno com grid (avatar | identidade) */
+.perfil-card-foto {
+  padding: 1.25rem 1.5rem;
+}
+.perfil-foto-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.5rem;
+}
+@media (max-width: 576px) {
+  .perfil-foto-inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+}
 
 /* Avatar */
 .perfil-avatar-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 .perfil-avatar {
   width: 96px;
@@ -2245,20 +2314,27 @@ a:hover {
 
 /* Identidade */
 .perfil-identity {
-  text-align: center;
-  margin-bottom: 1rem;
+  flex: 1;
+  min-width: 0;
 }
 .perfil-nome {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  margin-bottom: 0.125rem;
+  margin-bottom: 0.1rem;
+  line-height: 1.2;
 }
 .perfil-apelido {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  margin: 0 0 0.1rem 0;
+  font-style: italic;
+}
+.perfil-username {
+  font-size: 0.8rem;
   margin: 0;
+  color: #adb5bd;
 }
 
-/* Info rows */
+/* Info rows (reutilizados nos cards de org e dados pessoais) */
 .perfil-info-list {
   border-top: 1px solid rgba(0,0,0,0.07);
   padding-top: 0.75rem;
@@ -2428,6 +2504,12 @@ a:hover {
 }
 [data-theme=dark] .perfil-nome {
   color: var(--mine-shaft-50);
+}
+[data-theme=dark] .perfil-apelido {
+  color: var(--athens-gray-400);
+}
+[data-theme=dark] .perfil-username {
+  color: var(--athens-gray-600);
 }
 [data-theme=dark] .perfil-info-list {
   border-top-color: rgba(255,255,255,0.08);

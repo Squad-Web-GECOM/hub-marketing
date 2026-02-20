@@ -55,11 +55,17 @@
       targetUser = results[1].data;
 
       renderProfile();
-      await loadSquads(targetUser.user_name);
+      await loadSquads(targetUser.id);
 
       if (isOwnProfile) {
+        // Injetar botão Editar no header antes de setupEditModal (que busca o elemento)
+        var headerActions = document.getElementById('perfil-header-actions');
+        if (headerActions) {
+          headerActions.innerHTML =
+            '<button class="btn btn-secondary btn-sm" id="btn-editar-perfil-page">' +
+            '<i class="fa-solid fa-pen mr-1"></i>Editar Perfil</button>';
+        }
         setupEditModal();
-        document.getElementById('perfil-edit-btn-wrap').classList.remove('d-none');
         document.getElementById('btn-change-avatar').classList.remove('d-none');
       }
 
@@ -189,6 +195,12 @@
       if (!u.apelido) apelidoEl.style.display = 'none';
     }
 
+    var usernameEl = document.getElementById('perfil-username');
+    if (usernameEl) {
+      usernameEl.textContent = u.user_name ? '@' + u.user_name : '';
+      if (!u.user_name) usernameEl.style.display = 'none';
+    }
+
     // Org info
     var orgEl = document.getElementById('perfil-org-info');
     if (orgEl) {
@@ -220,12 +232,24 @@
         '</div>';
     }
 
-    // Contato
+    // Contato + endereço completo
     var contatoEl = document.getElementById('perfil-contato-info');
     if (contatoEl) {
       var html = '';
+      // Senioridade — visível apenas para o próprio usuário ou admin/coord
+      if (u.senioridade && (isOwnProfile || hub.auth.isAdminOrCoord())) {
+        html += infoRow('fa-solid fa-star', 'Senioridade', u.senioridade);
+      }
       html += infoRow('fa-solid fa-phone', 'Telefone', u.telefone);
       html += infoRow('fa-solid fa-location-dot', 'Bairro', u.bairro);
+      // Montar endereço completo: logradouro + bairro + CEP
+      var enderecoPartes = [];
+      if (u.endereco) enderecoPartes.push(u.endereco);
+      if (u.bairro && !u.endereco) { /* bairro já exibido acima */ }
+      if (u.cep) enderecoPartes.push('CEP ' + u.cep);
+      if (enderecoPartes.length) {
+        html += infoRow('fa-solid fa-map-pin', 'Endereço', enderecoPartes.join(' — '));
+      }
       contatoEl.innerHTML = html;
     }
 
@@ -274,7 +298,7 @@
   // ====================================================================
   // SQUADS
   // ====================================================================
-  async function loadSquads(userName) {
+  async function loadSquads(userId) {
     var listEl = document.getElementById('perfil-squads-list');
     if (!listEl) return;
 
@@ -282,7 +306,7 @@
       var resp = await hub.sb
         .from('squad_members')
         .select('squad_id, squads(id, nome, icone)')
-        .eq('user_name', userName);
+        .eq('user_id', userId);
 
       if (resp.error) throw resp.error;
 
@@ -405,8 +429,8 @@
       e.target.value = '';
       return;
     }
-    if (file.size > 300 * 1024) {
-      errEl.textContent = 'A imagem deve ter no máximo 300 KB (atual: ' + Math.round(file.size / 1024) + ' KB).';
+    if (file.size > 150 * 1024) {
+      errEl.textContent = 'A imagem deve ter no máximo 150 KB (atual: ' + Math.round(file.size / 1024) + ' KB).';
       errEl.classList.remove('d-none');
       e.target.value = '';
       return;

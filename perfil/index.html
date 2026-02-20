@@ -23,47 +23,61 @@
         <div id="perfil-header-actions"></div>
       </div>
 
-      <!-- Profile layout -->
-      <div class="row">
-        <!-- LEFT COL: avatar + info -->
-        <div class="col-12 col-md-4 mb-4">
-          <div class="hub-card perfil-card-left p-3">
-            <!-- Avatar -->
-            <div class="perfil-avatar-wrap">
-              <div class="perfil-avatar" id="perfil-avatar">
-                <i class="fa-solid fa-user perfil-avatar-placeholder"></i>
+      <!-- ============================================================
+           BENTO GRID
+           Linha 1: [Foto+Nome · col 1-8] [Estrutura · col 9-12]
+           Linha 2: [Gostos · col 1-4]    [Squads · col 5-8]   [Sobre Mim · col 9-12]
+           Linha 3: [Gostos cont...]       [Dados Pessoais · col 5-12]
+           ============================================================ -->
+      <div class="perfil-bento-grid">
+
+        <!-- Foto + Nome -->
+        <div class="perfil-bento-foto">
+          <div class="hub-card perfil-card-foto h-100">
+            <div class="perfil-foto-inner">
+              <div class="perfil-avatar-wrap">
+                <div class="perfil-avatar" id="perfil-avatar">
+                  <i class="fa-solid fa-user perfil-avatar-placeholder"></i>
+                </div>
+                <button class="btn btn-sm btn-secondary perfil-avatar-btn d-none" id="btn-change-avatar">
+                  <i class="fa-solid fa-camera"></i> Alterar foto
+                </button>
+                <input type="file" id="avatar-file-input" accept=".jpg,.jpeg,.png" class="d-none">
               </div>
-              <button class="btn btn-sm btn-secondary perfil-avatar-btn d-none" id="btn-change-avatar">
-                <i class="fa-solid fa-camera"></i> Alterar foto
-              </button>
-              <input type="file" id="avatar-file-input" accept=".jpg,.jpeg,.png" class="d-none">
-            </div>
-
-            <!-- Nome / apelido -->
-            <div class="perfil-identity">
-              <h4 class="perfil-nome" id="perfil-nome"></h4>
-              <p class="perfil-apelido text-muted" id="perfil-apelido"></p>
-            </div>
-
-            <!-- Info: org -->
-            <div class="perfil-info-list" id="perfil-org-info"></div>
-
-            <!-- Info: aniversario + signo + idade -->
-            <div class="perfil-info-list" id="perfil-aniv-info"></div>
-
-            <!-- Info: contato -->
-            <div class="perfil-info-list" id="perfil-contato-info"></div>
-
-            <!-- Botao editar (só próprio usuário) -->
-            <div class="mt-3 d-none" id="perfil-edit-btn-wrap">
-              <button class="btn btn-primary btn-block" id="btn-editar-perfil-page">
-                <i class="fa-solid fa-pen"></i> Editar Perfil
-              </button>
+              <div class="perfil-identity">
+                <h4 class="perfil-nome" id="perfil-nome"></h4>
+                <p class="perfil-apelido text-muted" id="perfil-apelido"></p>
+                <p class="perfil-username text-muted" id="perfil-username"></p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Squads -->
-          <div class="hub-card mt-3" id="perfil-squads-card">
+        <!-- Estrutura Organizacional -->
+        <div class="perfil-bento-org">
+          <div class="hub-card h-100">
+            <div class="hub-card-header">
+              <i class="fa-solid fa-sitemap mr-2"></i>Estrutura
+            </div>
+            <div class="hub-card-body" id="perfil-org-info"></div>
+          </div>
+        </div>
+
+        <!-- Gostos Pessoais (col esquerda, ocupa 2 linhas) -->
+        <div class="perfil-bento-gostos">
+          <div class="hub-card h-100">
+            <div class="hub-card-header">
+              <i class="fa-solid fa-heart mr-2"></i>Gostos Pessoais
+            </div>
+            <div class="hub-card-body" id="perfil-gostos">
+              <p class="text-muted" style="font-size:0.875rem; margin:0; font-style:italic;">Nada preenchido ainda.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Squads -->
+        <div class="perfil-bento-squads">
+          <div class="hub-card h-100">
             <div class="hub-card-header">
               <i class="fa-solid fa-layer-group mr-2"></i>Squads
             </div>
@@ -73,10 +87,9 @@
           </div>
         </div>
 
-        <!-- RIGHT COL: sobre mim + gostos -->
-        <div class="col-12 col-md-8 mb-4">
-          <!-- Sobre mim -->
-          <div class="hub-card mb-3">
+        <!-- Sobre Mim -->
+        <div class="perfil-bento-sobre">
+          <div class="hub-card h-100">
             <div class="hub-card-header">
               <i class="fa-solid fa-address-card mr-2"></i>Sobre mim
             </div>
@@ -84,18 +97,22 @@
               <p class="text-muted" style="font-size:0.875rem; margin:0; font-style:italic;">Nada escrito ainda.</p>
             </div>
           </div>
+        </div>
 
-          <!-- Gostos pessoais -->
-          <div class="hub-card">
+        <!-- Dados Pessoais -->
+        <div class="perfil-bento-dados">
+          <div class="hub-card h-100">
             <div class="hub-card-header">
-              <i class="fa-solid fa-heart mr-2"></i>Gostos Pessoais
+              <i class="fa-solid fa-id-card mr-2"></i>Dados Pessoais
             </div>
-            <div class="hub-card-body" id="perfil-gostos">
-              <p class="text-muted" style="font-size:0.875rem; margin:0; font-style:italic;">Nada preenchido ainda.</p>
+            <div class="hub-card-body">
+              <div id="perfil-aniv-info"></div>
+              <div id="perfil-contato-info"></div>
             </div>
           </div>
         </div>
-      </div>
+
+      </div><!-- /perfil-bento-grid -->
     </div>
 
     <!-- ================================================================
@@ -118,7 +135,7 @@
               <button class="btn btn-secondary btn-sm" id="btn-edit-avatar-pick">
                 <i class="fa-solid fa-camera"></i> Alterar foto
               </button>
-              <p class="text-muted mt-1 mb-0" style="font-size:0.75rem;">JPG ou PNG · máx. 300 KB</p>
+              <p class="text-muted mt-1 mb-0" style="font-size:0.75rem;">JPG ou PNG · máx. 150 KB</p>
               <p class="text-danger mt-1 mb-0 d-none" id="avatar-error" style="font-size:0.75rem;"></p>
               <input type="file" id="edit-avatar-input" accept=".jpg,.jpeg,.png" class="d-none">
             </div>
