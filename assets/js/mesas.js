@@ -168,9 +168,14 @@
     var isAdmin = user ? user.isAdmin : false;
 
     // Check if the current user already has a reservation today (non-canceled)
-    var hasResToday = state.reservations.some(function(r) {
-      return r.created_by === userName && !r.canceled_at;
+    var myResToday = null;
+    state.reservations.forEach(function(r) {
+      if (r.created_by === userName && !r.canceled_at) myResToday = r;
     });
+    var hasResToday = !!myResToday;
+
+    // Profile complete check — cadastro incompleto bloqueia reserva
+    var profileComplete = user ? user.profileComplete : true;
 
     var html = state.desks.map(function(desk) {
       // Active (non-canceled) reservation for this desk
@@ -210,7 +215,7 @@
       }
 
       var isMyRes = displayRes && displayRes.created_by === userName;
-      var canBook = !isOccupied && !state.viewMode && (isAdmin || !hasResToday);
+      var canBook = !isOccupied && !state.viewMode && profileComplete && (isAdmin || !hasResToday);
 
       var cardClass = isOccupied ? (isMyRes ? 'my-reservation' : 'occupied') : 'available';
       var statusText = isOccupied ? (displayRes.display_name || displayRes.created_by || 'Reservado') : 'Livre';
@@ -325,14 +330,40 @@
     }
 
     // Check if user already has a reservation for today
-    var hasRes = state.reservations.some(function(r) {
-      return r.created_by === user.user_name && !r.canceled_at;
+    var myRes = null;
+    state.reservations.forEach(function(r) {
+      if (r.created_by === user.user_name && !r.canceled_at) myRes = r;
     });
+    var hasRes = !!myRes;
 
+    // Se já tem reserva (e não é admin), mostrar card "Sua reserva"
     if (hasRes && !user.isAdmin) {
-      $el.html('<span class="text-muted">Voce ja possui reserva nesta data.</span>');
+      var deskObj = state.desks.find(function(d) { return d.desk_name === myRes.desk_name; });
+      var deskLabel = deskObj ? deskObj.desk_name : (myRes.desk_name || 'Mesa');
+      $el.html(
+        '<div class="suggestion-my-reservation">' +
+          '<div>' +
+            '<div class="suggestion-my-res-label"><i class="fa-solid fa-circle-check"></i> Sua reserva</div>' +
+            '<strong style="font-size:1.2rem;">' + deskLabel + '</strong>' +
+          '</div>' +
+          '<button class="btn btn-sm btn-outline-danger ml-2 cancel-suggestion-btn" data-res-id="' + (myRes.id || '') + '" data-num="' + (deskObj ? deskObj.number : '') + '">' +
+            '<i class="fa-solid fa-xmark"></i> Liberar' +
+          '</button>' +
+        '</div>'
+      );
+      $('.cancel-suggestion-btn').off('click').on('click', function() {
+        cancelReservation($(this).data('num'), $(this).data('res-id'));
+      });
+
+      // Atualiza título do card
+      var $card = $('#suggestion-card h6');
+      if ($card.length) $card.html('<i class="fa-solid fa-calendar-check"></i> Sua Reserva');
       return;
     }
+
+    // Restaura título padrão
+    var $card = $('#suggestion-card h6');
+    if ($card.length) $card.html('<i class="fa-solid fa-lightbulb"></i> Mesa Sugerida');
 
     try {
       var scores = {};
@@ -455,7 +486,7 @@
           '</div>' +
           '<div class="d-flex gap-2">' +
             (hasRes && !user.isAdmin ? '' :
-              '<button class="btn btn-sm btn-primary mr-2 suggestion-book-btn" data-num="' + bestDesk.number + '">Agendar</button>'
+              '<button class="btn btn-sm btn-primary mr-2 suggestion-book-btn" data-num="' + bestDesk.number + '">Reservar</button>'
             ) +
             '<button class="btn btn-sm btn-outline-secondary suggestion-view-btn">Ver outras</button>' +
           '</div>' +
@@ -517,6 +548,10 @@
       var user = hub.auth.getUser();
       if (!user || state.viewMode) {
         hub.utils.showToast('Faca login para reservar.', 'warning');
+        return;
+      }
+      if (!user.profileComplete) {
+        hub.utils.showToast('Cadastro incompleto! Complete seu perfil para reservar mesas.', 'warning');
         return;
       }
 

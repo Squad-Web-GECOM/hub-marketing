@@ -303,34 +303,39 @@
       var user = auth.getUser();
       var isAdminOrCoord = auth.isAdminOrCoord();
 
-      // Build nav items HTML
-      var navItemsHTML = this.items.map(function(item) {
-        return '<li><a href="' + item.href + '" class="' + (item.id === currentPage ? 'active' : '') + '" data-nav="' + item.id + '">' +
-          '<i class="fa-solid ' + item.icon + '"></i>' +
-          '<span>' + item.label + '</span>' +
-          '</a></li>';
-      }).join('');
+      // Externos e deslogados: sem menu (só página de mesas/formularios acessível)
+      var isExternal = user && user.isExternal;
+      var isLoggedOut = !auth.isAuthenticated();
+      var hideNav = isExternal || isLoggedOut;
 
-      if (isAdminOrCoord) {
-        navItemsHTML += '<li class="nav-divider"></li>';
-        navItemsHTML += this.adminItems.map(function(item) {
+      // Build nav items HTML (apenas para usuários internos logados)
+      var navItemsHTML = '';
+      if (!hideNav) {
+        navItemsHTML = this.items.map(function(item) {
           return '<li><a href="' + item.href + '" class="' + (item.id === currentPage ? 'active' : '') + '" data-nav="' + item.id + '">' +
             '<i class="fa-solid ' + item.icon + '"></i>' +
             '<span>' + item.label + '</span>' +
             '</a></li>';
         }).join('');
+
+        if (isAdminOrCoord) {
+          navItemsHTML += '<li class="nav-divider"></li>';
+          navItemsHTML += this.adminItems.map(function(item) {
+            return '<li><a href="' + item.href + '" class="' + (item.id === currentPage ? 'active' : '') + '" data-nav="' + item.id + '">' +
+              '<i class="fa-solid ' + item.icon + '"></i>' +
+              '<span>' + item.label + '</span>' +
+              '</a></li>';
+          }).join('');
+        }
       }
 
       // User info for footer
       var userHTML;
-      if (user) {
+      if (user && !isExternal) {
         var roleLabel = user.isAdmin ? 'Admin' : (user.isCoordenador ? 'Coordenador' : 'Marketing');
-        // "Editar Perfil" button: on usuarios page calls modal directly; elsewhere navigates there
-        var editarPerfilBtn = !user.isExternal
-          ? '<button onclick="hub.nav.openEditarPerfil()" title="Editar perfil" class="btn-editar-perfil">' +
+        var editarPerfilBtn = '<button onclick="hub.nav.openEditarPerfil()" title="Editar perfil" class="btn-editar-perfil">' +
               '<i class="fa-solid fa-user-pen"></i>' +
-            '</button>'
-          : '';
+            '</button>';
         userHTML = '' +
           '<div class="hub-sidebar-user">' +
             '<div>' +
@@ -349,31 +354,38 @@
             '</button>' +
           '</div>';
       } else {
+        // Deslogado ou externo: apenas botão de login
         userHTML = '' +
           '<button class="btn btn-sm btn-outline-light w-100" onclick="hub.auth.showLoginModal()">' +
             '<i class="fa-solid fa-right-to-bracket"></i> Entrar' +
           '</button>';
       }
 
-      container.innerHTML = '' +
-        '<button class="hub-hamburger" onclick="hub.nav.toggleMobile()">' +
-          '<i class="fa-solid fa-bars"></i>' +
-        '</button>' +
-        '<div class="hub-sidebar-overlay" onclick="hub.nav.toggleMobile()"></div>' +
-        '<nav class="hub-sidebar" id="hub-sidebar">' +
-          '<div class="hub-sidebar-header" style="display:flex;align-items:center;justify-content:space-between;">' +
-            '<h2><i class="fa-solid fa-bullhorn"></i> <span>Hub MKT</span></h2>' +
-            '<button class="hub-sidebar-collapse" onclick="hub.nav.toggleCollapse()" title="Fechar menu">' +
-              '<i class="fa-solid fa-chevron-left" id="sidebar-collapse-icon"></i>' +
-            '</button>' +
-          '</div>' +
-          '<ul class="hub-sidebar-nav">' +
-            navItemsHTML +
-          '</ul>' +
-          '<div class="hub-sidebar-footer">' +
-            userHTML +
-          '</div>' +
-        '</nav>';
+      // Sidebar só renderiza se houver nav ou se for mesas/formularios (mostra botão de login)
+      var shouldRenderSidebar = !hideNav;
+
+      if (shouldRenderSidebar) {
+        container.innerHTML = '' +
+          '<button class="hub-hamburger" onclick="hub.nav.toggleMobile()">' +
+            '<i class="fa-solid fa-bars"></i>' +
+          '</button>' +
+          '<div class="hub-sidebar-overlay" onclick="hub.nav.toggleMobile()"></div>' +
+          '<nav class="hub-sidebar" id="hub-sidebar">' +
+            '<div class="hub-sidebar-header" style="display:flex;align-items:center;justify-content:space-between;">' +
+              '<h2><i class="fa-solid fa-bullhorn"></i> <span>Hub MKT</span></h2>' +
+              '<button class="hub-sidebar-collapse" onclick="hub.nav.toggleCollapse()" title="Fechar menu">' +
+                '<i class="fa-solid fa-chevron-left" id="sidebar-collapse-icon"></i>' +
+              '</button>' +
+            '</div>' +
+            '<ul class="hub-sidebar-nav">' +
+              navItemsHTML +
+            '</ul>' +
+            '<div class="hub-sidebar-footer">' +
+              userHTML +
+            '</div>' +
+          '</nav>';
+      }
+      // Para externos/deslogados não renderiza sidebar
     },
 
     toggleMobile: function() {
@@ -412,7 +424,7 @@
     },
 
     openEditarPerfil: function() {
-      window.location.href = BASE_PATH + '/perfil/';
+      window.location.href = BASE_PATH + '/perfil/?edit=1';
     }
   };
 
@@ -1048,8 +1060,8 @@
     // Check profile complete - show gate or toast
     var user = auth.getUser();
     var currentPage = document.documentElement.dataset.page;
-    // 'usuarios' e 'squads' gerem seu proprio banner inline
-    var gateExcludedPages = ['admin', 'mesas', 'formularios', 'usuarios'];
+    // admin e formularios não bloqueiam; perfil tem seu próprio fluxo
+    var gateExcludedPages = ['admin', 'formularios', 'perfil'];
     if (user && !user.isExternal && !user.profileComplete) {
       if (gateExcludedPages.indexOf(currentPage) === -1) {
         _renderProfileGate();
@@ -1081,8 +1093,8 @@
       '<div class="hub-profile-gate-inner">' +
         '<i class="fa-solid fa-circle-exclamation"></i>' +
         '<div>' +
-          '<strong>Complete seu cadastro!</strong>' +
-          '<span> Selecione sua gerencia, coordenacao e nucleo para acessar todas as funcionalidades.</span>' +
+          '<strong>Cadastro incompleto!</strong>' +
+          '<span> Preencha tudo para acessar todas as funcionalidades.</span>' +
         '</div>' +
         '<button class="btn btn-sm btn-warning" onclick="hub.nav.openEditarPerfil()">' +
           '<i class="fa-solid fa-user-pen"></i> Completar Cadastro' +

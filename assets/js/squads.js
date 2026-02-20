@@ -26,6 +26,23 @@
     if (!hub.auth.requireAuth()) return;
     if (!hub.auth.requireMarketingUser()) return;
 
+    // Bloqueia acesso com cadastro incompleto
+    var u = hub.auth.getUser();
+    if (u && !u.profileComplete) {
+      document.getElementById('app-view').style.display = 'block';
+      document.getElementById('app-view').innerHTML =
+        '<div class="hub-profile-gate-page">' +
+          '<i class="fa-solid fa-lock fa-2x mb-3" style="color:var(--turq);"></i>' +
+          '<h5>Cadastro incompleto</h5>' +
+          '<p class="text-muted">Complete seu cadastro para ver os Squads.</p>' +
+          '<button class="btn btn-warning" onclick="hub.nav.openEditarPerfil()">' +
+            '<i class="fa-solid fa-user-pen mr-1"></i>Completar Cadastro' +
+          '</button>' +
+        '</div>';
+      hub.utils.hideLoader();
+      return;
+    }
+
     init();
   });
 

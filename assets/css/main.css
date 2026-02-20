@@ -2034,6 +2034,41 @@ a:hover {
   opacity: 0.75;
 }
 
+/* Página inteira de gate (squads, usuarios) */
+.hub-profile-gate-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Card "Sua reserva" no painel de sugestão */
+.suggestion-my-reservation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 174, 157, 0.08);
+  border: 1.5px solid rgba(0, 174, 157, 0.35);
+  border-radius: 8px;
+}
+.suggestion-my-res-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--turq);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+[data-theme=dark] .suggestion-my-reservation {
+  background: rgba(0, 174, 157, 0.12);
+  border-color: rgba(0, 174, 157, 0.4);
+}
+
 /* Dark mode */
 [data-theme=dark] .hub-profile-gate-banner {
   background: linear-gradient(135deg, var(--sunshade-950) 0%, rgba(255, 170, 44, 0.15) 100%);
@@ -2219,10 +2254,10 @@ a:hover {
 
 /* ── Bento Grid principal ───────────────────────────────────────────── */
 /*
-   Col tracks: [gostos=4] [squads=4] [sobre=4]   (12 colunas Bootstrap)
+   Col tracks: [sobre=4] [dados=4] [squads=4]   (12 colunas)
    Linha 1: foto(8) + org(4)
-   Linha 2: gostos(4) + squads(4) + sobre(4)
-   Linha 3: gostos(4, cont) + dados(8)
+   Linha 2: sobre(4, 2 linhas) + dados(4) + squads(4)
+   Linha 3: sobre(cont)        + gostos(8)
 */
 .perfil-bento-grid {
   display: grid;
@@ -2236,10 +2271,10 @@ a:hover {
 .perfil-bento-org   { grid-column: 9 / 13; grid-row: 1; }
 
 /* Linhas 2-3 */
-.perfil-bento-gostos { grid-column: 1 / 5;  grid-row: 2 / 4; }
-.perfil-bento-squads { grid-column: 5 / 9;  grid-row: 2; }
-.perfil-bento-sobre  { grid-column: 9 / 13; grid-row: 2; }
-.perfil-bento-dados  { grid-column: 5 / 13; grid-row: 3; }
+.perfil-bento-sobre  { grid-column: 1 / 5;  grid-row: 2 / 4; }
+.perfil-bento-dados  { grid-column: 5 / 9;  grid-row: 2; }
+.perfil-bento-squads { grid-column: 9 / 13; grid-row: 2; }
+.perfil-bento-gostos { grid-column: 5 / 13; grid-row: 3; }
 
 /* Mobile: tudo em coluna única */
 @media (max-width: 767px) {
@@ -2323,15 +2358,43 @@ a:hover {
   margin-bottom: 0.1rem;
   line-height: 1.2;
 }
-.perfil-apelido {
-  font-size: 0.95rem;
-  margin: 0 0 0.1rem 0;
-  font-style: italic;
+/* Bloco usuário + e-mail com botões de copiar */
+.perfil-user-email-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 0.25rem;
+}
+.perfil-user-email-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
 }
 .perfil-username {
-  font-size: 0.8rem;
-  margin: 0;
-  color: #adb5bd;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #495057;
+  line-height: 1.2;
+}
+.perfil-email-display {
+  font-size: 0.85rem;
+  color: #495057;
+  line-height: 1.2;
+}
+.perfil-copy-btn {
+  font-size: 0.72rem !important;
+  padding: 0 !important;
+  color: var(--turq) !important;
+  line-height: 1.2;
+  text-decoration: none !important;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.perfil-copy-btn:hover {
+  color: var(--verdee) !important;
+  text-decoration: underline !important;
 }
 
 /* Info rows (reutilizados nos cards de org e dados pessoais) */
@@ -2505,11 +2568,12 @@ a:hover {
 [data-theme=dark] .perfil-nome {
   color: var(--mine-shaft-50);
 }
-[data-theme=dark] .perfil-apelido {
-  color: var(--athens-gray-400);
+[data-theme=dark] .perfil-username,
+[data-theme=dark] .perfil-email-display {
+  color: var(--mine-shaft-100);
 }
-[data-theme=dark] .perfil-username {
-  color: var(--athens-gray-600);
+[data-theme=dark] .perfil-copy-btn {
+  color: var(--turq) !important;
 }
 [data-theme=dark] .perfil-info-list {
   border-top-color: rgba(255,255,255,0.08);

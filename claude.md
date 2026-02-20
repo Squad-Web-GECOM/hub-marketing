@@ -420,12 +420,17 @@ var allQuickLinks = [];
 .perfil-bento-grid      /* CSS Grid 12 colunas */
 .perfil-bento-foto      /* col 1–8, linha 1 */
 .perfil-bento-org       /* col 9–12, linha 1 */
-.perfil-bento-gostos    /* col 1–4, linhas 2–3 */
-.perfil-bento-squads    /* col 5–8, linha 2 */
-.perfil-bento-sobre     /* col 9–12, linha 2 */
-.perfil-bento-dados     /* col 5–12, linha 3 */
+.perfil-bento-sobre     /* col 1–4, linhas 2–3 (esquerda, ocupa 2 linhas) */
+.perfil-bento-dados     /* col 5–9, linha 2 */
+.perfil-bento-squads    /* col 9–12, linha 2 */
+.perfil-bento-gostos    /* col 5–12, linha 3 */
 .perfil-foto-inner      /* grid interno: avatar | identidade */
 .perfil-avatar          /* círculo 96×96px */
+.perfil-user-email-block /* flex row: col usuário | col e-mail */
+.perfil-user-email-col  /* flex column: texto + botão copiar */
+.perfil-username        /* texto do user_name (sem @) */
+.perfil-email-display   /* texto do e-mail completo */
+.perfil-copy-btn        /* botão link pequeno "copiar" */
 .perfil-squad-chip      /* chip verde com nome do squad */
 .perfil-gostos-grid     /* grid 2 colunas para gostos pessoais */
 .perfil-gosto-card      /* card individual de gosto */
@@ -494,8 +499,9 @@ Visível no perfil apenas para o próprio usuário ou admin/coord.
 6. **`is_gestor`** é a coluna atual (era `is_coordenador` até Fase 6)
 7. **`link`** é a coluna atual (era `link_wrike` até Fase 5b)
 8. **Limite de upload de avatar: 150 KB** (JPG/PNG)
-9. **Bootstrap é v4.6.2** — não usar sintaxe do Bootstrap 5
-10. **Sem async/await em alguns arquivos legados** — preferir `.then()` se encontrar inconsistência
+9. **`profile_complete`** é `true` apenas quando: nome, apelido, telefone, aniversario, endereco, bairro, cep, senioridade, gerencia_id preenchidos; coordenacao_id e nucleo_id obrigatórios **exceto** para `is_gestor = true`; avatar_url, sobre_mim e gostos_pessoais NÃO são obrigatórios
+10. **Bootstrap é v4.6.2** — não usar sintaxe do Bootstrap 5
+11. **Sem async/await em alguns arquivos legados** — preferir `.then()` se encontrar inconsistência
 
 ---
 
@@ -512,3 +518,4 @@ Visível no perfil apenas para o próprio usuário ou admin/coord.
 | 5c | Links: datalist de seções existentes | ✅ |
 | 5x | Tabs redesign (underline + scroll arrows) + tabelas modernas | ✅ |
 | 6 | `is_coordenador` → `is_gestor` + coluna `senioridade` | ✅ |
+| 7 | Perfil: user+email+copiar; grid reposicionado; endereço formatado; senioridade/terceirizado editáveis; profile_complete revisado | ✅ |

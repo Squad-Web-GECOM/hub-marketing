@@ -67,6 +67,17 @@
         }
         setupEditModal();
         document.getElementById('btn-change-avatar').classList.remove('d-none');
+
+        // Se vier com ?edit=1 na URL (ex: ao clicar "Completar Cadastro"), abre o modal automaticamente
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('edit') === '1') {
+          openEditModal();
+          // Limpa o param da URL sem recarregar
+          try {
+            var cleanUrl = window.location.pathname + (urlParams.get('u') ? '?u=' + urlParams.get('u') : '');
+            window.history.replaceState({}, '', cleanUrl);
+          } catch(e) {}
+        }
       }
 
       document.getElementById('app-view').style.display = 'block';
@@ -185,20 +196,48 @@
       }
     }
 
-    // Nome / apelido
+    // Nome
     var nomeEl = document.getElementById('perfil-nome');
     if (nomeEl) nomeEl.textContent = u.nome || '';
 
-    var apelidoEl = document.getElementById('perfil-apelido');
-    if (apelidoEl) {
-      apelidoEl.textContent = u.apelido ? '"' + u.apelido + '"' : '';
-      if (!u.apelido) apelidoEl.style.display = 'none';
+    // Usuário (sem @) + e-mail formatado + botões copiar
+    var usernameEl = document.getElementById('perfil-username');
+    if (usernameEl) usernameEl.textContent = u.user_name || '';
+
+    var emailDisplayEl = document.getElementById('perfil-email-display');
+    if (emailDisplayEl) {
+      // Determina domínio pelo e-mail real, fallback @sicoob.com.br
+      var emailDomain = '@sicoob.com.br';
+      if (u.email && u.email.indexOf('@fornecedores.sicoob') !== -1) {
+        emailDomain = '@fornecedores.sicoob.com.br';
+      }
+      var fullEmail = u.user_name ? (u.user_name + emailDomain) : (u.email || '');
+      emailDisplayEl.textContent = fullEmail;
     }
 
-    var usernameEl = document.getElementById('perfil-username');
-    if (usernameEl) {
-      usernameEl.textContent = u.user_name ? '@' + u.user_name : '';
-      if (!u.user_name) usernameEl.style.display = 'none';
+    var btnCopyUser = document.getElementById('btn-copy-username');
+    if (btnCopyUser && u.user_name) {
+      btnCopyUser.addEventListener('click', function() {
+        hub.utils.copyToClipboard(u.user_name);
+      });
+    } else if (btnCopyUser) {
+      btnCopyUser.style.display = 'none';
+    }
+
+    var btnCopyEmail = document.getElementById('btn-copy-email');
+    if (btnCopyEmail) {
+      var emailDomainForCopy = '@sicoob.com.br';
+      if (u.email && u.email.indexOf('@fornecedores.sicoob') !== -1) {
+        emailDomainForCopy = '@fornecedores.sicoob.com.br';
+      }
+      var fullEmailForCopy = u.user_name ? (u.user_name + emailDomainForCopy) : (u.email || '');
+      if (fullEmailForCopy) {
+        btnCopyEmail.addEventListener('click', function() {
+          hub.utils.copyToClipboard(fullEmailForCopy);
+        });
+      } else {
+        btnCopyEmail.style.display = 'none';
+      }
     }
 
     // Org info
@@ -232,7 +271,7 @@
         '</div>';
     }
 
-    // Contato + endereço completo
+    // Contato + endereço
     var contatoEl = document.getElementById('perfil-contato-info');
     if (contatoEl) {
       var html = '';
@@ -241,14 +280,24 @@
         html += infoRow('fa-solid fa-star', 'Senioridade', u.senioridade);
       }
       html += infoRow('fa-solid fa-phone', 'Telefone', u.telefone);
-      html += infoRow('fa-solid fa-location-dot', 'Bairro', u.bairro);
-      // Montar endereço completo: logradouro + bairro + CEP
-      var enderecoPartes = [];
-      if (u.endereco) enderecoPartes.push(u.endereco);
-      if (u.bairro && !u.endereco) { /* bairro já exibido acima */ }
-      if (u.cep) enderecoPartes.push('CEP ' + u.cep);
-      if (enderecoPartes.length) {
-        html += infoRow('fa-solid fa-map-pin', 'Endereço', enderecoPartes.join(' — '));
+      // Endereço: linha 1 = Logradouro — CEP; linha 2 = Bairro (em um único infoRow)
+      var linhaEndereco = '';
+      if (u.endereco && u.cep) {
+        linhaEndereco = hub.utils.escapeHtml(u.endereco) + ' <span class="text-muted">— CEP ' + hub.utils.escapeHtml(u.cep) + '</span>';
+      } else if (u.endereco) {
+        linhaEndereco = hub.utils.escapeHtml(u.endereco);
+      } else if (u.cep) {
+        linhaEndereco = 'CEP ' + hub.utils.escapeHtml(u.cep);
+      }
+      if (u.bairro) {
+        linhaEndereco += (linhaEndereco ? '<br>' : '') + hub.utils.escapeHtml(u.bairro);
+      }
+      if (linhaEndereco) {
+        html += '<div class="perfil-info-row">' +
+          '<i class="fa-solid fa-map-pin perfil-info-icon"></i>' +
+          '<div><span class="perfil-info-label">Endereço</span>' +
+          '<span class="perfil-info-value">' + linhaEndereco + '</span></div>' +
+        '</div>';
       }
       contatoEl.innerHTML = html;
     }
@@ -358,6 +407,17 @@
     if (btnAvatarPick) btnAvatarPick.addEventListener('click', function() { avatarInput.click(); });
     if (avatarInput)   avatarInput.addEventListener('change', onAvatarFileChange);
 
+    // Contador de caracteres — Sobre mim
+    var sobreMimInput = document.getElementById('edit-sobre-mim');
+    var sobreMimCount = document.getElementById('sobre-mim-count');
+    if (sobreMimInput && sobreMimCount) {
+      sobreMimInput.addEventListener('input', function() {
+        var len = sobreMimInput.value.length;
+        sobreMimCount.textContent = len + ' / 500';
+        sobreMimCount.style.color = len >= 480 ? '#e74c3c' : '';
+      });
+    }
+
     // Cascata org
     document.getElementById('edit-gerencia').addEventListener('change', updateEditCoord);
     document.getElementById('edit-coordenacao').addEventListener('change', updateEditNucleo);
@@ -377,7 +437,10 @@
     document.getElementById('edit-endereco').value    = u.endereco || '';
     document.getElementById('edit-bairro').value      = u.bairro || '';
     document.getElementById('edit-cep').value         = u.cep || '';
-    document.getElementById('edit-sobre-mim').value   = u.sobre_mim || '';
+    var sobreMimVal = u.sobre_mim || '';
+    document.getElementById('edit-sobre-mim').value   = sobreMimVal;
+    var sobreCount = document.getElementById('sobre-mim-count');
+    if (sobreCount) sobreCount.textContent = sobreMimVal.length + ' / 500';
 
     var g = u.gostos_pessoais || {};
     document.getElementById('edit-gostos-livros').value  = (g.livros  || []).join(', ');
@@ -399,6 +462,12 @@
     // Reset pending
     pendingAvatar = null;
     document.getElementById('avatar-error').classList.add('d-none');
+
+    // Senioridade e terceirizado
+    var selSen = document.getElementById('edit-senioridade');
+    if (selSen) selSen.value = u.senioridade || '';
+    var chkTerc = document.getElementById('edit-terceirizado');
+    if (chkTerc) chkTerc.checked = !!u.terceirizado;
 
     // Org dropdowns
     populateEditOrgDropdowns();
@@ -509,11 +578,28 @@
       var gerenciaId = document.getElementById('edit-gerencia').value || null;
       var coordId    = document.getElementById('edit-coordenacao').value || null;
       var nucleoId   = document.getElementById('edit-nucleo').value || null;
+      var senioridade = (document.getElementById('edit-senioridade').value || '').trim() || null;
+      var terceirizado = document.getElementById('edit-terceirizado').checked;
 
-      if (!gerenciaId || !coordId) {
-        hub.utils.showToast('Selecione pelo menos a gerência e a coordenação', 'warning');
+      // Validação de campos obrigatórios
+      // Gerência é sempre obrigatória
+      if (!gerenciaId) {
+        hub.utils.showToast('Selecione a gerência', 'warning');
         return;
       }
+      // Coordenação é obrigatória salvo para gestores
+      var isGestor = loggedUser && loggedUser.isCoordenador;
+      if (!isGestor && !coordId) {
+        hub.utils.showToast('Selecione a coordenação', 'warning');
+        return;
+      }
+
+      var apelido    = (document.getElementById('edit-apelido').value || '').trim() || null;
+      var telefone   = (document.getElementById('edit-telefone').value || '').trim() || null;
+      var aniversario = document.getElementById('edit-aniversario').value || null;
+      var endereco   = (document.getElementById('edit-endereco').value || '').trim() || null;
+      var bairro     = (document.getElementById('edit-bairro').value || '').trim() || null;
+      var cep        = (document.getElementById('edit-cep').value || '').trim() || null;
 
       // Gostos pessoais
       var splitTrim = function(str) {
@@ -527,19 +613,40 @@
         time_coracao: (document.getElementById('edit-gostos-time').value || '').trim() || null
       };
 
+      // profile_complete = TRUE apenas se campos obrigatórios preenchidos
+      // Obrigatórios: nome (vem do banco), apelido, telefone, aniversario,
+      //   endereco, bairro, cep, senioridade, gerencia_id,
+      //   coordenacao_id (exceto gestor), nucleo_id (exceto gestor)
+      // Não obrigatórios: avatar_url, sobre_mim, gostos_pessoais
+      var profileComplete = !!(
+        targetUser.nome &&
+        apelido &&
+        telefone &&
+        aniversario &&
+        endereco &&
+        bairro &&
+        cep &&
+        senioridade &&
+        gerenciaId &&
+        (isGestor || coordId) &&
+        (isGestor || nucleoId)
+      );
+
       var updates = {
         gerencia_id:     gerenciaId,
-        coordenacao_id:  coordId,
+        coordenacao_id:  isGestor ? (coordId || null) : coordId,
         nucleo_id:       nucleoId,
-        apelido:         (document.getElementById('edit-apelido').value || '').trim() || null,
-        telefone:        (document.getElementById('edit-telefone').value || '').trim() || null,
-        aniversario:     document.getElementById('edit-aniversario').value || null,
-        endereco:        (document.getElementById('edit-endereco').value || '').trim() || null,
-        bairro:          (document.getElementById('edit-bairro').value || '').trim() || null,
-        cep:             (document.getElementById('edit-cep').value || '').trim() || null,
+        apelido:         apelido,
+        telefone:        telefone,
+        aniversario:     aniversario,
+        endereco:        endereco,
+        bairro:          bairro,
+        cep:             cep,
+        senioridade:     senioridade,
+        terceirizado:    terceirizado,
         sobre_mim:       (document.getElementById('edit-sobre-mim').value || '').trim() || null,
         gostos_pessoais: gostos,
-        profile_complete: true
+        profile_complete: profileComplete
       };
 
       // Upload do avatar se houver pendente
@@ -569,12 +676,13 @@
       hub.utils.showToast('Perfil atualizado!', 'success');
       closeEditModal();
 
-      // Invalida cache e recarrega
+      // Re-carrega dados do usuário do banco e atualiza o cache (mantendo _source para não deslogar)
       try {
-        localStorage.removeItem('hub_cached_user');
-        localStorage.removeItem('hub_cached_role');
-        localStorage.removeItem('hub_cached_source');
-      } catch(e) {}
+        await hub.auth._lookupUser(targetUser.user_name);
+        hub.auth._saveCache();
+      } catch(e) {
+        // Se falhar o lookup, não apaga o cache — só recarrega
+      }
 
       setTimeout(function() { window.location.reload(); }, 600);
 

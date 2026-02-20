@@ -46,8 +46,20 @@
               </div>
               <div class="perfil-identity">
                 <h4 class="perfil-nome" id="perfil-nome"></h4>
-                <p class="perfil-apelido text-muted" id="perfil-apelido"></p>
-                <p class="perfil-username text-muted" id="perfil-username"></p>
+                <div class="perfil-user-email-block">
+                  <div class="perfil-user-email-col">
+                    <span class="perfil-username" id="perfil-username"></span>
+                    <button class="btn btn-link perfil-copy-btn" id="btn-copy-username" title="Copiar usuário">
+                      <i class="fa-solid fa-copy"></i> copiar
+                    </button>
+                  </div>
+                  <div class="perfil-user-email-col">
+                    <span class="perfil-email-display" id="perfil-email-display"></span>
+                    <button class="btn btn-link perfil-copy-btn" id="btn-copy-email" title="Copiar e-mail">
+                      <i class="fa-solid fa-copy"></i> copiar
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -175,7 +187,10 @@
           <!-- Sobre mim -->
           <h6 class="perfil-section-label mt-3">Sobre mim</h6>
           <div class="form-group">
-            <textarea class="form-control" id="edit-sobre-mim" rows="3" placeholder="Conte um pouco sobre você..."></textarea>
+            <textarea class="form-control" id="edit-sobre-mim" rows="3" placeholder="Conte um pouco sobre você..." maxlength="500"></textarea>
+            <div class="d-flex justify-content-end">
+              <small class="text-muted" id="sobre-mim-count">0 / 500</small>
+            </div>
           </div>
 
           <!-- Gostos pessoais -->
@@ -222,8 +237,8 @@
           <div class="row">
             <div class="col-md-8">
               <div class="form-group">
-                <label class="form-label">Bairro</label>
-                <input class="form-control" id="edit-bairro" type="text" placeholder="Bairro">
+                <label class="form-label">Cidade/Bairro</label>
+                <input class="form-control" id="edit-bairro" type="text" placeholder="Cidade ou Bairro">
               </div>
             </div>
             <div class="col-md-4">
@@ -249,6 +264,31 @@
             <select class="form-control" id="edit-nucleo">
               <option value="">Nenhum (ainda não definido)</option>
             </select>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Senioridade</label>
+                <select class="form-control" id="edit-senioridade">
+                  <option value="">— Não definida —</option>
+                  <option value="Gerente">Gerente</option>
+                  <option value="Coordenador">Coordenador</option>
+                  <option value="Especialista">Especialista</option>
+                  <option value="Sênior">Sênior</option>
+                  <option value="Pleno">Pleno</option>
+                  <option value="Júnior">Júnior</option>
+                  <option value="Assistente">Assistente</option>
+                  <option value="Estagiário">Estagiário</option>
+                  <option value="Jovem Aprendiz">Jovem Aprendiz</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="edit-terceirizado">
+                <label class="form-check-label" for="edit-terceirizado">Terceirizado</label>
+              </div>
+            </div>
           </div>
         </div>
         <div class="hub-modal-footer">
