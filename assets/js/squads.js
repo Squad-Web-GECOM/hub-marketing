@@ -420,7 +420,7 @@
           var nucleoLabel = nucleoGroup.nucleoName ?
             ' <span class="squad-nucleo-label">(' + hub.utils.escapeHtml(nucleoGroup.nucleoName) + ')</span>' : '';
           var nameHtml = user.user_name
-            ? '<a href="' + hub.config.basePath + '/perfil/?u=' + hub.utils.escapeHtml(user.user_name) + '" class="squad-member-link">' + displayName + '</a>'
+            ? '<a href="' + hub.config.basePath + '/web/mkt/perfil/?u=' + hub.utils.escapeHtml(user.user_name) + '" class="squad-member-link">' + displayName + '</a>'
             : displayName;
 
           html += '<div class="squad-member-row">' + nameHtml + nucleoLabel + '</div>';

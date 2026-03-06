@@ -1,6 +1,6 @@
 /* ==============================================================
  * Hub Marketing — usuarios.js (build Liferay)
- * Gerado em: 2026-03-06 10:09:12
+ * Gerado em: 2026-03-06 17:45:20
  * Contém: config + main.js + usuarios.js
  * ============================================================== */
 
@@ -412,6 +412,9 @@ window.HUB_PAGES = {
             editarPerfilBtn +
             '<button onclick="hub.darkMode.toggle()" title="Alternar tema" class="btn-theme-toggle">' +
               '<i class="fa-solid fa-circle-half-stroke"></i>' +
+            '</button>' +
+            '<button onclick="window.open(\'https://forms.gle/oorKXGhJhrFQUnhu8\', \'_blank\')" title="Ajuda">' +
+              '<i class="fa-solid fa-circle-question"></i>' +
             '</button>' +
             '<button onclick="hub.auth.logout()" title="Sair">' +
               '<i class="fa-solid fa-right-from-bracket"></i>' +
@@ -1474,7 +1477,7 @@ window.HUB_PAGES = {
     var html = '';
     filteredUsers.forEach(function(u) {
       html += '<tr>' +
-        '<td>' + (u.user_name ? '<a href="' + hub.config.basePath + '/perfil/?u=' + hub.utils.escapeHtml(u.user_name) + '">' + hub.utils.escapeHtml(u.nome || '-') + '</a>' : hub.utils.escapeHtml(u.nome || '-')) + '</td>' +
+        '<td>' + (u.user_name ? '<a href="' + hub.config.basePath + '/web/mkt/perfil/?u=' + hub.utils.escapeHtml(u.user_name) + '">' + hub.utils.escapeHtml(u.nome || '-') + '</a>' : hub.utils.escapeHtml(u.nome || '-')) + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.apelido || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.user_name || '-') + '</td>' +
         '<td class="td-truncate">' + hub.utils.escapeHtml(getOrgName(u.gerencia_id)) + '</td>' +

@@ -515,8 +515,8 @@
       e.target.value = '';
       return;
     }
-    if (file.size > 150 * 1024) {
-      errEl.textContent = 'A imagem deve ter no máximo 150 KB (atual: ' + Math.round(file.size / 1024) + ' KB).';
+    if (file.size > 300 * 1024) {
+      errEl.textContent = 'A imagem deve ter no máximo 300 KB (atual: ' + Math.round(file.size / 1024) + ' KB).';
       errEl.classList.remove('d-none');
       e.target.value = '';
       return;

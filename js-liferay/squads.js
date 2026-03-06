@@ -1,6 +1,6 @@
 /* ==============================================================
  * Hub Marketing — squads.js (build Liferay)
- * Gerado em: 2026-03-06 10:09:12
+ * Gerado em: 2026-03-06 17:45:20
  * Contém: config + main.js + squads.js
  * ============================================================== */
 
@@ -412,6 +412,9 @@ window.HUB_PAGES = {
             editarPerfilBtn +
             '<button onclick="hub.darkMode.toggle()" title="Alternar tema" class="btn-theme-toggle">' +
               '<i class="fa-solid fa-circle-half-stroke"></i>' +
+            '</button>' +
+            '<button onclick="window.open(\'https://forms.gle/oorKXGhJhrFQUnhu8\', \'_blank\')" title="Ajuda">' +
+              '<i class="fa-solid fa-circle-question"></i>' +
             '</button>' +
             '<button onclick="hub.auth.logout()" title="Sair">' +
               '<i class="fa-solid fa-right-from-bracket"></i>' +
@@ -1657,7 +1660,7 @@ window.HUB_PAGES = {
           var nucleoLabel = nucleoGroup.nucleoName ?
             ' <span class="squad-nucleo-label">(' + hub.utils.escapeHtml(nucleoGroup.nucleoName) + ')</span>' : '';
           var nameHtml = user.user_name
-            ? '<a href="' + hub.config.basePath + '/perfil/?u=' + hub.utils.escapeHtml(user.user_name) + '" class="squad-member-link">' + displayName + '</a>'
+            ? '<a href="' + hub.config.basePath + '/web/mkt/perfil/?u=' + hub.utils.escapeHtml(user.user_name) + '" class="squad-member-link">' + displayName + '</a>'
             : displayName;
 
           html += '<div class="squad-member-row">' + nameHtml + nucleoLabel + '</div>';

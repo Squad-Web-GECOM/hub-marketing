@@ -1,6 +1,6 @@
 /* ==============================================================
  * Hub Marketing — perfil.js (build Liferay)
- * Gerado em: 2026-03-06 10:09:12
+ * Gerado em: 2026-03-06 17:45:20
  * Contém: config + main.js + perfil.js
  * ============================================================== */
 
@@ -412,6 +412,9 @@ window.HUB_PAGES = {
             editarPerfilBtn +
             '<button onclick="hub.darkMode.toggle()" title="Alternar tema" class="btn-theme-toggle">' +
               '<i class="fa-solid fa-circle-half-stroke"></i>' +
+            '</button>' +
+            '<button onclick="window.open(\'https://forms.gle/oorKXGhJhrFQUnhu8\', \'_blank\')" title="Ajuda">' +
+              '<i class="fa-solid fa-circle-question"></i>' +
             '</button>' +
             '<button onclick="hub.auth.logout()" title="Sair">' +
               '<i class="fa-solid fa-right-from-bracket"></i>' +
@@ -1752,8 +1755,8 @@ window.HUB_PAGES = {
       e.target.value = '';
       return;
     }
-    if (file.size > 150 * 1024) {
-      errEl.textContent = 'A imagem deve ter no máximo 150 KB (atual: ' + Math.round(file.size / 1024) + ' KB).';
+    if (file.size > 300 * 1024) {
+      errEl.textContent = 'A imagem deve ter no máximo 300 KB (atual: ' + Math.round(file.size / 1024) + ' KB).';
       errEl.classList.remove('d-none');
       e.target.value = '';
       return;

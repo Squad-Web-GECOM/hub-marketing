@@ -15,7 +15,8 @@
     desks: [],
     reservations: [],
     availableDates: [],
-    viewMode: false
+    viewMode: false,
+    isBooking: false  // guard contra duplos cliques / chamadas simultâneas
   };
 
   // ====================================================================
@@ -596,6 +597,9 @@
   // RESERVATION ACTIONS
   // ====================================================================
   async function makeReservation(deskNumber) {
+    if (state.isBooking) return; // evita duplos cliques / chamadas simultâneas
+    state.isBooking = true;
+
     try {
       var desk = state.desks.find(function(d) { return d.number == deskNumber; });
       if (!desk) {
@@ -626,6 +630,8 @@
       if (resp.error) {
         if (resp.error.message && resp.error.message.indexOf('date_user') !== -1) {
           hub.utils.showToast('Voce ja possui uma reserva para este dia.', 'warning');
+        } else if (resp.error.message && resp.error.message.indexOf('pkey') !== -1) {
+          hub.utils.showToast('Requisicao duplicada. Tente novamente.', 'warning');
         } else {
           hub.utils.showToast('Esta mesa ja foi reservada. Atualize a pagina.', 'warning');
         }
@@ -640,6 +646,8 @@
       updateSuggestion();
     } catch (err) {
       console.error('Mesas: reservation error', err);
+    } finally {
+      state.isBooking = false;
     }
   }
 

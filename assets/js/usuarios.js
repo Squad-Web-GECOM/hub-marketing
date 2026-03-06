@@ -237,7 +237,7 @@
     var html = '';
     filteredUsers.forEach(function(u) {
       html += '<tr>' +
-        '<td>' + (u.user_name ? '<a href="' + hub.config.basePath + '/perfil/?u=' + hub.utils.escapeHtml(u.user_name) + '">' + hub.utils.escapeHtml(u.nome || '-') + '</a>' : hub.utils.escapeHtml(u.nome || '-')) + '</td>' +
+        '<td>' + (u.user_name ? '<a href="' + hub.config.basePath + '/web/mkt/perfil/?u=' + hub.utils.escapeHtml(u.user_name) + '">' + hub.utils.escapeHtml(u.nome || '-') + '</a>' : hub.utils.escapeHtml(u.nome || '-')) + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.apelido || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.user_name || '-') + '</td>' +
         '<td class="td-truncate">' + hub.utils.escapeHtml(getOrgName(u.gerencia_id)) + '</td>' +

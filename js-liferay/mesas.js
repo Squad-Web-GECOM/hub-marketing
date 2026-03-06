@@ -1,6 +1,6 @@
 /* ==============================================================
  * Hub Marketing — mesas.js (build Liferay)
- * Gerado em: 2026-03-06 10:09:12
+ * Gerado em: 2026-03-06 17:45:20
  * Contém: config + main.js + mesas.js
  * ============================================================== */
 
@@ -412,6 +412,9 @@ window.HUB_PAGES = {
             editarPerfilBtn +
             '<button onclick="hub.darkMode.toggle()" title="Alternar tema" class="btn-theme-toggle">' +
               '<i class="fa-solid fa-circle-half-stroke"></i>' +
+            '</button>' +
+            '<button onclick="window.open(\'https://forms.gle/oorKXGhJhrFQUnhu8\', \'_blank\')" title="Ajuda">' +
+              '<i class="fa-solid fa-circle-question"></i>' +
             '</button>' +
             '<button onclick="hub.auth.logout()" title="Sair">' +
               '<i class="fa-solid fa-right-from-bracket"></i>' +
@@ -1252,7 +1255,8 @@ window.HUB_PAGES = {
     desks: [],
     reservations: [],
     availableDates: [],
-    viewMode: false
+    viewMode: false,
+    isBooking: false  // guard contra duplos cliques / chamadas simultâneas
   };
 
   // ====================================================================
@@ -1833,6 +1837,9 @@ window.HUB_PAGES = {
   // RESERVATION ACTIONS
   // ====================================================================
   async function makeReservation(deskNumber) {
+    if (state.isBooking) return; // evita duplos cliques / chamadas simultâneas
+    state.isBooking = true;
+
     try {
       var desk = state.desks.find(function(d) { return d.number == deskNumber; });
       if (!desk) {
@@ -1863,6 +1870,8 @@ window.HUB_PAGES = {
       if (resp.error) {
         if (resp.error.message && resp.error.message.indexOf('date_user') !== -1) {
           hub.utils.showToast('Voce ja possui uma reserva para este dia.', 'warning');
+        } else if (resp.error.message && resp.error.message.indexOf('pkey') !== -1) {
+          hub.utils.showToast('Requisicao duplicada. Tente novamente.', 'warning');
         } else {
           hub.utils.showToast('Esta mesa ja foi reservada. Atualize a pagina.', 'warning');
         }
@@ -1877,6 +1886,8 @@ window.HUB_PAGES = {
       updateSuggestion();
     } catch (err) {
       console.error('Mesas: reservation error', err);
+    } finally {
+      state.isBooking = false;
     }
   }
 

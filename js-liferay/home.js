@@ -1,6 +1,6 @@
 /* ==============================================================
  * Hub Marketing — home.js (build Liferay)
- * Gerado em: 2026-03-06 10:09:12
+ * Gerado em: 2026-03-06 17:45:19
  * Contém: config + main.js + home.js
  * ============================================================== */
 
@@ -412,6 +412,9 @@ window.HUB_PAGES = {
             editarPerfilBtn +
             '<button onclick="hub.darkMode.toggle()" title="Alternar tema" class="btn-theme-toggle">' +
               '<i class="fa-solid fa-circle-half-stroke"></i>' +
+            '</button>' +
+            '<button onclick="window.open(\'https://forms.gle/oorKXGhJhrFQUnhu8\', \'_blank\')" title="Ajuda">' +
+              '<i class="fa-solid fa-circle-question"></i>' +
             '</button>' +
             '<button onclick="hub.auth.logout()" title="Sair">' +
               '<i class="fa-solid fa-right-from-bracket"></i>' +
