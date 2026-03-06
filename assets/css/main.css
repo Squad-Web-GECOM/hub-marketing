@@ -1,7 +1,13 @@
+.portlet-content-editable{
+border:none!important;
+}
+.sidenav-menu, 
+.sidenav-menu-slider,
 .control-menu,
 .portlet-topper,
 .portlet-header {
   display: none !important;
+width: 0px!important;
 }
 
 #wrapper {
@@ -22,7 +28,7 @@
 }
 
 body {
-  background-color: #f8f9fa;
+  background-color: #f7f8f9;
   color: var(--dark);
   font-family: var(--font-sans);
   margin: 0;
@@ -61,6 +67,41 @@ body {
   font-weight: 700;
   color: var(--verdee);
   margin: 0;
+  letter-spacing: -0.01em;
+}
+.hub-page-title i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background-color: rgba(0,174,157,0.08);
+  color: var(--turq);
+  font-size: var(--font-size-4);
+  margin-bottom: 0.5rem;
+  vertical-align: middle;
+}
+
+/* ── Greeting name — animated gradient text ── */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.greeting-name {
+  background: linear-gradient(
+    90deg,
+    var(--turq) 0%,
+    var(--verdem) 30%,
+    #34a065 60%,
+    var(--turq) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease-in-out infinite;
 }
 
 #loader {
@@ -118,6 +159,278 @@ a:hover {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* ── Float animation (inspired by Sicoob Circuito .account__media) ── */
+@keyframes hub-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ── Conic gradient spin (inspired by Sicoob Circuito .hero__cta) ── */
+@keyframes spinGradient {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Horizontal float for arrow indicator ── */
+@keyframes arrowFloat {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* Birthday panel — gentle float  --- removido para melhorar performance*/
+ /*
+ #birthday-panel {
+  animation: hub-float 8s ease-in-out infinite;  
+  will-change: transform;
+}
+  */
+
+/* ── Borda gradiente rotativa — elementos de destaque ── */
+/* Aplicada a: .hub-stat-card, .hub-suggestion-card, .hub-filter-bar, .perfil-card-foto */
+.hub-card.hub-stat-card,
+.hub-suggestion-card,
+.hub-filter-bar,
+.hub-card.perfil-card-foto {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+  border: none;
+}
+.hub-card.hub-stat-card::before,
+.hub-suggestion-card::before,
+.hub-card.perfil-card-foto::before {
+  content: '';
+  position: absolute;
+  inset: -800%;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--verdem) 25%,
+    #34a065 50%,
+    #ffffff 75%,
+    var(--turq) 100%
+  );
+  animation: spinGradient 10s linear infinite;
+  z-index: -2;
+}
+/* filter-bar */
+.hub-filter-bar::before {
+  content: '';
+  position: absolute;
+  inset: -800%;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--verdem) 25%,
+    #34a065 50%,
+    #ffffff 75%,
+    var(--turq) 100%
+  );
+  animation: spinGradient 10s linear infinite;
+  z-index: -2;
+}
+.hub-card.hub-stat-card::after,
+.hub-suggestion-card::after,
+.hub-filter-bar::after,
+.hub-card.perfil-card-foto::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #ffffff;
+  border-radius: calc(var(--border-radius-md) - 2px);
+  z-index: -1;
+}
+/* hub-filter-bar tem border-radius menor */
+.hub-filter-bar::after {
+  border-radius: calc(var(--border-radius-sm) - 2px);
+}
+/* hub-suggestion-card inner fill usa turq-200 */
+.hub-suggestion-card::after {
+  background: var(--turq-200);
+}
+/* Override hub-card hover border on glow elements */
+.hub-card.hub-stat-card:hover,
+.hub-card.perfil-card-foto:hover {
+  border: none;
+  box-shadow: none;
+}
+/* Hover — acelera rotação + gradiente vira quase todo turquesa */
+.hub-card.hub-stat-card:hover::before,
+.hub-suggestion-card:hover::before,
+.hub-filter-bar:hover::before,
+.hub-card.perfil-card-foto:hover::before {
+  animation-duration: 4s;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    #ffffff 94%,
+    var(--turq) 100%
+  );
+}
+
+/* ── Hover spinning border — all .hub-card (1px, only on hover) ── */
+.hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card) {
+  position: relative;
+  z-index: 0;
+}
+.hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card)::before {
+  content: '';
+  position: absolute;
+  inset: -800%;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    #ffffff 94%,
+    var(--turq) 100%
+  );
+  animation: spinGradient 10s linear infinite;
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card)::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: #ffffff;
+  border-radius: calc(var(--border-radius-md) - 1px);
+  z-index: -1;
+  transition: background 0.3s ease;
+}
+.hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card):hover::before {
+  opacity: 1;
+}
+.hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card):hover {
+  border-color: transparent;
+}
+/* Squads/Formulários — radial glow no inner fill on hover */
+[data-page="squads"] .hub-card:not(.hub-stat-card):not(.hub-suggestion-card):hover::after,
+[data-page="formularios"] .hub-card:not(.hub-stat-card):not(.hub-suggestion-card):hover::after {
+  background: radial-gradient(circle at 95% 95%, rgba(0,174,157,0.12), transparent 70%), #ffffff;
+}
+
+/* ── Stat card — hover de destaque + indicação de link ── */
+.hub-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: var(--border-radius-md);
+}
+/* Radial glow circle — bottom-right */
+.hub-card-link::before {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,174,157,0.12), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+/* Arrow icon in turquesa circle */
+.hub-card-link::after {
+  content: '\f061';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--turq);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 4;
+  pointer-events: none;
+}
+.hub-card-link:hover {
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,54,65,0.14);
+}
+.hub-card-link:hover::before {
+  opacity: 1;
+}
+.hub-card-link:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+  animation: arrowFloat 2.5s ease-in-out infinite;
+}
+.hub-card-link:hover .stat-icon-wrap {
+  background-color: rgba(0,174,157,0.18);
+  transform: scale(1.08);
+}
+.hub-card-link:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,54,65,0.08);
+}
+.hub-card-link:active::after {
+  animation: none;
+  transform: translateX(3px);
+}
+/* Cursor pointer já está via <a>, mas reforçar no card */
+.hub-card.hub-stat-card {
+  cursor: pointer;
+}
+
+/* ── Botão com borda gradiente rotativa ── */
+/* Uso: <span class="btn-glow-wrap"><button class="btn btn-glow">…</button></span> */
+.btn-glow-wrap {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--border-radius-sm);
+  padding: 2px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-glow-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -200%;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--verdem) 0%,
+    var(--turq) 25%,
+    var(--verdee) 50%,
+    var(--turq) 75%,
+    var(--verdem) 100%
+  );
+  animation: spinGradient 4s linear infinite;
+  z-index: -1;
+}
+.btn-glow {
+  position: relative;
+  background-color: #ffffff;
+  color: var(--verdee);
+  border: none;
+  border-radius: calc(var(--border-radius-sm) - 2px);
+  font-weight: 700;
+  padding: 0.5rem 1.25rem;
+  z-index: 1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.btn-glow:hover {
+  background-color: var(--verdee);
+  color: #ffffff;
 }
 @keyframes slideInLeft {
   from {
@@ -225,7 +538,7 @@ a:hover {
   top: 0;
   width: 260px;
   height: 100vh;
-  background-color: var(--verdee);
+  background: var(--verdee);
   color: #ffffff;
   z-index: 400;
   overflow-y: auto;
@@ -269,7 +582,7 @@ a:hover {
 }
 .hub-sidebar-nav li a.active {
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.08);
   border-left-color: var(--turq);
   font-weight: 600;
 }
@@ -281,6 +594,7 @@ a:hover {
 .hub-sidebar-footer {
   padding: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+margin-bottom:3rem;
 }
 
 .hub-sidebar-user {
@@ -551,21 +865,42 @@ a:hover {
   }
 }
 .hub-card {
-  background-color: #ffffff;
+  background: #ffffff;
   border-radius: var(--border-radius-md);
-  box-shadow: var(--box-shadow-1);
-  border: none;
+  border: 1px solid #e9ecef;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 .hub-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 174, 157, 0.2);
+  border-color: rgba(0,174,157,0.35);
+  box-shadow: 0 4px 16px rgba(0,54,65,0.06);
   transform: translateY(-2px);
+}
+/* Glow border cards controlam hover próprio, sem transform aqui */
+.hub-card.hub-stat-card:hover,
+.hub-card.perfil-card-foto:hover {
+  transform: none;
 }
 
 .hub-card-header {
   padding: 16px 24px;
   border-bottom: 1px solid #e9ecef;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--verdee);
+  letter-spacing: 0.01em;
+}
+.hub-card-header > i:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background-color: rgba(0,174,157,0.08);
+  color: var(--turq);
+  font-size: 0.75rem;
+  transition: background-color 0.2s ease;
 }
 
 .hub-card-body {
@@ -575,29 +910,30 @@ a:hover {
 .hub-card-footer {
   padding: 16px 24px;
   border-top: 1px solid #e9ecef;
-  background-color: #f8f9fa;
+  background-color: #fafafa;
 }
 
 .hub-stat-card {
-  padding: 24px 24px 24px calc(24px + 4px);
-  border-left: 4px solid var(--turq);
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 24px;
   text-decoration: none;
   color: inherit;
+  transition: border-color 0.2s ease;
 }
 .hub-stat-card .stat-icon-wrap {
   width: 48px;
   height: 48px;
-  border-radius: var(--border-radius-sm);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 1.35rem;
-  background: rgba(0,174,157,0.1);
+  background-color: rgba(0,174,157,0.08);
   color: var(--turq);
+  transition: background-color 0.25s ease, transform 0.25s ease;
 }
 .hub-stat-card .stat-body {
   min-width: 0;
@@ -651,26 +987,34 @@ a:hover {
   text-decoration: none;
   color: inherit;
   border-radius: var(--border-radius-md);
-  background-color: #ffffff;
-  box-shadow: var(--box-shadow-1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
   min-width: 0;
+  height: 100%;
 }
 .hub-link-card:hover {
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 8px 24px rgba(0, 174, 157, 0.2);
-  transform: translateY(-2px);
+  border-color: rgba(0,174,157,0.35);
+  background-color: rgba(0,174,157,0.02);
 }
 .hub-link-card .link-icon-wrap {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--border-radius-xs);
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 0.95rem;
+  background-color: rgba(0,174,157,0.08);
+  color: var(--turq);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.hub-link-card:hover .link-icon-wrap {
+  background-color: rgba(0,174,157,0.14);
+  transform: scale(1.05);
 }
 .hub-link-card .link-title {
   font-size: 0.85rem;
@@ -687,15 +1031,7 @@ a:hover {
   flex-shrink: 0;
 }
 
-.hub-card-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-}
-.hub-card-link:hover {
-  text-decoration: none;
-  color: inherit;
-}
+
 
 .form-label {
   font-weight: 600;
@@ -705,16 +1041,18 @@ a:hover {
 
 .form-select,
 .form-control {
-  border: 2px solid #dee2e6;
+  border: 1.5px solid #dee2e6;
   border-radius: var(--border-radius-sm);
   padding: 0.5rem 1rem;
   transition: var(--transition-1);
+  background-color: #ffffff;
 }
 .form-select:focus,
 .form-control:focus {
   border-color: var(--turq);
-  box-shadow: 0 0 0 3px rgba(0, 174, 157, 0.1);
+  box-shadow: 0 0 0 3px rgba(0,174,157,0.08);
   outline: none;
+  background-color: #ffffff;
 }
 
 .hub-search-box {
@@ -738,7 +1076,7 @@ a:hover {
   flex-wrap: wrap;
   align-items: flex-end;
   margin-bottom: 24px;
-  background-color: #ffffff;
+  background: #ffffff;
   border: 1px solid #e9ecef;
   border-radius: var(--border-radius-sm);
   padding: 1rem;
@@ -761,10 +1099,10 @@ a:hover {
   overflow-x: auto;
   overflow-y: auto;
   max-height: calc(100vh - 280px);
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #e9ecef;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
   position: relative;
+  background: #ffffff;
 }
 
 .hub-table {
@@ -779,20 +1117,23 @@ a:hover {
   z-index: 100;
 }
 .hub-table thead th {
-  background: #f8f9fa;
-  color: #495057;
+  background-color: #f8f9fa;
+  color: var(--verdee);
   font-weight: 700;
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0.65rem 1rem;
-  border-bottom: 2px solid #dee2e6;
+  letter-spacing: 0.6px;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e9ecef;
   border-top: none;
   white-space: nowrap;
 }
-.hub-table thead th:first-child { border-radius: 10px 0 0 0; }
-.hub-table thead th:last-child  { border-radius: 0 10px 0 0; }
+.hub-table thead th:first-child { border-radius: 12px 0 0 0; }
+.hub-table thead th:last-child  { border-radius: 0 12px 0 0; }
 
+.hub-table tbody {
+background-color: transparent;
+}
 .hub-table tbody tr {
   transition: background 0.12s;
 }
@@ -800,12 +1141,13 @@ a:hover {
   background: rgba(0,174,157,0.05);
 }
 .hub-table tbody tr:nth-child(even) {
-  background: #fbfcfd;
+  background-color: #f8f9fa;
 }
 .hub-table tbody td {
-  padding: 0.6rem 1rem;
+background-color: transparent;
+  padding: 0.65rem 1rem;
   vertical-align: middle;
-  border-bottom: 1px solid #f0f1f3;
+  border-bottom: 1px solid #f0f0f0;
   font-size: 0.855rem;
   color: #343a40;
 }
@@ -839,11 +1181,17 @@ a:hover {
 }
 
 .hub-table .badge {
-  padding: 0.25rem 0.55rem;
+  padding: 0.28rem 0.6rem;
   font-weight: 600;
   font-size: 0.72rem;
   border-radius: 20px;
+  letter-spacing: 0.02em;
 }
+.hub-table .badge-success { background-color: rgba(125,182,28,0.1); color: #4a7a0b; border: 1px solid rgba(125,182,28,0.18); }
+.hub-table .badge-danger  { background-color: rgba(247,64,108,0.08); color: #c4234e; border: 1px solid rgba(247,64,108,0.15); }
+.hub-table .badge-warning { background-color: rgba(255,170,44,0.1); color: #8a5a0a; border: 1px solid rgba(255,170,44,0.18); }
+.hub-table .badge-info    { background-color: rgba(0,144,224,0.08); color: #0067a3; border: 1px solid rgba(0,144,224,0.15); }
+.hub-table .badge-secondary { background-color: rgba(108,117,125,0.08); color: #495057; border: 1px solid rgba(108,117,125,0.12); }
 
 /* Cabeçalho do painel (título + botão add) */
 .admin-panel-header {
@@ -856,7 +1204,7 @@ a:hover {
 .admin-panel-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #003641;
+  color: var(--verdee);
   margin: 0;
   display: flex;
   align-items: center;
@@ -868,10 +1216,10 @@ a:hover {
   justify-content: center;
   font-size: 0.7rem;
   font-weight: 700;
-  background: rgba(0,174,157,0.12);
+  background-color: rgba(0,174,157,0.1);
   color: var(--turq);
   border-radius: 20px;
-  padding: 0.1rem 0.55rem;
+  padding: 0.15rem 0.6rem;
   margin-left: 0.25rem;
 }
 
@@ -895,29 +1243,30 @@ a:hover {
   background-image: none;
 }
 .acland .btn-primary:hover, .acland .btn-primary:focus {
-  background-color: #008c7e;
-  border-color: #008c7e;
+  background-color: #009688;
+  border-color: #009688;
   color: #ffffff;
   background-image: none;
-  box-shadow: none;
+  transform: translateY(-1px);
 }
 .acland .btn-primary:active {
-  background-color: #007a6e;
-  border-color: #007a6e;
+  background-color: #00857a;
+  border-color: #00857a;
   background-image: none;
+  transform: translateY(0);
 }
 
 .acland .btn-secondary {
-  background-color: #f8f9fa;
-  color: #495057;
+  background-color: #ffffff;
+  color: var(--verdee);
   border: 1px solid #dee2e6;
   background-image: none;
 }
 .acland .btn-secondary:hover, .acland .btn-secondary:focus {
-  background-color: #e9ecef;
-  color: #495057;
+  background-color: #f8f9fa;
+  color: var(--verdee);
+  border-color: rgba(0,174,157,0.3);
   background-image: none;
-  box-shadow: none;
 }
 
 .acland .btn-outline-primary {
@@ -1150,13 +1499,14 @@ a:hover {
 .hub-modal {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12);
   max-width: 600px;
   width: 90%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   animation: modalFadeIn 0.3s ease-out;
+  border-top: 3px solid var(--turq);
 }
 
 .hub-modal-header {
@@ -1166,6 +1516,10 @@ a:hover {
   padding: 24px;
   border-bottom: 1px solid #e9ecef;
   flex-shrink: 0;
+}
+.hub-modal-header h4 {
+  color: var(--verdee);
+  font-weight: 700;
 }
 
 .hub-modal-body {
@@ -1183,6 +1537,7 @@ a:hover {
   padding: 16px 24px;
   border-top: 1px solid #e9ecef;
   flex-shrink: 0;
+  background-color: #fafafa;
 }
 
 .hub-modal-close {
@@ -1422,10 +1777,13 @@ a:hover {
 }
 .desk-card {
   border-radius: var(--border-radius-sm);
-  border: 2px solid #dee2e6;
+  border: none;
+  box-shadow: inset 0 0 0 2px #dee2e6;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeIn 0.3s ease-out both;
   overflow: hidden;
+  position: relative;
+  z-index: 0;
 }
 .desk-card .card-body {
   display: flex;
@@ -1471,26 +1829,60 @@ a:hover {
 }
 
 .desk-card.available {
-  border: 2px solid var(--turq);
+  box-shadow: inset 0 0 0 2px var(--turq), 0 0 0 0 transparent;
   background-color: var(--turq-200);
 }
 .desk-card.available:hover {
-  box-shadow: 0 8px 24px rgba(0, 174, 157, 0.2);
+  box-shadow: inset 0 0 0 2px transparent, 0 8px 24px rgba(0, 174, 157, 0.2);
   transform: translateY(-4px);
 }
 
 .desk-card.occupied {
   background-color: #f8f9fa;
-  border-color: #dee2e6;
 }
 
 .desk-card.my-reservation {
-  border: 2px solid var(--turq);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
   background-color: var(--turq);
   color: #ffffff;
 }
 .desk-card.my-reservation .card-title {
   color: #ffffff;
+}
+/* ── desk-card — spinning border on hover (2px thickness) ── */
+.desk-card::before {
+  content: '';
+  position: absolute;
+  inset: -800%;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    #ffffff 94%,
+    var(--turq) 100%
+  );
+  animation: spinGradient 4s linear infinite;
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.desk-card::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: #ffffff;
+  border-radius: 16px;
+  z-index: -1;
+}
+.desk-card.available::after { background: var(--turq-200); }
+.desk-card.occupied::after { background: #f8f9fa; }
+.desk-card.my-reservation::after { background: var(--turq); }
+.desk-card:hover::before {
+  opacity: 1;
+}
+.desk-card:hover,
+.desk-card.my-reservation:hover {
+  box-shadow: inset 0 0 0 2px transparent;
 }
 
 .date-selector-btn {
@@ -1505,9 +1897,12 @@ a:hover {
 
 .hub-suggestion-card {
   background-color: var(--turq-200);
-  border: 2px solid var(--turq);
+  border: none;
   border-radius: var(--border-radius-md);
   padding: 24px;
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
 }
 
 .hub-free-count {
@@ -1590,9 +1985,28 @@ a:hover {
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .hub-content {
-  background-color: var(--athens-gray-950);
+  background-color: transparent;
 }
-[data-theme=dark] .hub-page-title,
+[data-theme=dark] .hub-page-title {
+  color: var(--mine-shaft-50);
+}
+[data-theme=dark] .hub-page-title i {
+  background-color: rgba(0,174,157,0.1);
+  color: var(--persian-green-400);
+}
+[data-theme=dark] .greeting-name {
+  background: linear-gradient(
+    90deg,
+    var(--persian-green-400) 0%,
+    var(--verdem) 30%,
+    #34a065 60%,
+    var(--persian-green-400) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 [data-theme=dark] .hub-section-title,
 [data-theme=dark] h1, [data-theme=dark] h2, [data-theme=dark] h3, [data-theme=dark] h4, [data-theme=dark] h5, [data-theme=dark] h6 {
   color: var(--mine-shaft-50);
@@ -1603,7 +2017,7 @@ a:hover {
 [data-theme=dark] .hub-card,
 [data-theme=dark] .card {
   background-color: var(--athens-gray-900);
-  border-color: var(--athens-gray-700);
+  border-color: rgba(255,255,255,0.08);
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .hub-card p,
@@ -1611,15 +2025,19 @@ a:hover {
   color: var(--athens-gray-300);
 }
 [data-theme=dark] .hub-card-header {
-  border-bottom-color: var(--athens-gray-700);
+  border-bottom-color: rgba(255,255,255,0.08);
   color: var(--mine-shaft-50);
+}
+[data-theme=dark] .hub-card-header > i:first-child {
+  background-color: rgba(0,174,157,0.1);
+  color: var(--persian-green-400);
 }
 [data-theme=dark] .hub-card-body {
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .hub-card-footer {
-  background-color: rgba(255, 255, 255, 0.04);
-  border-top-color: var(--athens-gray-700);
+  background-color: rgba(255,255,255,0.02);
+  border-top-color: rgba(255,255,255,0.08);
 }
 [data-theme=dark] .hub-stat-card .stat-body .stat-value {
   color: var(--mine-shaft-50);
@@ -1632,7 +2050,12 @@ a:hover {
 }
 [data-theme=dark] .hub-link-card {
   background-color: var(--athens-gray-900);
+  border-color: rgba(255,255,255,0.08);
   color: var(--mine-shaft-50);
+}
+[data-theme=dark] .hub-link-card .link-icon-wrap {
+  background-color: rgba(0,174,157,0.08);
+  color: var(--persian-green-400);
 }
 [data-theme=dark] .hub-link-card .link-title {
   color: var(--athens-gray-300);
@@ -1643,9 +2066,31 @@ a:hover {
 [data-theme=dark] .hub-link-card:hover {
   color: var(--mine-shaft-50);
   background-color: var(--athens-gray-800);
+  border-color: rgba(0,174,157,0.25);
 }
 [data-theme=dark] .hub-stat-card {
   color: var(--mine-shaft-50);
+  border: none;
+}
+/* Dark spinning border — verde escuro no lugar do branco */
+[data-theme=dark] .hub-card.hub-stat-card::before,
+[data-theme=dark] .hub-suggestion-card::before,
+[data-theme=dark] .hub-filter-bar::before,
+[data-theme=dark] .hub-card.perfil-card-foto::before {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--verdem) 25%,
+    #34a065 50%,
+    var(--verdee) 75%,
+    var(--turq) 100%
+  );
+}
+[data-theme=dark] .hub-card.hub-stat-card::after,
+[data-theme=dark] .hub-suggestion-card::after,
+[data-theme=dark] .hub-filter-bar::after,
+[data-theme=dark] .hub-card.perfil-card-foto::after {
+  background: var(--athens-gray-900);
 }
 [data-theme=dark] .hub-stat-card h5, [data-theme=dark] .hub-stat-card h6 {
   color: var(--mine-shaft-50);
@@ -1653,9 +2098,12 @@ a:hover {
 [data-theme=dark] .hub-stat-card .stat-label {
   color: var(--athens-gray-400);
 }
+[data-theme=dark] .hub-stat-card .stat-icon-wrap {
+  background-color: rgba(0,174,157,0.1);
+}
 [data-theme=dark] .hub-suggestion-card {
   background-color: var(--athens-gray-900);
-  border-color: rgba(0, 174, 157, 0.4);
+  border: none;
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .card-title {
@@ -1667,28 +2115,37 @@ a:hover {
 }
 [data-theme=dark] .hub-table-wrapper {
   border-color: rgba(255,255,255,0.08);
-  box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  background-color: var(--athens-gray-900);
 }
 [data-theme=dark] .hub-table thead th {
-  background: var(--athens-gray-900);
-  color: var(--athens-gray-400);
-  border-bottom-color: rgba(255,255,255,0.1);
+  background-color: var(--athens-gray-900);
+  color: var(--persian-green-400);
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+[data-theme=dark] .hub-table tbody tr {
+  background: transparent!important;
 }
 [data-theme=dark] .hub-table tbody tr:nth-child(even) {
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.02)!important;
 }
 [data-theme=dark] .hub-table tbody tr:hover {
   background: rgba(0,174,157,0.07);
 }
 [data-theme=dark] .hub-table tbody td {
   color: var(--mine-shaft-100);
-  border-bottom-color: rgba(255,255,255,0.05);
+  border-bottom-color: rgba(255,255,255,0.04);
 }
+[data-theme=dark] .hub-table .badge-success { background-color: rgba(125,182,28,0.12); color: var(--lima-300); border-color: rgba(125,182,28,0.2); }
+[data-theme=dark] .hub-table .badge-danger  { background-color: rgba(247,64,108,0.1); color: var(--violet-red-300); border-color: rgba(247,64,108,0.18); }
+[data-theme=dark] .hub-table .badge-warning { background-color: rgba(255,170,44,0.12); color: var(--sunshade-300); border-color: rgba(255,170,44,0.2); }
+[data-theme=dark] .hub-table .badge-info    { background-color: rgba(0,144,224,0.1); color: var(--cerulean-300); border-color: rgba(0,144,224,0.18); }
+[data-theme=dark] .hub-table .badge-secondary { background-color: rgba(255,255,255,0.06); color: var(--athens-gray-300); border-color: rgba(255,255,255,0.08); }
 [data-theme=dark] .admin-panel-title {
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .admin-panel-title .count-badge {
-  background: rgba(0,174,157,0.15);
+  background-color: rgba(0,174,157,0.12);
+  color: var(--persian-green-400);
 }
 [data-theme=dark] .form-control,
 [data-theme=dark] .form-select,
@@ -1784,18 +2241,24 @@ a:hover {
 [data-theme=dark] .hub-modal {
   background-color: var(--athens-gray-900);
   color: var(--mine-shaft-50);
+  border-top: 3px solid var(--persian-green-500);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
 }
-[data-theme=dark] .hub-modal h4, [data-theme=dark] .hub-modal h5, [data-theme=dark] .hub-modal h6 {
+[data-theme=dark] .hub-modal h4 {
+  color: var(--persian-green-400);
+}
+[data-theme=dark] .hub-modal h5, [data-theme=dark] .hub-modal h6 {
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .hub-modal p {
   color: var(--athens-gray-300);
 }
 [data-theme=dark] .hub-modal-header {
-  border-bottom-color: var(--athens-gray-700);
+  border-bottom-color: rgba(255,255,255,0.08);
 }
 [data-theme=dark] .hub-modal-footer {
-  border-top-color: var(--athens-gray-700);
+  border-top-color: rgba(255,255,255,0.08);
+  background-color: rgba(255,255,255,0.02);
 }
 [data-theme=dark] .hub-modal-close {
   color: var(--athens-gray-400);
@@ -1821,18 +2284,17 @@ a:hover {
 }
 [data-theme=dark] .desk-card.occupied {
   background-color: var(--athens-gray-950);
-  border-color: var(--athens-gray-700);
+  box-shadow: inset 0 0 0 2px var(--athens-gray-700);
   color: var(--mine-shaft-50);
 }
 [data-theme=dark] .desk-card.available {
   background-color: rgba(0, 174, 157, 0.15);
-  border-color: var(--turq);
+  box-shadow: inset 0 0 0 2px var(--turq), 0 0 0 0 transparent;
 }
 [data-theme=dark] .desk-card.my-reservation {
   background-color: var(--turq) !important;
-  border-color: var(--turq) !important;
   color: var(--mine-shaft-50) !important;
-  box-shadow: 0 0 0 3px rgba(0, 174, 157, 0.45), 0 4px 16px rgba(0, 174, 157, 0.35) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3) !important;
 }
 [data-theme=dark] .desk-card.my-reservation .card-title,
 [data-theme=dark] .desk-card.my-reservation .reserved-name,
@@ -1840,6 +2302,25 @@ a:hover {
 [data-theme=dark] .desk-card.my-reservation small {
   color: var(--mine-shaft-50) !important;
 }
+/* Dark mode — desk-card spinning border */
+[data-theme=dark] .desk-card::before {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    var(--verdee) 94%,
+    var(--turq) 100%
+  );
+}
+[data-theme=dark] .desk-card::after {
+  background: var(--athens-gray-900);
+}
+[data-theme=dark] .desk-card.available::after {
+  background-color: var(--athens-gray-800);
+  background-image: linear-gradient(rgba(0, 174, 157, 0.15), rgba(0, 174, 157, 0.15));
+}
+[data-theme=dark] .desk-card.occupied::after { background: var(--athens-gray-950); }
+[data-theme=dark] .desk-card.my-reservation::after { background: var(--turq); }
 [data-theme=dark] .admin-tabs-container {
   border-bottom-color: rgba(255,255,255,0.1);
 }
@@ -1970,22 +2451,116 @@ a:hover {
 }
 [data-theme=dark] .hub-section-title {
   color: var(--mine-shaft-50);
-  border-bottom-color: var(--athens-gray-700);
+  border-bottom-color: rgba(255,255,255,0.08);
 }
 [data-theme=dark] .hub-empty-state {
   color: var(--athens-gray-500);
 }
 [data-theme=dark] .hub-filter-bar {
   background-color: var(--athens-gray-900);
-  border: 1px solid var(--athens-gray-700);
-  border-radius: var(--border-radius-sm);
-  padding: 1rem;
+  border: none;
 }
 [data-theme=dark] .hub-filter-group label {
   color: var(--athens-gray-300);
 }
 [data-theme=dark] .hub-search-box i {
   color: var(--athens-gray-500);
+}
+[data-theme=dark] .acland .btn-primary {
+  background-color: var(--persian-green-600);
+  border-color: var(--persian-green-600);
+}
+[data-theme=dark] .acland .btn-primary:hover,
+[data-theme=dark] .acland .btn-primary:focus {
+  background-color: var(--persian-green-500);
+  border-color: var(--persian-green-500);
+}
+[data-theme=dark] .acland .btn-secondary {
+  background-color: var(--athens-gray-800);
+  color: var(--athens-gray-200);
+  border-color: rgba(255,255,255,0.1);
+}
+[data-theme=dark] .acland .btn-secondary:hover,
+[data-theme=dark] .acland .btn-secondary:focus {
+  background-color: var(--athens-gray-700);
+  border-color: rgba(0,174,157,0.25);
+  color: var(--mine-shaft-50);
+}
+
+/* Dark mode — glassmorphism sutil no modal overlay */
+[data-theme=dark] .hub-modal-overlay,
+[data-theme=dark] #login-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Dark mode — hover sutil nos cards */
+[data-theme=dark] .hub-card:hover,
+[data-theme=dark] .card:hover {
+  border-color: rgba(0, 174, 157, 0.25);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+/* Glow border cards não recebem a borda de hover */
+[data-theme=dark] .hub-card.hub-stat-card:hover,
+[data-theme=dark] .hub-card.perfil-card-foto:hover {
+  border: none;
+}
+[data-theme=dark] .hub-card-link:hover {
+  box-shadow: 0 8px 24px rgba(0,174,157,0.18);
+}
+[data-theme=dark] .hub-card-link::before {
+  background: radial-gradient(circle, rgba(0,174,157,0.15), transparent 70%);
+}
+[data-theme=dark] .hub-card-link::after {
+  background-color: var(--persian-green-600);
+}
+[data-theme=dark] .hub-card-link:hover .stat-icon-wrap {
+  background-color: rgba(0,174,157,0.2);
+}
+/* Dark hover — gradiente quase todo turquesa com pedaço verdee */
+[data-theme=dark] .hub-card.hub-stat-card:hover::before,
+[data-theme=dark] .hub-suggestion-card:hover::before,
+[data-theme=dark] .hub-filter-bar:hover::before,
+[data-theme=dark] .hub-card.perfil-card-foto:hover::before {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    var(--verdee) 94%,
+    var(--turq) 100%
+  );
+}
+
+/* Dark mode — generic .hub-card hover spinning border */
+[data-theme=dark] .hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card)::before {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    var(--verdee) 94%,
+    var(--turq) 100%
+  );
+}
+[data-theme=dark] .hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card)::after {
+  background: var(--athens-gray-900);
+}
+[data-theme=dark] .hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card):hover {
+  border-color: transparent;
+}
+[data-theme=dark][data-page="squads"] .hub-card:not(.hub-stat-card):not(.hub-suggestion-card):hover::after,
+[data-theme=dark][data-page="formularios"] .hub-card:not(.hub-stat-card):not(.hub-suggestion-card):hover::after {
+  background: radial-gradient(circle at 95% 95%, rgba(0,174,157,0.15), transparent 70%), var(--athens-gray-900);
+}
+
+/* Dark mode — btn-glow adaptação */
+[data-theme=dark] .btn-glow {
+  background-color: var(--athens-gray-900);
+  color: var(--mine-shaft-50);
+}
+[data-theme=dark] .btn-glow:hover {
+  background-color: var(--verdee);
+  color: #ffffff;
 }
 
 /* ============================================================

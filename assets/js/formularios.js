@@ -4,6 +4,12 @@
   let allForms = [];
 
   document.addEventListener('hub:ready', async function() {
+    // Guard: only run on formularios page
+    if (!document.getElementById('forms-grid')) return;
+
+    // Requer autenticação (externos autenticados podem acessar)
+    if (!hub.auth.requireAuth()) return;
+
     const user = hub.auth.getUser();
 
     // Fetch forms
@@ -29,7 +35,8 @@
     document.getElementById('app-view').style.display = 'block';
 
     // Search handler
-    document.getElementById('filter-search').addEventListener('input',
+    var searchInput = document.getElementById('filter-search');
+    if (searchInput) searchInput.addEventListener('input',
       hub.utils.debounce(function() {
         const q = this.value.toLowerCase();
         const filtered = allForms.filter(f =>
@@ -39,19 +46,34 @@
         renderForms(filtered);
       }, 200)
     );
+
+    // Modal close: click outside + Escape
+    var detailOverlay = document.getElementById('detail-modal-overlay');
+    if (detailOverlay) {
+      detailOverlay.addEventListener('click', function(e) {
+        if (e.target === detailOverlay) detailOverlay.classList.remove('show');
+      });
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var overlay = document.getElementById('detail-modal-overlay');
+        if (overlay) overlay.classList.remove('show');
+      }
+    });
   });
 
   function renderForms(forms) {
     const grid = document.getElementById('forms-grid');
     const empty = document.getElementById('empty-state');
+    if (!grid) return;
 
     if (forms.length === 0) {
       grid.innerHTML = '';
-      empty.classList.remove('d-none');
+      if (empty) empty.classList.remove('d-none');
       return;
     }
 
-    empty.classList.add('d-none');
+    if (empty) empty.classList.add('d-none');
     grid.innerHTML = forms.map((form, i) => `
       <div class="col-md-6 col-lg-4 mb-4 animate-fadeIn" style="animation-delay: ${i * 0.05}s">
         <div class="hub-card h-100">
@@ -78,11 +100,17 @@
     const form = allForms.find(f => f.id === formId);
     if (!form) return;
 
-    document.getElementById('detail-modal-title').textContent = form.nome;
-    document.getElementById('detail-modal-body').innerHTML =
+    var titleEl = document.getElementById('detail-modal-title');
+    var bodyEl = document.getElementById('detail-modal-body');
+    var linkEl = document.getElementById('detail-modal-link');
+    var overlayEl = document.getElementById('detail-modal-overlay');
+    if (!titleEl || !bodyEl || !overlayEl) return;
+
+    titleEl.textContent = form.nome;
+    bodyEl.innerHTML =
       '<p>' + hub.utils.escapeHtml(form.descricao_completa || form.descricao_breve || '') + '</p>';
-    document.getElementById('detail-modal-link').href = form.link;
-    document.getElementById('detail-modal-overlay').classList.add('show');
+    if (linkEl) linkEl.href = form.link;
+    overlayEl.classList.add('show');
   };
 
 })();

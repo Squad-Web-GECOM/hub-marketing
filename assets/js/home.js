@@ -6,6 +6,9 @@
   'use strict';
 
   document.addEventListener('hub:ready', function() {
+    // Guard: only run on home page
+    if (!document.getElementById('greeting')) return;
+
     // Auth gate
     if (!hub.auth.requireAuth()) return;
     if (!hub.auth.requireMarketingUser()) return;
@@ -67,7 +70,7 @@
     var displayName = user.apelido || user.nome;
     var el = document.getElementById('greeting');
     if (el) {
-      el.textContent = greeting + ', ' + displayName + '!';
+      el.innerHTML = hub.utils.escapeHtml(greeting) + ', <span class="greeting-name script">' + hub.utils.escapeHtml(displayName) + '</span>!';
     }
 
     // Subtítulo com data atual
@@ -97,38 +100,88 @@
 
   async function fetchMesasStat() {
     try {
-      // Get total active desks
-      var desksResp = await hub.sb
-        .from('desks')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true);
-
-      var totalDesks = desksResp.count || 0;
-
-      // Get reservations for today (not canceled)
+      var user = hub.auth.getUser();
       var today = new Date().toISOString().split('T')[0];
-      var reservResp = await hub.sb
-        .from('reservations')
-        .select('id', { count: 'exact', head: true })
-        .eq('date', today)
-        .is('canceled_at', null);
 
-      var reserved = reservResp.count || 0;
-      var available = Math.max(0, totalDesks - reserved);
+      // Busca mesas ativas e reservas de hoje em paralelo
+      var results = await Promise.all([
+        hub.sb.from('desks').select('desk_name, fixed_reserve').eq('is_active', true),
+        hub.sb.from('reservations').select('desk_name, canceled_at, created_by').eq('date', today)
+      ]);
+
+      var allDesks = results[0].data || [];
+      var allRes   = results[1].data || [];
+
+      // Verifica se o usuário tem reserva DB ativa para hoje
+      var myDbRes = null;
+      if (user && user.user_name) {
+        allRes.forEach(function(r) {
+          if (!r.canceled_at && r.created_by === user.user_name && !myDbRes) myDbRes = r;
+        });
+      }
+
+      // Verifica se o usuário tem mesa fixa (não liberada)
+      var myFixedDesk = null;
+      if (user && user.user_name && !myDbRes) {
+        allDesks.forEach(function(desk) {
+          if (desk.fixed_reserve === user.user_name && !myFixedDesk) {
+            var wasFreed = allRes.some(function(r) {
+              return r.desk_name === desk.desk_name && r.canceled_at && r.created_by === 'mesa_fixa';
+            });
+            if (!wasFreed) myFixedDesk = desk;
+          }
+        });
+      }
+
+      // Mostra a mesa do usuário se ele tiver uma atribuída
+      if (myDbRes) {
+        return buildStatCard({
+          href: '/web/mkt/mesas/',
+          icon: 'fa-chair',
+          title: 'MESA',
+          number: myDbRes.desk_name || 'Mesa',
+          label: 'agendada para hoje'
+        });
+      }
+      if (myFixedDesk) {
+        return buildStatCard({
+          href: '/web/mkt/mesas/',
+          icon: 'fa-chair',
+          title: 'MESA',
+          number: myFixedDesk.desk_name || 'Mesa',
+          label: 'mesa fixa'
+        });
+      }
+
+      // Conta mesas ocupadas (reservas ativas + fixas não liberadas)
+      var occupiedByRes = {};
+      allRes.forEach(function(r) {
+        if (!r.canceled_at) occupiedByRes[r.desk_name] = true;
+      });
+      allDesks.forEach(function(desk) {
+        if (desk.fixed_reserve && !occupiedByRes[desk.desk_name]) {
+          var wasFreed = allRes.some(function(r) {
+            return r.desk_name === desk.desk_name && r.canceled_at && r.created_by === 'mesa_fixa';
+          });
+          if (!wasFreed) occupiedByRes[desk.desk_name] = true;
+        }
+      });
+
+      var available = Math.max(0, allDesks.length - Object.keys(occupiedByRes).length);
 
       return buildStatCard({
-        href: '/mesas/',
+        href: '/web/mkt/mesas/',
         icon: 'fa-chair',
-        title: 'Mesas',
+        title: 'MESA',
         number: available,
-        label: 'vagas disponiveis hoje'
+        label: 'mesas disponíveis hoje'
       });
     } catch (err) {
       console.error('Mesas stat error:', err);
       return buildStatCard({
-        href: '/mesas/',
+        href: '/web/mkt/mesas/',
         icon: 'fa-chair',
-        title: 'Mesas',
+        title: 'MESA',
         label: 'Erro ao carregar'
       });
     }
@@ -149,16 +202,16 @@
       }
 
       return buildStatCard({
-        href: '/squads/',
+        href: '/web/mkt/squads/',
         icon: 'fa-layer-group',
         title: 'Squads',
         number: count,
-        label: 'que voce participa'
+        label: 'que você participa'
       });
     } catch (err) {
       console.error('Squads stat error:', err);
       return buildStatCard({
-        href: '/squads/',
+        href: '/web/mkt/squads/',
         icon: 'fa-layer-group',
         title: 'Squads',
         label: 'Erro ao carregar'
@@ -176,16 +229,16 @@
       var count = resp.count || 0;
 
       return buildStatCard({
-        href: '/formularios/',
+        href: '/web/mkt/formularios/',
         icon: 'fa-file-lines',
         title: 'Formularios',
         number: count,
-        label: 'disponiveis'
+        label: 'disponíveis'
       });
     } catch (err) {
       console.error('Formularios stat error:', err);
       return buildStatCard({
-        href: '/formularios/',
+        href: '/web/mkt/formularios/',
         icon: 'fa-file-lines',
         title: 'Formularios',
         label: 'Erro ao carregar'
@@ -208,7 +261,7 @@
     }
 
     return '' +
-      '<div class="col-md-4 mb-3">' +
+      '<div class="col-lg-4 col-md-6 mb-3">' +
         '<a href="' + opts.href + '" class="hub-card-link">' +
           '<div class="hub-card hub-stat-card animate-fadeIn">' +
             '<div class="stat-icon-wrap">' +
@@ -263,7 +316,7 @@
         sections[secao].forEach(function(link) {
           var icon = hub.utils.normalizeIcon(link.icone, 'fa-solid fa-link');
           html += '' +
-            '<div class="col-12 col-sm-6 col-lg-4 mb-2">' +
+            '<div class="col-12 col-sm-6 col-xl-4 mb-2">' +
               '<a href="' + hub.utils.escapeHtml(link.url) + '" target="_blank" class="hub-link-card animate-fadeIn">' +
                 '<div class="link-icon-wrap" style="background:rgba(0,174,157,0.1);color:var(--turq);">' +
                   '<i class="' + icon + '"></i>' +

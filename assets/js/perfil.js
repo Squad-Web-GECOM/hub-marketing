@@ -20,6 +20,9 @@
   // INIT
   // ====================================================================
   document.addEventListener('hub:ready', function() {
+    // Guard: only run on perfil page
+    if (!document.getElementById('perfil-header-actions')) return;
+
     if (!hub.auth.requireAuth()) return;
     if (!hub.auth.requireMarketingUser()) return;
     init();
@@ -401,6 +404,20 @@
     document.getElementById('btn-close-perfil-edit').addEventListener('click', closeEditModal);
     document.getElementById('btn-cancel-perfil-edit').addEventListener('click', closeEditModal);
 
+    // Fechar ao clicar fora + Escape
+    var perfilOverlay = document.getElementById('perfil-edit-overlay');
+    if (perfilOverlay) {
+      perfilOverlay.addEventListener('click', function(e) {
+        if (e.target === perfilOverlay) closeEditModal();
+      });
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var ov = document.getElementById('perfil-edit-overlay');
+        if (ov && ov.classList.contains('show')) closeEditModal();
+      }
+    });
+
     // Avatar picker dentro do modal
     var btnAvatarPick = document.getElementById('btn-edit-avatar-pick');
     var avatarInput   = document.getElementById('edit-avatar-input');
@@ -575,31 +592,37 @@
     if (btnSave) { btnSave.disabled = true; btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Salvando...'; }
 
     try {
+      var apelido    = (document.getElementById('edit-apelido').value || '').trim() || null;
+      var telefone   = (document.getElementById('edit-telefone').value || '').trim() || null;
+      var aniversario = document.getElementById('edit-aniversario').value || null;
       var gerenciaId = document.getElementById('edit-gerencia').value || null;
       var coordId    = document.getElementById('edit-coordenacao').value || null;
       var nucleoId   = document.getElementById('edit-nucleo').value || null;
       var senioridade = (document.getElementById('edit-senioridade').value || '').trim() || null;
       var terceirizado = document.getElementById('edit-terceirizado').checked;
-
-      // Validação de campos obrigatórios
-      // Gerência é sempre obrigatória
-      if (!gerenciaId) {
-        hub.utils.showToast('Selecione a gerência', 'warning');
-        return;
-      }
-      // Coordenação é obrigatória salvo para gestores
-      var isGestor = loggedUser && loggedUser.isCoordenador;
-      if (!isGestor && !coordId) {
-        hub.utils.showToast('Selecione a coordenação', 'warning');
-        return;
-      }
-
-      var apelido    = (document.getElementById('edit-apelido').value || '').trim() || null;
-      var telefone   = (document.getElementById('edit-telefone').value || '').trim() || null;
-      var aniversario = document.getElementById('edit-aniversario').value || null;
       var endereco   = (document.getElementById('edit-endereco').value || '').trim() || null;
       var bairro     = (document.getElementById('edit-bairro').value || '').trim() || null;
       var cep        = (document.getElementById('edit-cep').value || '').trim() || null;
+
+      // Regras de obrigatoriedade por senioridade
+      // - Gerente: sem gerencia, coordenacao e nucleo obrigatórios
+      // - Coordenador (flag is_gestor OU senioridade): sem nucleo obrigatório
+      // - Demais: gerencia + coordenacao + nucleo obrigatórios
+      var isGerente    = senioridade === 'Gerente';
+      var isCoordenador = (loggedUser && loggedUser.isCoordenador) || senioridade === 'Coordenador';
+
+      var missing = [];
+      if (!apelido)                                       missing.push('Apelido');
+      if (!telefone)                                      missing.push('Telefone');
+      if (!aniversario)                                   missing.push('Aniversário');
+      if (!senioridade)                                   missing.push('Senioridade');
+      if (!isGerente && !gerenciaId)                      missing.push('Gerência');
+      if (!isGerente && !isCoordenador && !coordId)       missing.push('Coordenação');
+      if (!isGerente && !isCoordenador && !nucleoId)      missing.push('Núcleo');
+      if (missing.length > 0) {
+        hub.utils.showToast('Preencha: ' + missing.join(', '), 'warning');
+        return;
+      }
 
       // Gostos pessoais
       var splitTrim = function(str) {
@@ -613,28 +636,25 @@
         time_coracao: (document.getElementById('edit-gostos-time').value || '').trim() || null
       };
 
-      // profile_complete = TRUE apenas se campos obrigatórios preenchidos
-      // Obrigatórios: nome (vem do banco), apelido, telefone, aniversario,
-      //   endereco, bairro, cep, senioridade, gerencia_id,
-      //   coordenacao_id (exceto gestor), nucleo_id (exceto gestor)
-      // Não obrigatórios: avatar_url, sobre_mim, gostos_pessoais
+      // profile_complete = TRUE se todos os campos obrigatórios conforme papel
+      // Gerente:     nome + apelido + telefone + aniversario + senioridade
+      // Coordenador: + gerencia_id + coordenacao_id
+      // Demais:      + gerencia_id + coordenacao_id + nucleo_id
+      // Não obrigatórios: endereco, bairro, cep, avatar_url, sobre_mim, gostos_pessoais
       var profileComplete = !!(
         targetUser.nome &&
         apelido &&
         telefone &&
         aniversario &&
-        endereco &&
-        bairro &&
-        cep &&
         senioridade &&
-        gerenciaId &&
-        (isGestor || coordId) &&
-        (isGestor || nucleoId)
+        (isGerente || gerenciaId) &&
+        (isGerente || isCoordenador || coordId) &&
+        (isGerente || isCoordenador || nucleoId)
       );
 
       var updates = {
         gerencia_id:     gerenciaId,
-        coordenacao_id:  isGestor ? (coordId || null) : coordId,
+        coordenacao_id:  (isGerente || isCoordenador) ? (coordId || null) : coordId,
         nucleo_id:       nucleoId,
         apelido:         apelido,
         telefone:        telefone,

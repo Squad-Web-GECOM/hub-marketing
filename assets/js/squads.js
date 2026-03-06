@@ -22,6 +22,9 @@
   // INIT - wait for hub:ready
   // ====================================================================
   document.addEventListener('hub:ready', function() {
+    // Guard: only run on squads page
+    if (!document.getElementById('squads-grid')) return;
+
     // Auth gate
     if (!hub.auth.requireAuth()) return;
     if (!hub.auth.requireMarketingUser()) return;
@@ -282,7 +285,8 @@
   // FILTERING
   // ====================================================================
   function applyFilters() {
-    var search = (document.getElementById('filter-search').value || '').toLowerCase().trim();
+    var searchEl = document.getElementById('filter-search');
+    var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
     var filtered = [];
 
     for (var i = 0; i < allSquads.length; i++) {

@@ -19,26 +19,12 @@
   // INIT - wait for hub:ready
   // ====================================================================
   document.addEventListener('hub:ready', function() {
+    // Guard: only run on usuarios page
+    if (!document.getElementById('users-tbody')) return;
+
     // Auth gate
     if (!hub.auth.requireAuth()) return;
     if (!hub.auth.requireMarketingUser()) return;
-
-    // Bloqueia acesso com cadastro incompleto
-    var u = hub.auth.getUser();
-    if (u && !u.profileComplete) {
-      document.getElementById('app-view').style.display = 'block';
-      document.getElementById('app-view').innerHTML =
-        '<div class="hub-profile-gate-page">' +
-          '<i class="fa-solid fa-lock fa-2x mb-3" style="color:var(--turq);"></i>' +
-          '<h5>Cadastro incompleto</h5>' +
-          '<p class="text-muted">Complete seu cadastro para ver os Usuários.</p>' +
-          '<button class="btn btn-warning" onclick="hub.nav.openEditarPerfil()">' +
-            '<i class="fa-solid fa-user-pen mr-1"></i>Completar Cadastro' +
-          '</button>' +
-        '</div>';
-      hub.utils.hideLoader();
-      return;
-    }
 
     init();
   });
@@ -123,6 +109,7 @@
   function populateFilterDropdowns() {
     var gerencias = getOrgsByType('gerencia');
     var selGerencia = document.getElementById('filter-gerencia');
+    if (!selGerencia) return;
     selGerencia.innerHTML = '<option value="">Todas</option>';
     gerencias.forEach(function(g) {
       selGerencia.innerHTML += '<option value="' + g.id + '">' + hub.utils.escapeHtml(g.nome) + '</option>';
@@ -133,8 +120,10 @@
   }
 
   function updateFilterCoord() {
-    var gerenciaId = document.getElementById('filter-gerencia').value;
+    var gerEl = document.getElementById('filter-gerencia');
+    var gerenciaId = gerEl ? gerEl.value : '';
     var selCoord = document.getElementById('filter-coordenacao');
+    if (!selCoord) return;
     if (!gerenciaId) { resetFilterCoord(); resetFilterNucleo(); return; }
     var coords = getOrgsByTypeAndParent('coordenacao', gerenciaId);
     selCoord.innerHTML = '<option value="">Todas</option>';
@@ -145,8 +134,10 @@
   }
 
   function updateFilterNucleo() {
-    var coordId = document.getElementById('filter-coordenacao').value;
+    var coordEl = document.getElementById('filter-coordenacao');
+    var coordId = coordEl ? coordEl.value : '';
     var selNucleo = document.getElementById('filter-nucleo');
+    if (!selNucleo) return;
     if (!coordId) { resetFilterNucleo(); return; }
     var nucleos = getOrgsByTypeAndParent('nucleo', coordId);
     selNucleo.innerHTML = '<option value="">Todos</option>';
@@ -157,12 +148,14 @@
 
   function resetFilterCoord() {
     var sel = document.getElementById('filter-coordenacao');
+    if (!sel) return;
     sel.innerHTML = '<option value="">Todas</option>';
     sel.value = '';
   }
 
   function resetFilterNucleo() {
     var sel = document.getElementById('filter-nucleo');
+    if (!sel) return;
     sel.innerHTML = '<option value="">Todos</option>';
     sel.value = '';
   }
@@ -186,11 +179,16 @@
   // FILTERING & SORTING
   // ====================================================================
   function applyFilters() {
-    var search = (document.getElementById('filter-search').value || '').toLowerCase().trim();
-    var gerenciaId = document.getElementById('filter-gerencia').value;
-    var coordId = document.getElementById('filter-coordenacao').value;
-    var nucleoId = document.getElementById('filter-nucleo').value;
-    var bairroFilter = (document.getElementById('filter-bairro') ? document.getElementById('filter-bairro').value : '').toLowerCase();
+    var searchEl = document.getElementById('filter-search');
+    var search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+    var gerEl = document.getElementById('filter-gerencia');
+    var gerenciaId = gerEl ? gerEl.value : '';
+    var coordEl = document.getElementById('filter-coordenacao');
+    var coordId = coordEl ? coordEl.value : '';
+    var nucleoEl = document.getElementById('filter-nucleo');
+    var nucleoId = nucleoEl ? nucleoEl.value : '';
+    var bairroEl = document.getElementById('filter-bairro');
+    var bairroFilter = (bairroEl ? bairroEl.value : '').toLowerCase();
 
     filteredUsers = allUsers.filter(function(u) {
       if (search) {
@@ -248,7 +246,6 @@
         '<td>' + hub.utils.escapeHtml(u.email || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.telefone || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.aniversario ? hub.utils.formatDate(u.aniversario) : '-') + '</td>' +
-        '<td class="td-truncate">' + hub.utils.escapeHtml(u.endereco || '-') + '</td>' +
         '<td>' + hub.utils.escapeHtml(u.bairro || '-') + '</td>' +
         '<td>' + (u.terceirizado ? '<span class="hub-badge hub-badge-warning">Sim</span>' : '<span class="hub-badge hub-badge-success">Nao</span>') + '</td>' +
         '</tr>';
@@ -308,6 +305,9 @@
     var user = hub.auth.getUser();
     if (!user) return;
 
+    // fullUser inclui colunas não presentes no cache de auth (sobre_mim, gostos_pessoais, etc.)
+    var fullUser = allUsers.find(function(u) { return u.id === user.id; }) || {};
+
     // Titulo dinamico
     var title = document.getElementById('profile-modal-title');
     if (title) title.textContent = user.profileComplete ? 'Editar Perfil' : 'Complete seu Cadastro';
@@ -325,17 +325,35 @@
     var aniEl = document.getElementById('profile-aniversario');
     if (aniEl) aniEl.value = user.aniversario || '';
 
-    var endEl = document.getElementById('profile-endereco');
-    if (endEl) endEl.value = user.endereco || '';
-
-    var bairroEl = document.getElementById('profile-bairro');
-    if (bairroEl) bairroEl.value = user.bairro || '';
-
-    var cepEl = document.getElementById('profile-cep');
-    if (cepEl) cepEl.value = user.cep || '';
-
     // Preencher dropdowns org
     populateProfileDropdowns();
+
+    // Preencher endereço
+    var endEl = document.getElementById('profile-endereco');
+    if (endEl) endEl.value = fullUser.endereco || '';
+
+    var bairroEl = document.getElementById('profile-bairro');
+    if (bairroEl) bairroEl.value = fullUser.bairro || '';
+
+    var cepEl = document.getElementById('profile-cep');
+    if (cepEl) cepEl.value = fullUser.cep || '';
+
+    // Preencher sobre mim
+    var sobreEl = document.getElementById('profile-sobre-mim');
+    if (sobreEl) sobreEl.value = fullUser.sobre_mim || '';
+
+    // Preencher gostos pessoais
+    var gp = fullUser.gostos_pessoais || {};
+    var livrosEl = document.getElementById('profile-livros');
+    if (livrosEl) livrosEl.value = (gp.livros || []).join(', ');
+    var filmesEl = document.getElementById('profile-filmes');
+    if (filmesEl) filmesEl.value = (gp.filmes || []).join(', ');
+    var comidasEl = document.getElementById('profile-comidas');
+    if (comidasEl) comidasEl.value = (gp.comidas || []).join(', ');
+    var hobbiesEl = document.getElementById('profile-hobbies');
+    if (hobbiesEl) hobbiesEl.value = (gp.hobbies || []).join(', ');
+    var timeEl = document.getElementById('profile-time-coracao');
+    if (timeEl) timeEl.value = gp.time_coracao || '';
 
     var overlay = document.getElementById('profile-modal-overlay');
     if (overlay) overlay.classList.add('show');
@@ -346,6 +364,7 @@
     var gerencias = getOrgsByType('gerencia');
 
     var selGer = document.getElementById('profile-gerencia');
+    if (!selGer) return;
     selGer.innerHTML = '<option value="">Selecione...</option>';
     gerencias.forEach(function(g) {
       var sel = (user && String(user.gerencia_id) === String(g.id)) ? ' selected' : '';
@@ -356,8 +375,10 @@
   }
 
   function updateProfileCoord() {
-    var gerenciaId = document.getElementById('profile-gerencia').value;
+    var gerEl = document.getElementById('profile-gerencia');
+    var gerenciaId = gerEl ? gerEl.value : '';
     var selCoord = document.getElementById('profile-coordenacao');
+    if (!selCoord) return;
     var user = hub.auth.getUser();
 
     if (!gerenciaId) {
@@ -377,8 +398,10 @@
   }
 
   function updateProfileNucleo() {
-    var coordId = document.getElementById('profile-coordenacao').value;
+    var coordEl = document.getElementById('profile-coordenacao');
+    var coordId = coordEl ? coordEl.value : '';
     var selNucleo = document.getElementById('profile-nucleo');
+    if (!selNucleo) return;
     var user = hub.auth.getUser();
 
     if (!coordId) {
@@ -404,32 +427,64 @@
       return;
     }
 
-    var gerenciaId = document.getElementById('profile-gerencia').value || null;
-    var coordId = document.getElementById('profile-coordenacao').value || null;
-    var nucleoId = document.getElementById('profile-nucleo').value || null;
-    var apelido = (document.getElementById('profile-apelido').value || '').trim();
-    var telefone = (document.getElementById('profile-telefone').value || '').trim();
+    // Campos obrigatórios
+    var apelido    = (document.getElementById('profile-apelido').value || '').trim();
+    var telefone   = (document.getElementById('profile-telefone').value || '').trim();
     var aniversario = document.getElementById('profile-aniversario').value || null;
-    var endereco = (document.getElementById('profile-endereco').value || '').trim();
-    var bairro = (document.getElementById('profile-bairro').value || '').trim();
-    var cep = (document.getElementById('profile-cep').value || '').trim();
+    var gerenciaId  = document.getElementById('profile-gerencia').value || null;
+    var coordId     = document.getElementById('profile-coordenacao').value || null;
+    var nucleoId    = document.getElementById('profile-nucleo').value || null;
 
-    if (!gerenciaId || !coordId) {
-      hub.utils.showToast('Selecione pelo menos a gerencia e a coordenacao', 'warning');
+    // Validação dos campos obrigatórios
+    var missing = [];
+    if (!apelido)     missing.push('Apelido');
+    if (!telefone)    missing.push('Telefone');
+    if (!aniversario) missing.push('Aniversário');
+    if (!gerenciaId)  missing.push('Gerência');
+    if (!coordId)     missing.push('Coordenação');
+    if (missing.length > 0) {
+      hub.utils.showToast('Preencha: ' + missing.join(', '), 'warning');
       return;
     }
 
+    // Campos opcionais — endereço
+    var endereco = (document.getElementById('profile-endereco').value || '').trim();
+    var bairro   = (document.getElementById('profile-bairro').value || '').trim();
+    var cep      = (document.getElementById('profile-cep').value || '').trim();
+
+    // Sobre mim
+    var sobreMim = (document.getElementById('profile-sobre-mim').value || '').trim();
+
+    // Gostos pessoais (arrays separados por vírgula)
+    var parseList = function(id) {
+      var v = (document.getElementById(id) ? document.getElementById(id).value : '').trim();
+      return v ? v.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+    };
+    var gostosPessoais = {
+      livros:       parseList('profile-livros'),
+      filmes:       parseList('profile-filmes'),
+      comidas:      parseList('profile-comidas'),
+      hobbies:      parseList('profile-hobbies'),
+      time_coracao: (document.getElementById('profile-time-coracao') ? document.getElementById('profile-time-coracao').value.trim() : '')
+    };
+
+    // profile_complete: obrigatórios preenchidos; núcleo obrigatório exceto para gestores
+    var isGestor = user.isCoordenador;
+    var profileComplete = !!(apelido && telefone && aniversario && gerenciaId && coordId && (isGestor || nucleoId));
+
     var updates = {
-      gerencia_id: gerenciaId,
-      coordenacao_id: coordId,
-      nucleo_id: nucleoId,
-      apelido: apelido || null,
-      telefone: telefone || null,
-      aniversario: aniversario,
-      endereco: endereco || null,
-      bairro: bairro || null,
-      cep: cep || null,
-      profile_complete: true
+      apelido:          apelido,
+      telefone:         telefone,
+      aniversario:      aniversario,
+      gerencia_id:      gerenciaId,
+      coordenacao_id:   coordId,
+      nucleo_id:        nucleoId,
+      endereco:         endereco || null,
+      bairro:           bairro || null,
+      cep:              cep || null,
+      sobre_mim:        sobreMim || null,
+      gostos_pessoais:  gostosPessoais,
+      profile_complete: profileComplete
     };
 
     var btnSave = document.getElementById('btn-save-profile');
@@ -531,6 +586,20 @@
     var btnCancel = document.getElementById('btn-cancel-profile');
     if (btnCancel) btnCancel.addEventListener('click', function() {
       document.getElementById('profile-modal-overlay').classList.remove('show');
+    });
+
+    // Fechar ao clicar fora + Escape
+    var profileOverlay = document.getElementById('profile-modal-overlay');
+    if (profileOverlay) {
+      profileOverlay.addEventListener('click', function(e) {
+        if (e.target === profileOverlay) profileOverlay.classList.remove('show');
+      });
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var ov = document.getElementById('profile-modal-overlay');
+        if (ov && ov.classList.contains('show')) ov.classList.remove('show');
+      }
     });
 
     // Botao "Editar Perfil" no sidebar (injetado pelo main.js se existir)

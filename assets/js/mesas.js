@@ -22,6 +22,9 @@
   // INIT - wait for hub:ready
   // ====================================================================
   document.addEventListener('hub:ready', function() {
+    // Guard: only run on mesas page
+    if (!document.getElementById('desk-grid')) return;
+
     // Mesas page allows view mode (no login required)
     state.viewMode = hub.auth._source === 'view';
 
@@ -324,40 +327,72 @@
       return !occupiedDesks[d.desk_name];
     });
 
-    if (availableDesks.length === 0) {
-      $el.html('<span class="text-muted">Nenhuma mesa disponivel nesta data.</span>');
-      return;
-    }
+    // Verifica se o usuário tem mesa fixa (não liberada para o dia)
+    var myFixedDesk = null;
+    state.desks.forEach(function(desk) {
+      if (desk.fixed_reserve === user.user_name) {
+        var wasFreed = state.reservations.some(function(r) {
+          return r.desk_name === desk.desk_name && r.canceled_at && r.created_by === 'mesa_fixa';
+        });
+        if (!wasFreed) myFixedDesk = desk;
+      }
+    });
 
-    // Check if user already has a reservation for today
+    // Verifica se o usuário tem reserva DB para a data selecionada
     var myRes = null;
     state.reservations.forEach(function(r) {
-      if (r.created_by === user.user_name && !r.canceled_at) myRes = r;
+      if (r.created_by === user.user_name && !r.canceled_at) {
+        if (!myRes) myRes = r; // usa o mais antigo encontrado
+      }
     });
-    var hasRes = !!myRes;
 
-    // Se já tem reserva (e não é admin), mostrar card "Sua reserva"
-    if (hasRes && !user.isAdmin) {
-      var deskObj = state.desks.find(function(d) { return d.desk_name === myRes.desk_name; });
-      var deskLabel = deskObj ? deskObj.desk_name : (myRes.desk_name || 'Mesa');
+    // Mesa atribuída: fixa tem prioridade sobre reserva DB
+    var myAssignedDesk = null;
+    var myResId = null;
+    var isFixedDesk = false;
+
+    if (myFixedDesk) {
+      myAssignedDesk = myFixedDesk;
+      isFixedDesk = true;
+    } else if (myRes) {
+      myAssignedDesk = state.desks.find(function(d) { return d.desk_name === myRes.desk_name; });
+      myResId = myRes.id;
+    }
+
+    // Mostrar "Mesa Agendada" para qualquer usuário com mesa atribuída (admin inclusive)
+    if (myAssignedDesk) {
+      var deskLabel = myAssignedDesk.desk_name || 'Mesa';
+      var subLabel = isFixedDesk ? 'Mesa fixa' : 'Reservado';
+      var cancelBtn = isFixedDesk ? '' :
+        '<button class="btn btn-sm btn-outline-danger ml-2 cancel-suggestion-btn"' +
+          ' data-res-id="' + (myResId || '') + '" data-num="' + (myAssignedDesk.number || '') + '">' +
+          '<i class="fa-solid fa-xmark"></i> Liberar' +
+        '</button>';
+
       $el.html(
         '<div class="suggestion-my-reservation">' +
           '<div>' +
-            '<div class="suggestion-my-res-label"><i class="fa-solid fa-circle-check"></i> Sua reserva</div>' +
-            '<strong style="font-size:1.2rem;">' + deskLabel + '</strong>' +
+            '<div class="suggestion-my-res-label"><i class="fa-solid fa-circle-check"></i> ' + subLabel + '</div>' +
+            '<strong style="font-size:1.2rem;">' + hub.utils.escapeHtml(deskLabel) + '</strong>' +
           '</div>' +
-          '<button class="btn btn-sm btn-outline-danger ml-2 cancel-suggestion-btn" data-res-id="' + (myRes.id || '') + '" data-num="' + (deskObj ? deskObj.number : '') + '">' +
-            '<i class="fa-solid fa-xmark"></i> Liberar' +
-          '</button>' +
+          cancelBtn +
         '</div>'
       );
-      $('.cancel-suggestion-btn').off('click').on('click', function() {
-        cancelReservation($(this).data('num'), $(this).data('res-id'));
-      });
+
+      if (!isFixedDesk) {
+        $('.cancel-suggestion-btn').off('click').on('click', function() {
+          cancelReservation($(this).data('num'), $(this).data('res-id'));
+        });
+      }
 
       // Atualiza título do card
       var $card = $('#suggestion-card h6');
-      if ($card.length) $card.html('<i class="fa-solid fa-calendar-check"></i> Sua Reserva');
+      if ($card.length) $card.html('<i class="fa-solid fa-calendar-check"></i> Mesa Agendada');
+      return;
+    }
+
+    if (availableDesks.length === 0) {
+      $el.html('<span class="text-muted">Nenhuma mesa disponivel nesta data.</span>');
       return;
     }
 
@@ -378,12 +413,13 @@
         .from('reservations')
         .select('desk_name')
         .eq('created_by', user.user_name)
-        .gte('date', historyDate)
+        // .gte('date', historyDate)
         .is('canceled_at', null);
 
       var historyCounts = {};
       var topHistoryDesk = null;
       var topHistoryCount = 0;
+      var historyProximityActive = false; // true quando mesa habitual não disponível
 
       if (histResp.data && histResp.data.length > 0) {
         histResp.data.forEach(function(r) {
@@ -395,9 +431,29 @@
             topHistoryDesk = dn;
           }
         });
-        // Apply +3 score to the top personal desk
+        // Aplica score ao top desk histórico; se indisponível, pontua mesas próximas
         if (topHistoryDesk && scores.hasOwnProperty(topHistoryDesk)) {
+          // Mesa habitual disponível → boost direto
           scores[topHistoryDesk] += 3;
+        } else if (topHistoryDesk) {
+          // Mesa habitual ocupada → pontuar mesas vizinhas
+          // Formato desk_name: letra(row) + número(col), ex: "A1", "B3"
+          historyProximityActive = true;
+          var parseDeskName = function(name) {
+            return { row: name.charAt(0), num: parseInt(name.slice(1), 10) || 0 };
+          };
+          var target = parseDeskName(topHistoryDesk);
+          Object.keys(scores).forEach(function(dn) {
+            var d = parseDeskName(dn);
+            var rowDist = Math.abs(d.row.charCodeAt(0) - target.row.charCodeAt(0));
+            var numDist = Math.abs(d.num - target.num);
+            if (rowDist === 0) {
+              if (numDist === 1)     scores[dn] += 2; // mesma linha, número adjacente
+              else if (numDist <= 3) scores[dn] += 1; // mesma linha, número próximo
+            } else if (rowDist === 1 && numDist <= 2) {
+              scores[dn] += 1;                        // linha adjacente, número próximo
+            }
+          });
         }
       }
 
@@ -470,8 +526,12 @@
 
       // Determine reason text
       var reason = 'Mesa disponivel';
-      if (bestScore >= 3 && topHistoryDesk === bestDesk.desk_name) {
+      if (topHistoryDesk === bestDesk.desk_name && bestScore >= 3) {
         reason = 'Sua mesa mais frequente';
+      } else if (historyProximityActive && bestScore > 0) {
+        reason = (bestDesk.desk_name.charAt(0) === topHistoryDesk.charAt(0))
+          ? 'Mesma linha que sua mesa habitual'
+          : 'Proxima a sua mesa habitual';
       } else if (bestScore >= 2) {
         reason = 'Perto do seu nucleo';
       } else if (bestScore >= 1) {
@@ -485,10 +545,8 @@
             '<div class="text-muted small">' + reason + '</div>' +
           '</div>' +
           '<div class="d-flex gap-2">' +
-            (hasRes && !user.isAdmin ? '' :
-              '<button class="btn btn-sm btn-primary mr-2 suggestion-book-btn" data-num="' + bestDesk.number + '">Reservar</button>'
-            ) +
-            '<button class="btn btn-sm btn-outline-secondary suggestion-view-btn">Ver outras</button>' +
+            '<button class="btn btn-sm btn-primary mr-2 suggestion-book-btn" data-num="' + bestDesk.number + '">Reservar</button>' +
+            '<button class="btn btn-sm btn-secondary suggestion-view-btn">Ver outras</button>' +
           '</div>' +
         '</div>';
 
