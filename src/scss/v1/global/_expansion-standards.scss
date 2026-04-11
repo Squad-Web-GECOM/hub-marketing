@@ -1,0 +1,252 @@
+/* ==========================================================================
+   FASE C — PADRÕES PARA NOVAS PÁGINAS E DASHBOARDS
+   Objetivo: manter coesão visual entre novas áreas do Hub sem mexer na V1.
+   Preferência de tokens: variáveis já existentes no Sicoob Styles.
+   ========================================================================== */
+
+$std-bg-surface: var(--color-surface-background-low);
+$std-border-surface: var(--color-surface-stroke-medium);
+$std-text-muted: var(--color-surface-text-default-low);
+$std-title: var(--verdee);
+$std-shadow-light: 0 4px 16px rgba(0, 54, 65, 0.06);
+
+.hub-std {
+  // Shell semântico para novas páginas
+  &-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    &-main {
+      min-width: 0;
+    }
+
+    &-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $std-title;
+      letter-spacing: -0.01em;
+    }
+
+    &-subtitle {
+      margin: 6px 0 0;
+      font-size: 0.9rem;
+      color: $std-text-muted;
+    }
+  }
+
+  &-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  // Grid padrão para blocos da página
+  &-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  &-col {
+    &-12 { grid-column: span 12; }
+    &-9  { grid-column: span 9; }
+    &-8  { grid-column: span 8; }
+    &-6  { grid-column: span 6; }
+    &-4  { grid-column: span 4; }
+    &-3  { grid-column: span 3; }
+  }
+
+  // Bloco de conteúdo visualmente alinhado com os cards do Hub
+  &-section {
+    background: $std-bg-surface;
+    border: 1px solid $std-border-surface;
+    border-radius: var(--border-radius-md);
+    box-shadow: $std-shadow-light;
+    overflow: hidden;
+
+    &-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid $std-border-surface;
+    }
+
+    &-title {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: $std-title;
+      letter-spacing: 0.01em;
+    }
+
+    &-body {
+      padding: 18px;
+    }
+
+    &-foot {
+      padding: 12px 18px;
+      border-top: 1px solid $std-border-surface;
+      background: var(--athens-gray-50);
+    }
+  }
+
+  // Barras e painéis de filtros padronizados para expansão
+  &-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid $std-border-surface;
+    border-radius: var(--border-radius-sm);
+    background: $std-bg-surface;
+
+    &-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 180px;
+
+      > label {
+        margin: 0;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: $std-text-muted;
+      }
+    }
+  }
+
+  // KPIs com responsividade consistente
+  &-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  // Empty state padrão para páginas novas
+  &-empty {
+    text-align: center;
+    padding: 32px 20px;
+    color: $std-text-muted;
+    border: 1px dashed $std-border-surface;
+    border-radius: var(--border-radius-sm);
+    background: var(--athens-gray-50);
+
+    > i {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.7rem;
+      color: var(--turq);
+    }
+  }
+}
+
+// Responsividade padrão
+@media (max-width: 991px) {
+  .hub-std-col {
+    &-9,
+    &-8,
+    &-6,
+    &-4,
+    &-3 {
+      grid-column: span 12;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .hub-std {
+    &-page {
+      gap: 16px;
+    }
+
+    &-header-title {
+      font-size: 1.25rem;
+    }
+
+    &-grid {
+      gap: 12px;
+    }
+
+    &-section {
+      &-head,
+      &-body,
+      &-foot {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+    }
+
+    &-filter-group {
+      min-width: 100%;
+    }
+  }
+}
+
+// Dark mode obrigatório para a camada padrão de expansão
+[data-theme=dark] {
+  .hub-std {
+    &-header {
+      &-title {
+        color: var(--mine-shaft-50);
+      }
+
+      &-subtitle {
+        color: var(--athens-gray-400);
+      }
+    }
+
+    &-section {
+      background: var(--athens-gray-900);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+
+      &-head {
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+      }
+
+      &-title {
+        color: var(--mine-shaft-50);
+      }
+
+      &-foot {
+        border-top-color: rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+      }
+    }
+
+    &-filter {
+      background: var(--athens-gray-900);
+      border-color: rgba(255, 255, 255, 0.08);
+
+      &-group > label {
+        color: var(--athens-gray-300);
+      }
+    }
+
+    &-empty {
+      color: var(--athens-gray-300);
+      border-color: rgba(255, 255, 255, 0.12);
+      background: var(--athens-gray-800);
+
+      > i {
+        color: var(--persian-green-400);
+      }
+    }
+  }
+}

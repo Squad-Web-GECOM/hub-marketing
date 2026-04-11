@@ -1,6 +1,6 @@
 /* ==============================================================
  * Hub Marketing — squads.js (build Liferay)
- * Gerado em: 2026-03-06 17:45:20
+ * Gerado em: 2026-04-10 17:37:49
  * Contém: config + main.js + squads.js
  * ============================================================== */
 
@@ -26,26 +26,26 @@ window.HUB_PAGES = {
   // ====================================================================
   // CONFIG (Supabase key obfuscated)
   // ====================================================================
-  const _p1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
-  const _p2 = '.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjcWl0b2NvcGpkaWx4Z3Vwcmls';
-  const _p3 = 'Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzODM5MTEsImV4cCI6MjA3MTk1OTkxMX0';
-  const _p4 = '.GTqh--djGKQfCgCnlpRNNx75KMEXNImSPcs8OQ7K5gc';
+  var _p1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+  var _p2 = '.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjcWl0b2NvcGpkaWx4Z3Vwcmls';
+  var _p3 = 'Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzODM5MTEsImV4cCI6MjA3MTk1OTkxMX0';
+  var _p4 = '.GTqh--djGKQfCgCnlpRNNx75KMEXNImSPcs8OQ7K5gc';
 
-  const HUB_CONFIG = {
+  var HUB_CONFIG = {
     URL: 'https://gcqitocopjdilxgupril.supabase.co',
     KEY: _p1 + _p2 + _p3 + _p4
   };
 
   // Cache keys (new keys to break old cache)
-  const CACHE_KEYS = {
+  var CACHE_KEYS = {
     USER: 'hub_cached_user',
     ROLE: 'hub_cached_role',
     SOURCE: 'hub_cached_source'
   };
 
   // Versão do schema do cache — incrementar força refresh em todos os navegadores
-  const CACHE_VERSION = '2';
-  const CACHE_VERSION_KEY = 'hub_cache_version';
+  var CACHE_VERSION = '2';
+  var CACHE_VERSION_KEY = 'hub_cache_version';
 
   // Invalida cache se versão mudou
   (function() {
@@ -60,7 +60,7 @@ window.HUB_PAGES = {
   // ====================================================================
   // SUPABASE INIT
   // ====================================================================
-  let sbClient = null;
+  var sbClient = null;
   function getSb() {
     if (!sbClient) {
       sbClient = window.supabase.createClient(HUB_CONFIG.URL, HUB_CONFIG.KEY);
@@ -71,36 +71,112 @@ window.HUB_PAGES = {
   // ====================================================================
   // AUTH MODULE
   // ====================================================================
-  const auth = {
+  var auth = {
     _user: null,
     _role: null,
     _source: null, // 'liferay', 'secret', 'view'
 
     async check() {
       // 1. Try localStorage cache
-      const cachedUser = localStorage.getItem(CACHE_KEYS.USER);
-      const cachedRole = localStorage.getItem(CACHE_KEYS.ROLE);
-      const cachedSource = localStorage.getItem(CACHE_KEYS.SOURCE);
+      var cachedUser = localStorage.getItem(CACHE_KEYS.USER);
+      var cachedRole = localStorage.getItem(CACHE_KEYS.ROLE);
+      var cachedSource = localStorage.getItem(CACHE_KEYS.SOURCE);
 
       if (cachedUser && cachedRole) {
-        this._user = JSON.parse(cachedUser);
-        this._role = JSON.parse(cachedRole);
-        this._source = cachedSource || 'cache';
-
-        // Se apelido estiver ausente no cache (sessão antiga), atualiza silenciosamente do banco
-        if (!this._user.apelido && this._user.user_name && !this._user.isExternal) {
-          try {
-            await this._lookupUser(this._user.user_name);
-            this._saveCache();
-          } catch(e) {
-            // silencioso — mantém cache atual
-          }
+        try {
+          this._user = JSON.parse(cachedUser);
+          this._role = JSON.parse(cachedRole);
+        } catch(e) {
+          // Cache corrompido — limpa e segue para auth normal
+          localStorage.removeItem(CACHE_KEYS.USER);
+          localStorage.removeItem(CACHE_KEYS.ROLE);
+          localStorage.removeItem(CACHE_KEYS.SOURCE);
+          this._user = null;
+          this._role = null;
+          cachedUser = null;
         }
-
-        return true;
       }
 
-      // 2. window.localPart (injetado pelo template FreeMarker do Liferay)
+      if (cachedUser && this._user) {
+        this._source = cachedSource || 'cache';
+
+        // Verifica se o usuario do Liferay mudou (ex: outro colaborador no mesmo browser)
+        var liferayUser = null;
+        if (window.localPart) {
+          liferayUser = String(window.localPart).toLowerCase().trim();
+        } else if (typeof Liferay !== 'undefined' && Liferay.ThemeDisplay) {
+          try {
+            var tdEmail = Liferay.ThemeDisplay.getUserEmailAddress().toLowerCase();
+            if (tdEmail && tdEmail.indexOf('default') === -1) {
+              liferayUser = tdEmail.split('@')[0];
+            }
+          } catch(e) { /* silencioso */ }
+        }
+
+        if (liferayUser && liferayUser !== 'guest' && this._user.user_name !== liferayUser) {
+          // Usuario do Liferay diferente do cache — invalida cache
+          localStorage.removeItem(CACHE_KEYS.USER);
+          localStorage.removeItem(CACHE_KEYS.ROLE);
+          localStorage.removeItem(CACHE_KEYS.SOURCE);
+          this._user = null;
+          this._role = null;
+          this._source = null;
+          // Segue para o passo 2 (Liferay SSO) abaixo
+        } else {
+          // Se cache veio do Supabase Auth, verificar se sessao ainda existe
+          if (this._source === 'supabase') {
+            try {
+              var sessCheck = await getSb().auth.getSession();
+              if (!sessCheck.data || !sessCheck.data.session) {
+                // Sessao Supabase expirou — invalidar cache
+                localStorage.removeItem(CACHE_KEYS.USER);
+                localStorage.removeItem(CACHE_KEYS.ROLE);
+                localStorage.removeItem(CACHE_KEYS.SOURCE);
+                this._user = null;
+                this._role = null;
+                this._source = null;
+                // Segue para os passos abaixo
+              } else {
+                // Sessao valida — atualiza dados do banco
+                if (this._user.user_name && !this._user.isExternal) {
+                  try { await this._lookupUser(this._user.user_name); this._saveCache(); } catch(e) {}
+                }
+                return true;
+              }
+            } catch(e) {
+              return true; // em caso de erro, confia no cache
+            }
+          } else {
+            // Cache nao-supabase — atualiza silenciosamente se necessario
+            if (this._user.user_name && !this._user.isExternal) {
+              try {
+                await this._lookupUser(this._user.user_name);
+                this._saveCache();
+              } catch(e) {
+                // silencioso — mantém cache atual
+              }
+            }
+            return true;
+          }
+        }
+      }
+
+      // 2. Supabase Auth session (sem cache, mas sessao pode existir)
+      try {
+        var sessionResp = await getSb().auth.getSession();
+        if (sessionResp.data && sessionResp.data.session) {
+          var sessionEmail = sessionResp.data.session.user.email;
+          var sessionUser = sessionEmail.split('@')[0].toLowerCase();
+          var foundSession = await this._lookupUser(sessionUser);
+          if (foundSession) {
+            this._source = 'supabase';
+            this._saveCache();
+            return true;
+          }
+        }
+      } catch(e) { /* silencioso */ }
+
+      // 3. window.localPart (injetado pelo template FreeMarker do Liferay)
       if (window.localPart) {
         try {
           var localPartUser = String(window.localPart).toLowerCase().trim();
@@ -126,7 +202,7 @@ window.HUB_PAGES = {
       try {
         if (typeof Liferay !== 'undefined' && Liferay.ThemeDisplay) {
           var email = Liferay.ThemeDisplay.getUserEmailAddress().toLowerCase();
-          if (email && email !== '' && !email.includes('default')) {
+          if (email && email !== '' && email.indexOf('default') === -1) {
             var userName = email.split('@')[0];
             var found = await this._lookupUser(userName);
             if (found) {
@@ -155,7 +231,7 @@ window.HUB_PAGES = {
     async login(input) {
       // Secret login: extract user_name, lowercase, no @domain
       var userName = input.toLowerCase().trim();
-      if (userName.includes('@')) {
+      if (userName.indexOf('@') !== -1) {
         userName = userName.split('@')[0];
       }
 
@@ -166,6 +242,22 @@ window.HUB_PAGES = {
         return { success: true, user: this._user };
       }
       return { success: false, error: 'Usuario nao encontrado' };
+    },
+
+    async loginWithEmail(email, password) {
+      var result = await getSb().auth.signInWithPassword({ email: email, password: password });
+      if (result.error) {
+        return { success: false, error: result.error.message || 'Email ou senha incorretos.' };
+      }
+      var userName = email.split('@')[0].toLowerCase();
+      var found = await this._lookupUser(userName);
+      if (!found) {
+        await getSb().auth.signOut();
+        return { success: false, error: 'Conta desativada. Contacte o administrador.' };
+      }
+      this._source = 'supabase';
+      this._saveCache();
+      return { success: true, user: this._user };
     },
 
     async _lookupUser(userName) {
@@ -235,7 +327,10 @@ window.HUB_PAGES = {
       localStorage.setItem(CACHE_KEYS.SOURCE, this._source);
     },
 
-    logout: function() {
+    logout: async function() {
+      // Sign out from Supabase Auth (clears session tokens)
+      try { await getSb().auth.signOut(); } catch(e) { /* silencioso */ }
+
       localStorage.removeItem(CACHE_KEYS.USER);
       localStorage.removeItem(CACHE_KEYS.ROLE);
       localStorage.removeItem(CACHE_KEYS.SOURCE);
@@ -565,7 +660,12 @@ window.HUB_PAGES = {
 
       var toast = document.createElement('div');
       toast.className = 'hub-toast hub-toast-' + type;
-      toast.innerHTML = '<i class="fa-solid ' + (icons[type] || icons.info) + '"></i><span>' + msg + '</span>';
+      var icon = document.createElement('i');
+      icon.className = 'fa-solid ' + (icons[type] || icons.info);
+      var span = document.createElement('span');
+      span.textContent = msg;
+      toast.appendChild(icon);
+      toast.appendChild(span);
       stack.appendChild(toast);
 
       setTimeout(function() {
@@ -595,6 +695,15 @@ window.HUB_PAGES = {
         clearTimeout(timer);
         timer = setTimeout(function() { fn.apply(ctx, args); }, ms);
       };
+    },
+
+    throttle: function(key, ms) {
+      var storageKey = 'hub_throttle_' + key;
+      var last = parseInt(sessionStorage.getItem(storageKey) || '0', 10);
+      var now = Date.now();
+      if (now - last < ms) return false;
+      sessionStorage.setItem(storageKey, String(now));
+      return true;
     },
 
     copyToClipboard: function(text) {
@@ -716,27 +825,16 @@ window.HUB_PAGES = {
   };
 
   // ====================================================================
-  // ACCESS CODES (same as agendamento-complete-v4.js)
-  // ====================================================================
-  var ACCESS_CODES = {
-    ADMIN: 'MKTadmin',
-    EXTERNAL: 'MKTexterno'
-  };
-
-  // ====================================================================
-  // LOGIN MODAL  (replicates exactly the v4.2 flow)
+  // LOGIN MODAL
   //
-  // Step "choice":  3 buttons  – Sisbr · Administrador · Externo
-  //                 + Cancel
-  // Step "admin-input":  username  → next
-  // Step "external-input": username → next
-  // Step "code":  access-code input  → login
+  // Step "choice":  2 buttons — Sisbr · Entrar com Email
+  //                 + link "Nao tem conta? Criar conta"
+  // Step "login-email": email + password → Entrar
+  // Step "signup-email": email + password + confirmar → Criar conta
   // Step "secret":  username → login (hidden, triple-click on icon)
   // ====================================================================
   var _modalState = {
-    currentStep: 'choice',
-    currentUsername: '',
-    currentType: ''        // 'admin' | 'external'
+    currentStep: 'choice'
   };
 
   function renderLoginModal() {
@@ -756,42 +854,34 @@ window.HUB_PAGES = {
               '<span class="icon">&#127970;</span>' +
               '<span>Acesso via Sisbr</span>' +
             '</button>' +
-            '<button class="login-choice-btn admin" id="btn-admin">' +
-              '<span class="icon">&#128104;&#8205;&#128188;</span>' +
-              '<span>Administrador</span>' +
-            '</button>' +
-            '<button class="login-choice-btn external" id="btn-external">' +
-              '<span class="icon">&#128100;</span>' +
-              '<span>Usuario Externo</span>' +
+            '<button class="login-choice-btn email" id="btn-email-login">' +
+              '<span class="icon"><i class="fa-solid fa-envelope"></i></span>' +
+              '<span>Entrar com Email</span>' +
             '</button>' +
           '</div>' +
-          '<button id="cancel-choice-btn" class="btn btn-secondary btn-action" style="width:100%;margin-top:1rem;">Cancelar</button>' +
+          '<p class="login-link-row"><a href="#" id="btn-signup-link">Nao tem conta? <strong>Criar conta</strong></a></p>' +
+          '<button id="cancel-choice-btn" class="btn btn-secondary btn-action" style="width:100%;margin-top:0.75rem;">Cancelar</button>' +
         '</div>' +
 
-        // ── admin-input step ──
-        '<div id="admin-input-step" style="display:none;">' +
-          '<input type="text" id="admin-username-input" placeholder="Digite seu usuario admin" autocomplete="username">' +
+        // ── login-email step ──
+        '<div id="login-email-step" style="display:none;">' +
+          '<input type="email" id="login-email-input" placeholder="Seu email corporativo" autocomplete="email">' +
+          '<input type="password" id="login-password-input" placeholder="Senha" autocomplete="current-password">' +
           '<div class="btn-group">' +
-            '<button id="back-from-admin-btn" class="btn btn-secondary btn-action">Voltar</button>' +
-            '<button id="next-admin-btn" class="btn btn-primary btn-action">Continuar</button>' +
+            '<button id="back-from-login-btn" class="btn btn-secondary btn-action">Voltar</button>' +
+            '<button id="submit-login-btn" class="btn btn-primary btn-action">Entrar</button>' +
           '</div>' +
+          '<p class="login-link-row"><a href="#" id="btn-forgot-password">Esqueceu a senha?</a></p>' +
         '</div>' +
 
-        // ── external-input step ──
-        '<div id="external-input-step" style="display:none;">' +
-          '<input type="text" id="external-username-input" placeholder="Digite seu usuario" autocomplete="username">' +
+        // ── signup-email step ──
+        '<div id="signup-email-step" style="display:none;">' +
+          '<input type="email" id="signup-email-input" placeholder="Seu email corporativo" autocomplete="email">' +
+          '<input type="password" id="signup-password-input" placeholder="Criar senha (min. 6 caracteres)" autocomplete="new-password">' +
+          '<input type="password" id="signup-password-confirm" placeholder="Confirmar senha" autocomplete="new-password">' +
           '<div class="btn-group">' +
-            '<button id="back-from-external-btn" class="btn btn-secondary btn-action">Voltar</button>' +
-            '<button id="next-external-btn" class="btn btn-primary btn-action">Continuar</button>' +
-          '</div>' +
-        '</div>' +
-
-        // ── code step (admin or external) ──
-        '<div id="code-step" style="display:none;">' +
-          '<input type="password" id="code-input" placeholder="Digite o codigo de acesso" autocomplete="off">' +
-          '<div class="btn-group">' +
-            '<button id="back-from-code-btn" class="btn btn-secondary btn-action">Voltar</button>' +
-            '<button id="login-final-btn" class="btn btn-primary btn-action">Entrar</button>' +
+            '<button id="back-from-signup-btn" class="btn btn-secondary btn-action">Voltar</button>' +
+            '<button id="submit-signup-btn" class="btn btn-primary btn-action">Criar conta</button>' +
           '</div>' +
         '</div>' +
 
@@ -815,15 +905,15 @@ window.HUB_PAGES = {
 
   // ── helpers ──
   function _resetModal() {
-    _modalState = { currentStep: 'choice', currentUsername: '', currentType: '' };
-    var allSteps = ['choice-step','admin-input-step','external-input-step','code-step','secret-input-step'];
+    _modalState = { currentStep: 'choice' };
+    var allSteps = ['choice-step','login-email-step','signup-email-step','secret-input-step'];
     allSteps.forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
     var choice = document.getElementById('choice-step');
     if (choice) choice.style.display = 'block';
-    ['admin-username-input','external-username-input','code-input','secret-username-input'].forEach(function(id) {
+    ['login-email-input','login-password-input','signup-email-input','signup-password-input','signup-password-confirm','secret-username-input'].forEach(function(id) {
       var inp = document.getElementById(id);
       if (inp) inp.value = '';
     });
@@ -837,14 +927,14 @@ window.HUB_PAGES = {
   function _showModalError(msg) {
     var e = document.getElementById('login-error');
     var s = document.getElementById('login-success');
-    if (e) { e.innerHTML = '<strong>⚠️ ' + msg + '</strong>'; e.style.display = 'block'; }
+    if (e) { e.textContent = msg; e.style.display = 'block'; }
     if (s) s.style.display = 'none';
   }
 
   function _showModalSuccess(msg) {
     var e = document.getElementById('login-error');
     var s = document.getElementById('login-success');
-    if (s) { s.innerHTML = '<strong>✅ ' + msg + '</strong>'; s.style.display = 'block'; }
+    if (s) { s.textContent = msg; s.style.display = 'block'; }
     if (e) e.style.display = 'none';
   }
 
@@ -856,7 +946,7 @@ window.HUB_PAGES = {
   }
 
   function _showStep(stepId) {
-    var allSteps = ['choice-step','admin-input-step','external-input-step','code-step','secret-input-step'];
+    var allSteps = ['choice-step','login-email-step','signup-email-step','secret-input-step'];
     allSteps.forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.style.display = 'none';
@@ -870,138 +960,128 @@ window.HUB_PAGES = {
     _hideModalAlerts();
   }
 
-  // ── step handlers (mirror v4.2) ──
+  // ── step handlers ──
   function _handleSisbrChoice() {
     window.location.href = 'https://www.sicoob.com.br/group/acessos/mesasmkt';
   }
 
-  function _handleAdminChoice() {
-    _showStep('admin-input-step');
-    var t = document.getElementById('modal-title');
-    var s = document.getElementById('modal-subtitle');
-    if (t) t.textContent = 'Acesso Administrador';
-    if (s) s.textContent = 'Digite seu nome de usuario administrativo';
+  // ── Supabase Auth signup helper ──
+  async function _signupWithEmail(email, password) {
+    var check = await getSb().from('users').select('id').eq('email', email).single();
+    if (check.error || !check.data) {
+      return { success: false, error: 'Email nao encontrado. Contacte o administrador.' };
+    }
+    var result = await getSb().auth.signUp({ email: email, password: password });
+    if (result.error) {
+      if (result.error.message && result.error.message.indexOf('already registered') !== -1) {
+        return { success: false, error: 'Este email ja possui conta. Faca login.' };
+      }
+      return { success: false, error: result.error.message || 'Erro ao criar conta.' };
+    }
+    return { success: true };
   }
 
-  function _handleExternalChoice() {
-    _showStep('external-input-step');
+  function _handleEmailLoginChoice() {
+    _showStep('login-email-step');
     var t = document.getElementById('modal-title');
     var s = document.getElementById('modal-subtitle');
-    if (t) t.textContent = 'Acesso Externo';
-    if (s) s.textContent = 'Digite seu nome de usuario';
+    if (t) t.textContent = 'Entrar com Email';
+    if (s) s.textContent = 'Use seu email corporativo e senha';
+  }
+
+  function _handleSignupChoice() {
+    _showStep('signup-email-step');
+    var t = document.getElementById('modal-title');
+    var s = document.getElementById('modal-subtitle');
+    if (t) t.textContent = 'Criar Conta';
+    if (s) s.textContent = 'Use o email cadastrado na sua conta do Hub';
+  }
+
+  async function _handleEmailLoginSubmit() {
+    if (!hub.utils.throttle('login', 2000)) { _showModalError('Aguarde antes de tentar novamente.'); return; }
+    var emailInput = document.getElementById('login-email-input');
+    var passInput  = document.getElementById('login-password-input');
+    var email    = (emailInput ? emailInput.value : '').trim().toLowerCase();
+    var password = passInput ? passInput.value : '';
+
+    if (!email || !password) { _showModalError('Preencha email e senha.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { _showModalError('Email invalido.'); return; }
+
+    _showModalSuccess('Autenticando...');
+    var result = await auth.loginWithEmail(email, password);
+    if (result.success) {
+      _showModalSuccess('Login realizado! Redirecionando...');
+      setTimeout(function() { location.reload(); }, 1000);
+    } else {
+      _showModalError(result.error || 'Email ou senha incorretos.');
+    }
+  }
+
+  async function _handleSignupSubmit() {
+    if (!hub.utils.throttle('signup', 2000)) { _showModalError('Aguarde antes de tentar novamente.'); return; }
+    var emailInput   = document.getElementById('signup-email-input');
+    var passInput    = document.getElementById('signup-password-input');
+    var confirmInput = document.getElementById('signup-password-confirm');
+    var email    = (emailInput ? emailInput.value : '').trim().toLowerCase();
+    var password = passInput ? passInput.value : '';
+    var confirm  = confirmInput ? confirmInput.value : '';
+
+    if (!email || !password || !confirm) { _showModalError('Preencha todos os campos.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { _showModalError('Email invalido.'); return; }
+    if (password.length < 6) { _showModalError('A senha deve ter no minimo 6 caracteres.'); return; }
+    if (password !== confirm) { _showModalError('As senhas nao conferem.'); return; }
+
+    _showModalSuccess('Criando conta...');
+    var result = await _signupWithEmail(email, password);
+    if (result.success) {
+      _showModalSuccess('Conta criada com sucesso! Faca login.');
+      setTimeout(function() {
+        _handleEmailLoginChoice();
+        var loginEmailInput = document.getElementById('login-email-input');
+        if (loginEmailInput) loginEmailInput.value = email;
+      }, 1500);
+    } else {
+      _showModalError(result.error || 'Erro ao criar conta.');
+    }
+  }
+
+  async function _handleForgotPassword() {
+    var emailInput = document.getElementById('login-email-input');
+    var email = (emailInput ? emailInput.value : '').trim().toLowerCase();
+    if (!email) { _showModalError('Digite seu email para recuperar a senha.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { _showModalError('Email invalido.'); return; }
+
+    _showModalSuccess('Enviando email de recuperacao...');
+    try {
+      var result = await getSb().auth.resetPasswordForEmail(email);
+      if (result.error) {
+        _showModalError(result.error.message || 'Erro ao enviar email.');
+      } else {
+        _showModalSuccess('Email de recuperacao enviado! Verifique sua caixa de entrada.');
+      }
+    } catch(e) {
+      _showModalError('Erro ao enviar email de recuperacao.');
+    }
   }
 
   function _handleSecretChoice() {
     _showStep('secret-input-step');
     var t = document.getElementById('modal-title');
     var s = document.getElementById('modal-subtitle');
-    if (t) t.textContent = '🔒 Login';
+    if (t) t.textContent = 'Login';
     if (s) s.textContent = 'Digite seu usuario completo';
   }
 
-  function _handleAdminUsernameSubmit() {
-    var input = document.getElementById('admin-username-input');
-    var username = (input ? input.value : '').trim().toLowerCase();
-    if (!username) { _showModalError('Por favor, digite um nome de usuario.'); return; }
-
-    // Validate against users table (lookup)
-    auth.login(username).then(function(result) {
-      if (!result.success) {
-        _showModalError('Usuario nao encontrado.');
-        return;
-      }
-      // Check if user is actually admin
-      var u = auth.getUser();
-      if (!u || !u.isAdmin) {
-        _showModalError('Usuario nao encontrado na lista de administradores.');
-        // Reset auth state since we don't want to keep non-admin login
-        auth._user = null; auth._role = null; auth._source = null;
-        localStorage.removeItem(CACHE_KEYS.USER);
-        localStorage.removeItem(CACHE_KEYS.ROLE);
-        localStorage.removeItem(CACHE_KEYS.SOURCE);
-        return;
-      }
-      _modalState.currentUsername = username;
-      _modalState.currentType = 'admin';
-      _showCodeStep();
-    });
-  }
-
-  function _handleExternalUsernameSubmit() {
-    var input = document.getElementById('external-username-input');
-    var username = (input ? input.value : '').trim().toLowerCase();
-    if (!username) { _showModalError('Por favor, digite um nome de usuario.'); return; }
-
-    // For external flow, just store the username and go to code step
-    _modalState.currentUsername = username;
-    _modalState.currentType = 'external';
-    _showCodeStep();
-  }
-
-  function _showCodeStep() {
-    _showStep('code-step');
-    var t = document.getElementById('modal-title');
-    var s = document.getElementById('modal-subtitle');
-    if (t) t.textContent = 'Codigo de Acesso';
-    if (s) s.textContent = 'Digite o codigo fornecido';
-  }
-
-  function _handleCodeSubmit() {
-    var input = document.getElementById('code-input');
-    var code = (input ? input.value : '').trim();
-    if (!code) { _showModalError('Por favor, digite o codigo de acesso.'); return; }
-
-    var expectedCode = _modalState.currentType === 'admin' ? ACCESS_CODES.ADMIN : ACCESS_CODES.EXTERNAL;
-
-    if (code !== expectedCode) {
-      _showModalError('Codigo incorreto. Tente novamente.');
+  function _handleSecretLogin() {
+    if (!hub.utils.throttle('login', 2000)) {
+      _showModalError('Aguarde antes de tentar novamente.');
       return;
     }
-
-    // Code is correct – complete the login
-    if (_modalState.currentType === 'admin') {
-      // Admin was already validated via auth.login in the username step
-      // Re-login to restore the cached state
-      auth.login(_modalState.currentUsername).then(function(result) {
-        if (result.success) {
-          _showModalSuccess('Login realizado! Redirecionando...');
-          setTimeout(function() { location.reload(); }, 1000);
-        } else {
-          _showModalError('Erro ao finalizar login.');
-        }
-      });
-    } else {
-      // External user – login via auth.login (looks up in users table)
-      auth.login(_modalState.currentUsername).then(function(result) {
-        if (result.success) {
-          _showModalSuccess('Login realizado! Redirecionando...');
-          setTimeout(function() { location.reload(); }, 1000);
-        } else {
-          // User not found in table – store minimal external session
-          auth._user = {
-            user_name: _modalState.currentUsername,
-            nome: _modalState.currentUsername,
-            apelido: _modalState.currentUsername,
-            email: _modalState.currentUsername + '@sicoob.com.br',
-            isExternal: true
-          };
-          auth._role = { isAdmin: false, isCoordenador: false };
-          auth._source = 'code';
-          auth._saveCache();
-          _showModalSuccess('Login realizado! Redirecionando...');
-          setTimeout(function() { location.reload(); }, 1000);
-        }
-      });
-    }
-  }
-
-  function _handleSecretLogin() {
     var input = document.getElementById('secret-username-input');
     var username = (input ? input.value : '').trim().toLowerCase();
     if (!username) { _showModalError('Por favor, digite um nome de usuario.'); return; }
 
-    // Extract user_name (remove @domain if present)
-    if (username.includes('@')) username = username.split('@')[0];
+    if (username.indexOf('@') !== -1) username = username.split('@')[0];
 
     auth.login(username).then(function(result) {
       if (result.success) {
@@ -1013,69 +1093,71 @@ window.HUB_PAGES = {
     });
   }
 
-  // ── event bindings (mirrors v4.2 bindModalEvents) ──
+  // ── event bindings ──
   function _bindModalEvents() {
     // Choice buttons
     var btnSisbr = document.getElementById('btn-sisbr');
-    var btnAdmin = document.getElementById('btn-admin');
-    var btnExternal = document.getElementById('btn-external');
+    var btnEmailLogin = document.getElementById('btn-email-login');
+    var btnSignupLink = document.getElementById('btn-signup-link');
     var cancelBtn = document.getElementById('cancel-choice-btn');
 
     if (btnSisbr) btnSisbr.addEventListener('click', _handleSisbrChoice);
-    if (btnAdmin) btnAdmin.addEventListener('click', _handleAdminChoice);
-    if (btnExternal) btnExternal.addEventListener('click', _handleExternalChoice);
+    if (btnEmailLogin) btnEmailLogin.addEventListener('click', _handleEmailLoginChoice);
+    if (btnSignupLink) btnSignupLink.addEventListener('click', function(e) { e.preventDefault(); _handleSignupChoice(); });
     if (cancelBtn) cancelBtn.addEventListener('click', function() { auth.hideLoginModal(); _resetModal(); });
 
     // Back buttons
-    var backAdmin = document.getElementById('back-from-admin-btn');
-    var backExternal = document.getElementById('back-from-external-btn');
-    var backCode = document.getElementById('back-from-code-btn');
+    var backLogin = document.getElementById('back-from-login-btn');
+    var backSignup = document.getElementById('back-from-signup-btn');
     var backSecret = document.getElementById('back-from-secret-btn');
 
-    if (backAdmin) backAdmin.addEventListener('click', _resetModal);
-    if (backExternal) backExternal.addEventListener('click', _resetModal);
-    if (backCode) backCode.addEventListener('click', function() {
-      if (_modalState.currentType === 'admin') _handleAdminChoice();
-      else _handleExternalChoice();
-    });
+    if (backLogin) backLogin.addEventListener('click', _resetModal);
+    if (backSignup) backSignup.addEventListener('click', _resetModal);
     if (backSecret) backSecret.addEventListener('click', _resetModal);
 
     // Submit buttons
-    var nextAdmin = document.getElementById('next-admin-btn');
-    var nextExternal = document.getElementById('next-external-btn');
-    var loginFinal = document.getElementById('login-final-btn');
+    var submitLogin = document.getElementById('submit-login-btn');
+    var submitSignup = document.getElementById('submit-signup-btn');
     var secretLogin = document.getElementById('secret-login-btn');
+    var forgotPassword = document.getElementById('btn-forgot-password');
 
-    if (nextAdmin) nextAdmin.addEventListener('click', _handleAdminUsernameSubmit);
-    if (nextExternal) nextExternal.addEventListener('click', _handleExternalUsernameSubmit);
-    if (loginFinal) loginFinal.addEventListener('click', _handleCodeSubmit);
+    if (submitLogin) submitLogin.addEventListener('click', _handleEmailLoginSubmit);
+    if (submitSignup) submitSignup.addEventListener('click', _handleSignupSubmit);
     if (secretLogin) secretLogin.addEventListener('click', _handleSecretLogin);
+    if (forgotPassword) forgotPassword.addEventListener('click', function(e) { e.preventDefault(); _handleForgotPassword(); });
 
     // Enter key on inputs
-    var adminInput = document.getElementById('admin-username-input');
-    var externalInput = document.getElementById('external-username-input');
-    var codeInput = document.getElementById('code-input');
+    var loginEmailInput = document.getElementById('login-email-input');
+    var loginPassInput = document.getElementById('login-password-input');
+    var signupEmailInput = document.getElementById('signup-email-input');
+    var signupPassInput = document.getElementById('signup-password-input');
+    var signupConfirmInput = document.getElementById('signup-password-confirm');
     var secretInput = document.getElementById('secret-username-input');
 
-    if (adminInput) adminInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleAdminUsernameSubmit(); });
-    if (externalInput) externalInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleExternalUsernameSubmit(); });
-    if (codeInput) codeInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleCodeSubmit(); });
+    if (loginEmailInput) loginEmailInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleEmailLoginSubmit(); });
+    if (loginPassInput) loginPassInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleEmailLoginSubmit(); });
+    if (signupEmailInput) signupEmailInput.addEventListener('keypress', function(e) { if (e.which === 13) { var next = document.getElementById('signup-password-input'); if (next) next.focus(); } });
+    if (signupPassInput) signupPassInput.addEventListener('keypress', function(e) { if (e.which === 13) { var next = document.getElementById('signup-password-confirm'); if (next) next.focus(); } });
+    if (signupConfirmInput) signupConfirmInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleSignupSubmit(); });
     if (secretInput) secretInput.addEventListener('keypress', function(e) { if (e.which === 13) _handleSecretLogin(); });
 
-    // Triple-click on lock icon → secret login
-    var clickCount = 0;
-    var clickTimer = null;
-    var icon = document.getElementById('login-icon');
-    if (icon) {
-      icon.addEventListener('click', function() {
-        clickCount++;
-        clearTimeout(clickTimer);
-        if (clickCount >= 3) {
-          clickCount = 0;
-          _handleSecretChoice();
-        }
-        clickTimer = setTimeout(function() { clickCount = 0; }, 500);
-      });
+    // Triple-click on lock icon → secret login (apenas em dev/localhost)
+    var _isDevEnv = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.indexOf('github.io') !== -1);
+    if (_isDevEnv) {
+      var clickCount = 0;
+      var clickTimer = null;
+      var icon = document.getElementById('login-icon');
+      if (icon) {
+        icon.addEventListener('click', function() {
+          clickCount++;
+          clearTimeout(clickTimer);
+          if (clickCount >= 3) {
+            clickCount = 0;
+            _handleSecretChoice();
+          }
+          clickTimer = setTimeout(function() { clickCount = 0; }, 500);
+        });
+      }
     }
 
     // Close overlay on background click
@@ -1275,7 +1357,7 @@ window.HUB_PAGES = {
       document.getElementById('app-view').style.display = 'block';
       document.getElementById('app-view').innerHTML =
         '<div class="hub-profile-gate-page">' +
-          '<i class="fa-solid fa-lock fa-2x mb-3" style="color:var(--turq);"></i>' +
+          '<i class="fa-solid fa-lock fa-2x mb-3 text-turq"></i>' +
           '<h5>Cadastro incompleto</h5>' +
           '<p class="text-muted">Complete seu cadastro para ver os Squads.</p>' +
           '<button class="btn btn-warning" onclick="hub.nav.openEditarPerfil()">' +

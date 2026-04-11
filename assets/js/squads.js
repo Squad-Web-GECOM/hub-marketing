@@ -35,7 +35,7 @@
       document.getElementById('app-view').style.display = 'block';
       document.getElementById('app-view').innerHTML =
         '<div class="hub-profile-gate-page">' +
-          '<i class="fa-solid fa-lock fa-2x mb-3" style="color:var(--turq);"></i>' +
+          '<i class="fa-solid fa-lock fa-2x mb-3 text-turq"></i>' +
           '<h5>Cadastro incompleto</h5>' +
           '<p class="text-muted">Complete seu cadastro para ver os Squads.</p>' +
           '<button class="btn btn-warning" onclick="hub.nav.openEditarPerfil()">' +

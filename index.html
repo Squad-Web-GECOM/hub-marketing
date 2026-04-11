@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,7 +15,7 @@
   <div id="hub-nav"></div>
   <main class="acland hub-content">
     <div id="loader"><div class="spinner-border" role="status"></div></div>
-    <div id="app-view" style="display:none;">
+    <div id="app-view" class="hub-app-view">
       <!-- Greeting -->
       <div class="hub-page-header">
         <div>
@@ -40,7 +42,7 @@
               <span><i class="fa-solid fa-cake-candles mr-2"></i>Aniversariantes</span>
               <div class="d-flex align-items-center gap-1">
                 <button class="btn btn-sm btn-secondary" id="birthday-prev"><i class="fa-solid fa-chevron-left"></i></button>
-                <span id="birthday-month-label" class="mx-2 font-weight-600" style="font-size:0.875rem; min-width:80px; text-align:center;"></span>
+                <span id="birthday-month-label" class="mx-2 font-weight-600 hub-birthday-month-label"></span>
                 <button class="btn btn-sm btn-secondary" id="birthday-next"><i class="fa-solid fa-chevron-right"></i></button>
               </div>
             </div>

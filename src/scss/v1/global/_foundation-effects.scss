@@ -1,0 +1,467 @@
+.portlet-content-editable {
+  border: none !important;
+}
+
+.sidenav-menu,
+.sidenav-menu-slider,
+.control-menu,
+.portlet-topper,
+.portlet-header {
+  display: none !important;
+  width: 0 !important;
+}
+
+#wrapper {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.portlet-body {
+  padding: 0 !important;
+}
+
+.portlet-content {
+  padding: 0 !important;
+}
+
+.portlet-borderless-container {
+  margin: 0 !important;
+}
+
+body {
+  background-color: #f7f8f9;
+  color: var(--dark);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hub-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.hub-content {
+  flex: 1;
+  padding: 24px;
+  margin-left: 260px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hub-app-view {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hub-content {
+    margin-left: 0;
+  }
+}
+
+.hub-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.hub-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--verdee);
+  margin: 0;
+  letter-spacing: -0.01em;
+
+  i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    background-color: rgba(0, 174, 157, 0.08);
+    color: var(--turq);
+    font-size: var(--font-size-4);
+    margin-bottom: 0.5rem;
+    vertical-align: middle;
+  }
+}
+
+/* Greeting name — animated gradient text */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.greeting-name {
+  background: linear-gradient(
+    90deg,
+    var(--turq) 0%,
+    var(--verdem) 30%,
+    #34a065 60%,
+    var(--turq) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease-in-out infinite;
+}
+
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  .spinner-border {
+    color: var(--turq);
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+::selection {
+  background-color: #00ae9d;
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background-color: #00ae9d;
+  color: #ffffff;
+}
+
+a {
+  color: var(--turq);
+  transition: var(--transition-1);
+
+  &:hover {
+    color: #008c7e;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Float animation (inspired by Sicoob Circuito .account__media) */
+@keyframes hub-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Conic gradient spin (inspired by Sicoob Circuito .hero__cta) */
+@keyframes spinGradient {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Horizontal float for arrow indicator */
+@keyframes arrowFloat {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* Borda gradiente rotativa — elementos de destaque
+   Aplicada a: .hub-stat-card, .hub-suggestion-card, .hub-filter-bar, .perfil-card-foto */
+.hub-card.hub-stat-card,
+.hub-suggestion-card,
+.hub-filter-bar,
+.hub-card.perfil-card-foto {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+  border: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -800%;
+    background: conic-gradient(
+      from 90deg at 50% 50%,
+      var(--turq) 0%,
+      var(--verdem) 25%,
+      #34a065 50%,
+      #ffffff 75%,
+      var(--turq) 100%
+    );
+    animation: spinGradient 10s linear infinite;
+    z-index: -2;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: #ffffff;
+    border-radius: calc(var(--border-radius-md) - 2px);
+    z-index: -1;
+  }
+}
+
+// filter-bar tem border-radius menor
+.hub-filter-bar::after {
+  border-radius: calc(var(--border-radius-sm) - 2px);
+}
+
+// hub-suggestion-card inner fill usa turq-200
+.hub-suggestion-card::after {
+  background: var(--turq-200);
+}
+
+// Override hub-card hover border on glow elements
+.hub-card.hub-stat-card:hover,
+.hub-card.perfil-card-foto:hover {
+  border: none;
+  box-shadow: none;
+}
+
+// Hover — acelera rotação + gradiente vira quase todo turquesa
+.hub-card.hub-stat-card:hover::before,
+.hub-suggestion-card:hover::before,
+.hub-filter-bar:hover::before,
+.hub-card.perfil-card-foto:hover::before {
+  animation-duration: 4s;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--turq) 0%,
+    var(--turq) 88%,
+    #ffffff 94%,
+    var(--turq) 100%
+  );
+}
+
+/* Hover spinning border — all .hub-card (1px, only on hover) */
+.hub-card:not(.hub-stat-card):not(.perfil-card-foto):not(.hub-suggestion-card) {
+  position: relative;
+  z-index: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -800%;
+    background: conic-gradient(
+      from 90deg at 50% 50%,
+      var(--turq) 0%,
+      var(--turq) 88%,
+      #ffffff 94%,
+      var(--turq) 100%
+    );
+    animation: spinGradient 10s linear infinite;
+    z-index: -2;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: #ffffff;
+    border-radius: calc(var(--border-radius-md) - 1px);
+    z-index: -1;
+    transition: background 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:hover {
+    border-color: transparent;
+  }
+}
+
+// Squads/Formulários — radial glow no inner fill on hover
+[data-page="squads"] .hub-card:not(.hub-stat-card):not(.hub-suggestion-card):hover::after,
+[data-page="formularios"] .hub-card:not(.hub-stat-card):not(.hub-suggestion-card):hover::after {
+  background: radial-gradient(circle at 95% 95%, rgba(0, 174, 157, 0.12), transparent 70%), #ffffff;
+}
+
+/* Stat card — hover de destaque + indicação de link */
+.hub-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: var(--border-radius-md);
+
+  // Radial glow circle — bottom-right
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 174, 157, 0.12), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  // Arrow icon in turquesa circle
+  &::after {
+    content: "\f061";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--turq);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  &:hover {
+    text-decoration: none;
+    color: inherit;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 54, 65, 0.14);
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      opacity: 1;
+      transform: translateX(0);
+      animation: arrowFloat 2.5s ease-in-out infinite;
+    }
+
+    .stat-icon-wrap {
+      background-color: rgba(0, 174, 157, 0.18);
+      transform: scale(1.08);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 54, 65, 0.08);
+
+    &::after {
+      animation: none;
+      transform: translateX(3px);
+    }
+  }
+}
+
+// Cursor pointer já está via <a>, mas reforçar no card
+.hub-card.hub-stat-card {
+  cursor: pointer;
+}
+
+/* Botão com borda gradiente rotativa
+   Uso: <span class="btn-glow-wrap"><button class="btn btn-glow">…</button></span> */
+.btn-glow-wrap {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--border-radius-sm);
+  padding: 2px;
+  overflow: hidden;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -200%;
+    background: conic-gradient(
+      from 90deg at 50% 50%,
+      var(--verdem) 0%,
+      var(--turq) 25%,
+      var(--verdee) 50%,
+      var(--turq) 75%,
+      var(--verdem) 100%
+    );
+    animation: spinGradient 4s linear infinite;
+    z-index: -1;
+  }
+}
+
+.btn-glow {
+  position: relative;
+  background-color: #ffffff;
+  color: var(--verdee);
+  border: none;
+  border-radius: calc(var(--border-radius-sm) - 2px);
+  font-weight: 700;
+  padding: 0.5rem 1.25rem;
+  z-index: 1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background-color: var(--verdee);
+    color: #ffffff;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+@for $i from 1 through 20 {
+  .animate-fadeIn:nth-child(#{$i}) {
+    animation-delay: #{($i - 1) * 0.05}s;
+  }
+}

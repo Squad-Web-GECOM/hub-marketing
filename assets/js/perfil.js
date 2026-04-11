@@ -34,7 +34,9 @@
       loggedUser = hub.auth.getUser();
 
       var urlParams  = new URLSearchParams(window.location.search);
-      var targetName = urlParams.get('u') || loggedUser.user_name;
+      var rawTarget = urlParams.get('u') || loggedUser.user_name;
+      // Sanitiza: apenas alfanumericos, pontos, hifens, underscores; max 50 chars
+      var targetName = String(rawTarget).toLowerCase().trim().replace(/[^a-z0-9.\-_]/g, '').substring(0, 50);
 
       isOwnProfile = (targetName === loggedUser.user_name);
 
@@ -603,6 +605,25 @@
       var endereco   = (document.getElementById('edit-endereco').value || '').trim() || null;
       var bairro     = (document.getElementById('edit-bairro').value || '').trim() || null;
       var cep        = (document.getElementById('edit-cep').value || '').trim() || null;
+
+      // Validacao de formato
+      if (telefone && !/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(telefone)) {
+        hub.utils.showToast('Telefone inválido. Use o formato (XX) XXXXX-XXXX', 'warning');
+        return;
+      }
+      if (cep && !/^\d{5}-?\d{3}$/.test(cep)) {
+        hub.utils.showToast('CEP inválido. Use o formato XXXXX-XXX', 'warning');
+        return;
+      }
+      var sobreMimEl = document.getElementById('edit-sobre-mim');
+      if (sobreMimEl && sobreMimEl.value && sobreMimEl.value.length > 500) {
+        hub.utils.showToast('Sobre mim deve ter no máximo 500 caracteres', 'warning');
+        return;
+      }
+      if (apelido && apelido.length > 50) {
+        hub.utils.showToast('Apelido deve ter no máximo 50 caracteres', 'warning');
+        return;
+      }
 
       // Regras de obrigatoriedade por senioridade
       // - Gerente: sem gerencia, coordenacao e nucleo obrigatórios

@@ -1,0 +1,253 @@
+#desk-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 160px);
+  grid-template-rows: 140px 140px 2rem 140px 140px 2rem 140px 140px;
+  gap: 1rem;
+  overflow: auto;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+  max-height: 80vh;
+  cursor: grab;
+  border-radius: var(--border-radius-md);
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &:has(table) {
+    display: block;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 767px) {
+  #desk-grid {
+    grid-template-columns: repeat(8, 140px);
+    grid-template-rows: 130px 130px 2rem 130px 130px 2rem 130px 130px;
+  }
+}
+
+.desk-card {
+  border-radius: var(--border-radius-sm);
+  border: none;
+  box-shadow: inset 0 0 0 2px #dee2e6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.3s ease-out both;
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    text-align: center;
+    height: 100%;
+  }
+
+  .card-title {
+    margin-bottom: 0.35rem;
+    color: var(--verdee);
+  }
+
+  .btn {
+    font-size: 0.875rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background-color: var(--turq);
+    border-color: var(--turq);
+    color: var(--mine-shaft-50);
+    background-image: none;
+
+    &:hover {
+      background-color: #008c7e;
+      border-color: #008c7e;
+      background-image: none;
+    }
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: var(--mine-shaft-50);
+    background-image: none;
+
+    &:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+      background-image: none;
+    }
+  }
+
+  &.available {
+    box-shadow: inset 0 0 0 2px var(--turq), 0 0 0 0 transparent;
+    background-color: var(--turq-200);
+
+    &:hover {
+      box-shadow: inset 0 0 0 2px transparent, 0 8px 24px rgba(0, 174, 157, 0.2);
+      transform: translateY(-4px);
+    }
+  }
+
+  &.occupied {
+    background-color: #f8f9fa;
+  }
+
+  &.my-reservation {
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+    background-color: var(--turq);
+    color: var(--mine-shaft-50);
+
+    .card-title {
+      color: var(--mine-shaft-50);
+    }
+  }
+
+  // desk-card — spinning border on hover (2px thickness)
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -800%;
+    background: conic-gradient(
+      from 90deg at 50% 50%,
+      var(--turq) 0%,
+      var(--turq) 88%,
+      #ffffff 94%,
+      var(--turq) 100%
+    );
+    animation: spinGradient 4s linear infinite;
+    z-index: -2;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: #ffffff;
+    border-radius: var(--border-radius-md);
+    z-index: -1;
+  }
+
+  &.available::after {
+    background: var(--turq-200);
+  }
+
+  &.occupied::after {
+    background: #f8f9fa;
+  }
+
+  &.my-reservation::after {
+    background: var(--turq);
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:hover,
+  &.my-reservation:hover {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+
+.date-selector-btn {
+  transition: var(--transition-1);
+
+  &.active {
+    background-color: var(--turq);
+    border-color: var(--turq);
+    color: var(--mine-shaft-50);
+    background-image: none;
+  }
+}
+
+.hub-suggestion-card {
+  background-color: var(--turq-200);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.hub-free-count {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(0, 174, 157, 0.1);
+  color: var(--turq);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius-pill);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+@media print {
+  .hub-sidebar,
+  .hub-hamburger,
+  .hub-sidebar-overlay,
+  #toast-stack,
+  .hub-filter-bar,
+  .hub-page-header .btn {
+    display: none !important;
+  }
+
+  .hub-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  #desk-grid {
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .desk-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ced4da;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 174, 157, 0.4);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--turq);
+  }
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 174, 157, 0.4) transparent;
+}

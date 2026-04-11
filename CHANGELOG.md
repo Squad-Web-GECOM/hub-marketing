@@ -5,6 +5,107 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [1.1.1] — 02/04/2026
+
+Ajustes estruturais de baixo risco para consistência de código, documentação e publicação no Liferay sem alterar regras de negócio.
+
+### Alterado — JavaScript
+
+- Removidos logs de debug residuais de `assets/js/admin.js`.
+- Padronização de sintaxe para ES5 em scripts ativos (`var`/`function`, sem `const`/`let`/arrow) com ajuste de compatibilidade em:
+  - `assets/js/main.js`
+  - `assets/js/formularios.js`
+- `assets/js/formularios.js` refatorado para:
+  - render sem `onclick` inline para detalhe;
+  - uso de `.js-form-detail` + `data-form-id`;
+  - manutenção de `window.showFormDetail` por compatibilidade.
+- Tipos de toast normalizados de `'danger'` para `'error'` em:
+  - `assets/js/home.js`
+  - `assets/js/mesas.js`
+
+### Alterado — HTML/SCSS
+
+- Removidos `style=""` estáticos dos HTML das páginas V1 e substituídos por classes utilitárias/semânticas.
+- Novas classes adicionadas na camada SCSS V1 para suportar extração de inline styles:
+  - `hub-app-view`, `hub-birthday-month-label`, `hub-filter-group--*`,
+  - `hub-scroll-touch-x`, `hub-category-buttons-row`, `hub-hidden-initial`,
+  - `hub-modal--sm|md|lg|xl`, `hub-text-note-*`, `hub-section-caption`, `hub-optional-label`,
+  - `hub-form-card-*`, `squads-empty-state`, `perfil-placeholder-text`, `perfil-loading-text`.
+- Migração de Sass de `@import` para `@use` em:
+  - `src/scss/main.scss`
+  - `src/scss/v1/_global.scss`
+- `assets/css/main.css` e `assets/css/main.css.map` recompilados a partir da fonte SCSS.
+
+### Alterado — Governança e documentação
+
+- Governança obrigatória adicionada e unificada nos `agents.md` de áreas:
+  - `admin/`, `formularios/`, `mesas/`, `perfil/`, `squads/`, `usuarios/`, `src/`, `assets/css/`, `assets/js/`.
+- `Agents.md` (raiz) reforçado com:
+  - regra de coerência entre múltiplos `agents.md`;
+  - diretriz de publicação Liferay via Documentos e Mídias com fallback inline.
+- `README.md` atualizado para refletir:
+  - arquitetura SCSS V1 atual;
+  - arquivo `claude.md` (nomenclatura correta);
+  - estratégia recomendada de publicação no Liferay.
+
+### Limpeza estrutural
+
+- Removidos da base ativa:
+  - partials SCSS legados em `src/scss/_*.scss`;
+  - pasta `dashboards/` vazia;
+  - CSVs auxiliares de reservas usados apenas em análise.
+- Pasta `old/` mantida como release histórica v4.2 (somente referência).
+
+---
+
+## [1.1.0] — 01/04/2026
+
+Evolução de governança da estilização, mantendo o visual da V1 sem alteração funcional de UI.
+
+### Alterado — Pipeline de estilos
+
+- `src/scss` definido como fonte única de verdade para estilos.
+- `src/scss/main.scss` atualizado para usar a estrutura V1 modular:
+  - `v1/_global.scss`
+  - `v1/_profile-gate.scss`
+  - `v1/_squads.scss`
+  - `v1/_birthdays.scss`
+  - `v1/_perfil.scss`
+  - `v1/_admin-icons.scss`
+- Fase B concluída: `v1/_global.scss` virou agregador da camada global semântica:
+  - `v1/global/_foundation-effects.scss`
+  - `v1/global/_navigation.scss`
+  - `v1/global/_components.scss`
+  - `v1/global/_mesas-scrollbar.scss`
+  - `v1/global/_dark-mode.scss`
+- Fase C concluída: padrão de expansão para novas páginas em:
+  - `v1/global/_expansion-standards.scss` (classes `hub-std-*`, com dark mode)
+- Refactor SCSS com nesting aplicado em:
+  - `v1/global/_expansion-standards.scss`
+  - `v1/_profile-gate.scss`
+  - `v1/_squads.scss`
+  - `v1/_birthdays.scss`
+  - `v1/_admin-icons.scss`
+  - `v1/_perfil.scss`
+  - `v1/global/_dark-mode.scss`
+- Diretriz reforçada para priorizar tokens/classes do `sicoob-styles` em novas estilizações.
+- `assets/css/main.css` recompilado exclusivamente a partir de `main.scss`.
+
+### Adicionado — Governança para IA
+
+- Regras no `Agents.md` da raiz exigindo:
+  - atualização do `agents.md` das áreas alteradas;
+  - registro obrigatório em versionamento.
+- Novo `assets/css/agents.md` com regra de arquivo compilado (sem edição manual).
+- `src/agents.md` atualizado com fluxo oficial SCSS -> CSS.
+- Novo `checklist-qa-visual.md` como checklist obrigatório de QA visual por página.
+
+### Observação de versão
+
+- O Hub permanece tratado como base **V1**; esta entrega formaliza o processo de evolução incremental da V1.
+
+---
+
 ## [1.0.0] — 06/03/2026
 
 Versão inicial de produção. Projeto desenvolvido inteiramente com Claude (Anthropic) ao longo de 3 semanas.

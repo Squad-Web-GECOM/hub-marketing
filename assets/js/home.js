@@ -44,7 +44,7 @@
       if (appView) appView.style.display = 'block';
     } catch (err) {
       console.error('Home init error:', err);
-      hub.utils.showToast('Erro ao carregar a home', 'danger');
+      hub.utils.showToast('Erro ao carregar a home', 'error');
     } finally {
       hub.utils.hideLoader();
     }
@@ -333,7 +333,7 @@
       container.innerHTML = html;
     } catch (err) {
       console.error('Quick links error:', err);
-      hub.utils.showToast('Erro ao carregar links rapidos', 'danger');
+      hub.utils.showToast('Erro ao carregar links rapidos', 'error');
     }
   }
 

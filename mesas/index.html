@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,11 +15,11 @@
   <div id="hub-nav"></div>
   <main class="acland hub-content">
     <div id="loader"><div class="spinner-border" role="status"></div></div>
-    <div id="app-view" style="display:none;">
+    <div id="app-view" class="hub-app-view">
       <div class="hub-page-header">
         <h1 class="hub-page-title"><i class="fa-solid fa-chair"></i> Mes<span class="script">as</span></h1>
         <div id="user-logged-container">
-          <button class="btn btn-sm btn-secondary" id="open-login-btn" style="display:none;">Fazer Login</button>
+          <button class="btn btn-sm btn-secondary hub-hidden-initial" id="open-login-btn">Fazer Login</button>
         </div>
       </div>
 

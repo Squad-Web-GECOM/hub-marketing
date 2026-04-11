@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +16,7 @@
   <main class="acland hub-content">
     <div id="loader"><div class="spinner-border" role="status"></div></div>
 
-    <div id="app-view" style="display:none;">
+    <div id="app-view" class="hub-app-view">
       <!-- Page header -->
       <div class="hub-page-header">
         <h1 class="hub-page-title script" id="perfil-page-title">
@@ -82,7 +84,7 @@
               <i class="fa-solid fa-heart mr-2"></i>Gostos Pessoais
             </div>
             <div class="hub-card-body" id="perfil-gostos">
-              <p class="text-muted" style="font-size:0.875rem; margin:0; font-style:italic;">Nada preenchido ainda.</p>
+              <p class="text-muted perfil-placeholder-text">Nada preenchido ainda.</p>
             </div>
           </div>
         </div>
@@ -94,7 +96,7 @@
               <i class="fa-solid fa-layer-group mr-2"></i>Squads
             </div>
             <div class="hub-card-body" id="perfil-squads-list">
-              <p class="text-muted" style="font-size:0.875rem; margin:0;">Carregando...</p>
+              <p class="text-muted perfil-loading-text">Carregando...</p>
             </div>
           </div>
         </div>
@@ -106,7 +108,7 @@
               <i class="fa-solid fa-address-card mr-2"></i>Sobre mim
             </div>
             <div class="hub-card-body" id="perfil-sobre-mim">
-              <p class="text-muted" style="font-size:0.875rem; margin:0; font-style:italic;">Nada escrito ainda.</p>
+              <p class="text-muted perfil-placeholder-text">Nada escrito ainda.</p>
             </div>
           </div>
         </div>
@@ -130,16 +132,17 @@
     <!-- ================================================================
          MODAL DE EDIÇÃO DE PERFIL
          ================================================================ -->
-    <div class="hub-modal-overlay" id="perfil-edit-overlay">
-      <div class="hub-modal" style="max-width:680px;">
+    <div class="hub-modal-overlay" id="perfil-edit-overlay" role="dialog" aria-modal="true" aria-labelledby="perfil-edit-title">
+      <div class="hub-modal hub-modal--lg">
         <div class="hub-modal-header">
           <h4 id="perfil-edit-title">Editar Perfil</h4>
-          <button class="hub-modal-close" id="btn-close-perfil-edit">&times;</button>
+          <button class="hub-modal-close" id="btn-close-perfil-edit" aria-label="Fechar">&times;</button>
         </div>
+        <form id="perfil-edit-form" novalidate>
         <div class="hub-modal-body">
 
           <!-- Hint campos obrigatórios -->
-          <p class="mb-3 text-muted" style="font-size:0.78rem;"><span class="text-danger">*</span> Campos obrigatórios para completar o cadastro.</p>
+          <p class="mb-3 text-muted hub-text-note-sm"><span class="text-danger">*</span> Campos obrigatórios para completar o cadastro.</p>
 
           <!-- Avatar upload preview -->
           <div class="perfil-edit-avatar-row mb-4">
@@ -150,64 +153,64 @@
               <button class="btn btn-secondary btn-sm" id="btn-edit-avatar-pick">
                 <i class="fa-solid fa-camera"></i> Alterar foto
               </button>
-              <p class="text-muted mt-1 mb-0" style="font-size:0.75rem;">JPG ou PNG · máx. 150 KB</p>
-              <p class="text-danger mt-1 mb-0 d-none" id="avatar-error" style="font-size:0.75rem;"></p>
+              <p class="text-muted mt-1 mb-0 hub-text-note-xs">JPG ou PNG · máx. 150 KB</p>
+              <p class="text-danger mt-1 mb-0 d-none hub-text-note-xs" id="avatar-error"></p>
               <input type="file" id="edit-avatar-input" accept=".jpg,.jpeg,.png" class="d-none">
             </div>
           </div>
 
           <!-- Dados pessoais -->
-          <h6 class="perfil-section-label">Dados Pessoais</h6>
+          <h5 class="perfil-section-label">Dados Pessoais</h5>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Nome completo</label>
+                <label class="form-label" for="edit-nome">Nome completo</label>
                 <input class="form-control" id="edit-nome" type="text" readonly>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Apelido <span class="text-danger">*</span></label>
-                <input class="form-control" id="edit-apelido" type="text" placeholder="Como prefere ser chamado">
+                <label class="form-label" for="edit-apelido">Apelido <span class="text-danger">*</span></label>
+                <input class="form-control" id="edit-apelido" type="text" placeholder="Como prefere ser chamado" required aria-required="true" maxlength="50">
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Telefone <span class="text-danger">*</span></label>
-                <input class="form-control" id="edit-telefone" type="text" placeholder="(00) 00000-0000">
+                <label class="form-label" for="edit-telefone">Telefone <span class="text-danger">*</span></label>
+                <input class="form-control" id="edit-telefone" type="tel" placeholder="(00) 00000-0000" required aria-required="true">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Aniversário <span class="text-danger">*</span></label>
-                <input class="form-control" id="edit-aniversario" type="date">
+                <label class="form-label" for="edit-aniversario">Aniversário <span class="text-danger">*</span></label>
+                <input class="form-control" id="edit-aniversario" type="date" required aria-required="true">
               </div>
             </div>
           </div>
 
           <!-- Estrutura organizacional -->
-          <h6 class="perfil-section-label mt-3">Estrutura Organizacional</h6>
+          <h5 class="perfil-section-label mt-3">Estrutura Organizacional</h5>
           <div class="form-group">
-            <label class="form-label">Gerência <span class="text-danger">*</span></label>
-            <select class="form-control" id="edit-gerencia"></select>
+            <label class="form-label" for="edit-gerencia">Gerência <span class="text-danger">*</span></label>
+            <select class="form-control" id="edit-gerencia" required aria-required="true"></select>
           </div>
           <div class="form-group">
-            <label class="form-label">Coordenação <span class="text-danger">*</span></label>
-            <select class="form-control" id="edit-coordenacao"></select>
+            <label class="form-label" for="edit-coordenacao">Coordenação <span class="text-danger">*</span></label>
+            <select class="form-control" id="edit-coordenacao" required aria-required="true"></select>
           </div>
           <div class="form-group">
-            <label class="form-label">Núcleo <span class="text-danger">*</span></label>
-            <select class="form-control" id="edit-nucleo">
+            <label class="form-label" for="edit-nucleo">Núcleo <span class="text-danger">*</span></label>
+            <select class="form-control" id="edit-nucleo" required aria-required="true">
               <option value="">Nenhum (ainda não definido)</option>
             </select>
           </div>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Senioridade <span class="text-danger">*</span></label>
-                <select class="form-control" id="edit-senioridade">
+                <label class="form-label" for="edit-senioridade">Senioridade <span class="text-danger">*</span></label>
+                <select class="form-control" id="edit-senioridade" required aria-required="true">
                   <option value="">— Não definida —</option>
                   <option value="Gerente">Gerente</option>
                   <option value="Coordenador">Coordenador</option>
@@ -230,29 +233,30 @@
           </div>
 
           <!-- Endereço (opcional) -->
-          <h6 class="perfil-section-label mt-3">Endereço <span class="text-muted font-weight-normal" style="font-size:0.7rem;text-transform:none;">(opcional)</span></h6>
+          <h5 class="perfil-section-label mt-3">Endereço <span class="text-muted font-weight-normal hub-optional-label">(opcional)</span></h5>
           <div class="form-group">
-            <label class="form-label">Logradouro</label>
+            <label class="form-label" for="edit-endereco">Logradouro</label>
             <input class="form-control" id="edit-endereco" type="text" placeholder="Rua, número, complemento">
           </div>
           <div class="row">
             <div class="col-md-8">
               <div class="form-group">
-                <label class="form-label">Cidade/Bairro</label>
+                <label class="form-label" for="edit-bairro">Cidade/Bairro</label>
                 <input class="form-control" id="edit-bairro" type="text" placeholder="Cidade ou Bairro">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
-                <label class="form-label">CEP</label>
-                <input class="form-control" id="edit-cep" type="text" placeholder="00000-000">
+                <label class="form-label" for="edit-cep">CEP</label>
+                <input class="form-control" id="edit-cep" type="text" placeholder="00000-000" pattern="\d{5}-?\d{3}">
               </div>
             </div>
           </div>
 
           <!-- Sobre mim (opcional) -->
-          <h6 class="perfil-section-label mt-3">Sobre mim <span class="text-muted font-weight-normal" style="font-size:0.7rem;text-transform:none;">(opcional)</span></h6>
+          <h5 class="perfil-section-label mt-3">Sobre mim <span class="text-muted font-weight-normal hub-optional-label">(opcional)</span></h5>
           <div class="form-group">
+            <label class="form-label sr-only" for="edit-sobre-mim">Sobre mim</label>
             <textarea class="form-control" id="edit-sobre-mim" rows="3" placeholder="Conte um pouco sobre você..." maxlength="500"></textarea>
             <div class="d-flex justify-content-end">
               <small class="text-muted" id="sobre-mim-count">0 / 500</small>
@@ -260,17 +264,17 @@
           </div>
 
           <!-- Gostos pessoais (opcional) -->
-          <h6 class="perfil-section-label mt-3">Gostos Pessoais <span class="text-muted font-weight-normal" style="font-size:0.7rem;text-transform:none;">(opcional)</span></h6>
+          <h5 class="perfil-section-label mt-3">Gostos Pessoais <span class="text-muted font-weight-normal hub-optional-label">(opcional)</span></h5>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-book mr-1"></i>Livros favoritos</label>
+                <label class="form-label" for="edit-gostos-livros"><i class="fa-solid fa-book mr-1"></i>Livros favoritos</label>
                 <input class="form-control" id="edit-gostos-livros" type="text" placeholder="Separe por vírgula">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-film mr-1"></i>Filmes / Séries favoritos</label>
+                <label class="form-label" for="edit-gostos-filmes"><i class="fa-solid fa-film mr-1"></i>Filmes / Séries favoritos</label>
                 <input class="form-control" id="edit-gostos-filmes" type="text" placeholder="Separe por vírgula">
               </div>
             </div>
@@ -278,22 +282,23 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-utensils mr-1"></i>Comidas favoritas</label>
+                <label class="form-label" for="edit-gostos-comidas"><i class="fa-solid fa-utensils mr-1"></i>Comidas favoritas</label>
                 <input class="form-control" id="edit-gostos-comidas" type="text" placeholder="Separe por vírgula">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-gamepad mr-1"></i>Hobbies</label>
+                <label class="form-label" for="edit-gostos-hobbies"><i class="fa-solid fa-gamepad mr-1"></i>Hobbies</label>
                 <input class="form-control" id="edit-gostos-hobbies" type="text" placeholder="Separe por vírgula">
               </div>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label"><i class="fa-solid fa-futbol mr-1"></i>Time do coração</label>
+            <label class="form-label" for="edit-gostos-time"><i class="fa-solid fa-futbol mr-1"></i>Time do coração</label>
             <input class="form-control" id="edit-gostos-time" type="text" placeholder="Seu time">
           </div>
         </div>
+        </form>
         <div class="hub-modal-footer">
           <button class="btn btn-secondary" id="btn-cancel-perfil-edit">Cancelar</button>
           <button class="btn btn-primary" id="btn-save-perfil-edit">

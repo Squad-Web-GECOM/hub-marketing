@@ -1,0 +1,11 @@
+// =============================================================================
+// V1 GLOBAL AGGREGATOR
+// Fase B: modularizacao semantica preservando exatamente a ordem de cascade da V1.
+// =============================================================================
+
+@use 'global/foundation-effects';
+@use 'global/navigation';
+@use 'global/components';
+@use 'global/mesas-scrollbar';
+@use 'global/dark-mode';
+@use 'global/expansion-standards';

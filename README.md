@@ -84,22 +84,22 @@ hub-marketing/
 │       ├── mesas.js            # Sistema de reservas
 │       └── formularios.js      # Grid de formulários externos
 │
-├── src/scss/                   # Partials SCSS (compilam para assets/css/main.css)
-│   ├── main.scss               # Entry point
-│   ├── _variables.scss         # Variáveis de cor, espaçamento, tipografia
-│   ├── _base.scss              # Reset, body, tipografia global
-│   ├── _buttons.scss           # Botões customizados
-│   ├── _cards.scss             # .hub-card e variantes
-│   ├── _dark-mode.scss         # Overrides [data-theme=dark]
-│   ├── _forms.scss             # Inputs, selects, labels
-│   ├── _mesas.scss             # Layout e componentes da página de Mesas
-│   ├── _modals.scss            # .hub-modal-overlay, .hub-modal
-│   ├── _nav.scss               # Sidebar (#hub-nav)
-│   ├── _scrollbar.scss         # Scrollbar customizada
-│   ├── _tables.scss            # .hub-table, .hub-table-wrapper
-│   ├── _toasts.scss            # Sistema de toasts
-│   ├── _utilities.scss         # Classes utilitárias
-│   └── _animations.scss        # Keyframes e transições
+├── src/scss/                   # Fonte de verdade dos estilos V1
+│   ├── main.scss               # Entrypoint Sass (usa @use)
+│   └── v1/
+│       ├── _global.scss        # Agregador global V1
+│       ├── _profile-gate.scss
+│       ├── _squads.scss
+│       ├── _birthdays.scss
+│       ├── _perfil.scss
+│       ├── _admin-icons.scss
+│       └── global/
+│           ├── _foundation-effects.scss
+│           ├── _navigation.scss
+│           ├── _components.scss
+│           ├── _mesas-scrollbar.scss
+│           ├── _dark-mode.scss
+│           └── _expansion-standards.scss
 │
 ├── js-liferay/                 # JS pré-compilado para uso no Liferay
 │   ├── home.js                 # config + main.js + home.js
@@ -111,11 +111,11 @@ hub-marketing/
 │   └── formularios.js          # config + main.js + formularios.js
 │
 ├── build-liferay.sh            # Script que gera os arquivos em js-liferay/
-├── CLAUDE.md                   # Documentação técnica para uso com IA
+├── claude.md                   # Documentação técnica para uso com IA
 ├── CHANGELOG.md                # Histórico de versões
 ├── README.md                   # Este arquivo
 │
-└── old/                        # Versão legada v4.2 (somente referência)
+└── old/                        # Release histórica v4.2 (somente referência)
     ├── README-V4.md
     ├── agendamento-complete-v4.js
     └── style-v4.css
@@ -310,7 +310,12 @@ Ativado via `[data-theme="dark"]` no `<html>`. Toggle persistido em `localStorag
 
 ## Integração Liferay
 
-O app é embarcado em páginas do portal Liferay via "JavaScript personalizado". Cada página requer um único arquivo JS que contenha toda a lógica (config + main + page).
+O app é embarcado em páginas do portal Liferay. Hoje coexistem dois formatos de publicação:
+
+1. **Legado (inline):** colar conteúdo de JS/CSS nas configurações da página.
+2. **Recomendado (Documentos e Mídias):** publicar arquivos versionados e referenciar por URL.
+
+> Observação: os imports de Bootstrap/jQuery/Sicoob Styles presentes nos HTML deste repositório existem para simular ambiente local. No Liferay, essas dependências já podem estar disponíveis globalmente.
 
 ### Configuração por página
 
@@ -330,7 +335,14 @@ window.HUB_PAGES = {
 };
 ```
 
-Os arquivos prontos para colar no Liferay ficam em `js-liferay/`.
+Os arquivos prontos para uso em Liferay ficam em `js-liferay/`.
+
+### Estratégia recomendada (Documentos e Mídias)
+
+1. Publicar `main.css` e os JS (`main.js` + `[page].js` ou bundle `js-liferay/[page].js`) em **Documentos e Mídias**.
+2. Usar URL versionada dos arquivos nas configurações da página.
+3. No Conteúdo Web, manter apenas o HTML do `<body>` (sem tags `<script>` locais).
+4. Atualizar versão dos arquivos publicados a cada release e registrar no `CHANGELOG.md`.
 
 ---
 
@@ -418,4 +430,4 @@ O projeto é hospedado em dois ambientes:
 | Ambiente | URL | Como atualizar |
 |---|---|---|
 | GitHub Pages | `https://squad-web-gecom.github.io/hub-marketing/` | Push para branch `main` |
-| Liferay | Portal interno Sicoob | Colar conteúdo de `js-liferay/[page].js` no campo "JavaScript personalizado" de cada página |
+| Liferay | Portal interno Sicoob | Preferencialmente publicar JS/CSS em Documentos e Mídias e referenciar por URL (fallback: colagem inline de `js-liferay/[page].js`) |

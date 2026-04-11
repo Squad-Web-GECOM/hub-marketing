@@ -1,0 +1,137 @@
+/* ============================================================
+   PROFILE GATE BANNER
+   Exibido acima do #app-view quando profile_complete = false
+   ============================================================ */
+.hub-profile-gate {
+  &-banner {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+    border: 1px solid #ffecb5;
+    border-radius: var(--border-radius-sm);
+    padding: 0.875rem 1.25rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  &-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+
+    > i {
+      font-size: 1.35rem;
+      color: #856404;
+      flex-shrink: 0;
+    }
+
+    > div {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.875rem;
+      color: #533f03;
+
+      strong {
+        color: #533f03;
+      }
+    }
+
+    > button {
+      flex-shrink: 0;
+    }
+  }
+
+  // Efeito visual sutil quando gate ativo — sem bloquear interação
+  &-active {
+    opacity: 0.75;
+  }
+
+  // Página inteira de gate (squads, usuarios)
+  &-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40vh;
+    text-align: center;
+    padding: 2rem;
+  }
+}
+
+// Card "Sua reserva" no painel de sugestão
+.suggestion-my-reservation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 174, 157, 0.08);
+  border: 1.5px solid rgba(0, 174, 157, 0.35);
+  border-radius: var(--border-radius-sm);
+}
+
+.suggestion-my-res-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--turq);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+
+/* Dark mode */
+[data-theme=dark] {
+  .suggestion-my-reservation {
+    background: rgba(0, 174, 157, 0.12);
+    border-color: rgba(0, 174, 157, 0.4);
+  }
+
+  .hub-profile-gate {
+    &-banner {
+      background: linear-gradient(135deg, var(--sunshade-950) 0%, rgba(255, 170, 44, 0.15) 100%);
+      border-color: var(--sunshade-700);
+    }
+
+    &-inner {
+      > i {
+        color: var(--sunshade-300);
+      }
+
+      > div {
+        color: var(--sunshade-200);
+
+        strong {
+          color: var(--sunshade-100);
+        }
+      }
+    }
+  }
+}
+
+/* ============================================================
+   BOTÃO "EDITAR PERFIL" NO SIDEBAR
+   ============================================================ */
+.btn-editar-perfil {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-xs);
+  transition: var(--transition-1);
+
+  &:hover {
+    color: var(--mine-shaft-50);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Quando sidebar colapsada, manter visível
+.hub-sidebar {
+  &.collapsed {
+    .btn-editar-perfil {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

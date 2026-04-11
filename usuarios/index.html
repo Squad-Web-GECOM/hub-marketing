@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +18,7 @@
       <div class="spinner-border" role="status"></div>
     </div>
 
-    <div id="app-view" style="display:none;">
+    <div id="app-view" class="hub-app-view">
       <!-- Page header with title + copy emails button -->
       <div class="hub-page-header">
         <h1 class="hub-page-title"><i class="fa-solid fa-user-group"></i> Usuari<span class="script">os</span></h1>
@@ -36,7 +38,7 @@
 
       <!-- Filters bar -->
       <div class="hub-filter-bar">
-        <div class="hub-filter-group" style="flex:2;">
+        <div class="hub-filter-group hub-filter-group--grow-2">
           <label>Buscar</label>
           <div class="hub-search-box">
             <i class="fa-solid fa-search"></i>
@@ -97,104 +99,106 @@
     </div>
 
     <!-- Profile Edit Modal -->
-    <div class="hub-modal-overlay" id="profile-modal-overlay">
-      <div class="hub-modal" style="max-width:600px;">
+    <div class="hub-modal-overlay" id="profile-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+      <div class="hub-modal hub-modal--md">
         <div class="hub-modal-header">
           <h4 id="profile-modal-title">Meu Perfil</h4>
-          <button class="hub-modal-close" id="btn-close-profile-modal">&times;</button>
+          <button class="hub-modal-close" id="btn-close-profile-modal" aria-label="Fechar">&times;</button>
         </div>
+        <form id="profile-edit-form" novalidate>
         <div class="hub-modal-body">
           <!-- Required fields hint -->
-          <p class="mb-3 text-muted" style="font-size:0.78rem;"><span class="text-danger">*</span> Campos obrigatórios para completar o cadastro.</p>
+          <p class="mb-3 text-muted hub-text-note-sm"><span class="text-danger">*</span> Campos obrigatórios para completar o cadastro.</p>
 
           <!-- Dados pessoais -->
-          <h6 class="mb-3 text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:.08em;">Dados Pessoais</h6>
+          <h5 class="mb-3 text-muted text-uppercase hub-section-caption">Dados Pessoais</h5>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Nome completo</label>
+                <label class="form-label" for="profile-nome">Nome completo</label>
                 <input class="form-control" id="profile-nome" type="text" readonly>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Apelido <span class="text-danger">*</span></label>
-                <input class="form-control" id="profile-apelido" type="text" placeholder="Como prefere ser chamado">
+                <label class="form-label" for="profile-apelido">Apelido <span class="text-danger">*</span></label>
+                <input class="form-control" id="profile-apelido" type="text" placeholder="Como prefere ser chamado" required aria-required="true" maxlength="50">
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Telefone <span class="text-danger">*</span></label>
-                <input class="form-control" id="profile-telefone" type="text" placeholder="(00) 00000-0000">
+                <label class="form-label" for="profile-telefone">Telefone <span class="text-danger">*</span></label>
+                <input class="form-control" id="profile-telefone" type="tel" placeholder="(00) 00000-0000" required aria-required="true">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Aniversário <span class="text-danger">*</span></label>
-                <input class="form-control" id="profile-aniversario" type="date">
+                <label class="form-label" for="profile-aniversario">Aniversário <span class="text-danger">*</span></label>
+                <input class="form-control" id="profile-aniversario" type="date" required aria-required="true">
               </div>
             </div>
           </div>
 
           <!-- Estrutura organizacional -->
-          <h6 class="mt-3 mb-3 text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:.08em;">Estrutura Organizacional</h6>
+          <h5 class="mt-3 mb-3 text-muted text-uppercase hub-section-caption">Estrutura Organizacional</h5>
           <div class="form-group">
-            <label class="form-label">Gerência <span class="text-danger">*</span></label>
-            <select class="form-control" id="profile-gerencia"></select>
+            <label class="form-label" for="profile-gerencia">Gerência <span class="text-danger">*</span></label>
+            <select class="form-control" id="profile-gerencia" required aria-required="true"></select>
           </div>
           <div class="form-group">
-            <label class="form-label">Coordenação <span class="text-danger">*</span></label>
-            <select class="form-control" id="profile-coordenacao"></select>
+            <label class="form-label" for="profile-coordenacao">Coordenação <span class="text-danger">*</span></label>
+            <select class="form-control" id="profile-coordenacao" required aria-required="true"></select>
           </div>
           <div class="form-group">
-            <label class="form-label">Núcleo</label>
+            <label class="form-label" for="profile-nucleo">Núcleo</label>
             <select class="form-control" id="profile-nucleo">
               <option value="">Nenhum (ainda não definido)</option>
             </select>
           </div>
 
           <!-- Endereço (opcional) -->
-          <h6 class="mt-3 mb-3 text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:.08em;">Endereço <span class="text-muted font-weight-normal" style="font-size:0.7rem;text-transform:none;">(opcional)</span></h6>
+          <h5 class="mt-3 mb-3 text-muted text-uppercase hub-section-caption">Endereço <span class="text-muted font-weight-normal hub-optional-label">(opcional)</span></h5>
           <div class="form-group">
-            <label class="form-label">Logradouro</label>
+            <label class="form-label" for="profile-endereco">Logradouro</label>
             <input class="form-control" id="profile-endereco" type="text" placeholder="Rua, número, complemento">
           </div>
           <div class="row">
             <div class="col-md-8">
               <div class="form-group">
-                <label class="form-label">Bairro</label>
+                <label class="form-label" for="profile-bairro">Bairro</label>
                 <input class="form-control" id="profile-bairro" type="text" placeholder="Bairro">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
-                <label class="form-label">CEP</label>
-                <input class="form-control" id="profile-cep" type="text" placeholder="00000-000">
+                <label class="form-label" for="profile-cep">CEP</label>
+                <input class="form-control" id="profile-cep" type="text" placeholder="00000-000" pattern="\d{5}-?\d{3}">
               </div>
             </div>
           </div>
 
           <!-- Sobre mim (opcional) -->
-          <h6 class="mt-3 mb-3 text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:.08em;">Sobre mim <span class="text-muted font-weight-normal" style="font-size:0.7rem;text-transform:none;">(opcional)</span></h6>
+          <h5 class="mt-3 mb-3 text-muted text-uppercase hub-section-caption">Sobre mim <span class="text-muted font-weight-normal hub-optional-label">(opcional)</span></h5>
           <div class="form-group">
-            <textarea class="form-control" id="profile-sobre-mim" rows="3" placeholder="Conte um pouco sobre você..."></textarea>
+            <label class="form-label sr-only" for="profile-sobre-mim">Sobre mim</label>
+            <textarea class="form-control" id="profile-sobre-mim" rows="3" placeholder="Conte um pouco sobre você..." maxlength="500"></textarea>
           </div>
 
           <!-- Gostos pessoais (opcional) -->
-          <h6 class="mt-3 mb-3 text-muted text-uppercase" style="font-size:0.7rem;letter-spacing:.08em;">Gostos Pessoais <span class="text-muted font-weight-normal" style="font-size:0.7rem;text-transform:none;">(opcional)</span></h6>
-          <p class="text-muted mb-2" style="font-size:0.75rem;">Separe múltiplos itens com vírgula.</p>
+          <h5 class="mt-3 mb-3 text-muted text-uppercase hub-section-caption">Gostos Pessoais <span class="text-muted font-weight-normal hub-optional-label">(opcional)</span></h5>
+          <p class="text-muted mb-2 hub-text-note-xs">Separe múltiplos itens com vírgula.</p>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Livros favoritos</label>
+                <label class="form-label" for="profile-livros">Livros favoritos</label>
                 <input class="form-control" id="profile-livros" type="text" placeholder="Ex: Dom Quixote, 1984">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Filmes favoritos</label>
+                <label class="form-label" for="profile-filmes">Filmes favoritos</label>
                 <input class="form-control" id="profile-filmes" type="text" placeholder="Ex: Matrix, O Poderoso Chefão">
               </div>
             </div>
@@ -202,22 +206,23 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Comidas favoritas</label>
+                <label class="form-label" for="profile-comidas">Comidas favoritas</label>
                 <input class="form-control" id="profile-comidas" type="text" placeholder="Ex: Pizza, Sushi">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label class="form-label">Hobbies</label>
+                <label class="form-label" for="profile-hobbies">Hobbies</label>
                 <input class="form-control" id="profile-hobbies" type="text" placeholder="Ex: Leitura, Ciclismo">
               </div>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Time do coração</label>
+            <label class="form-label" for="profile-time-coracao">Time do coração</label>
             <input class="form-control" id="profile-time-coracao" type="text" placeholder="Ex: Flamengo">
           </div>
         </div>
+        </form>
         <div class="hub-modal-footer">
           <button class="btn btn-secondary" id="btn-cancel-profile">Cancelar</button>
           <button class="btn btn-primary" id="btn-save-profile">Salvar</button>

@@ -4,6 +4,20 @@ Regras obrigatórias para qualquer agente de IA que edite este repositório. Lei
 
 ---
 
+## 0. Governança de Versão e Documentação
+
+- O estado atual do Hub deve ser tratado como **V1**.
+- Toda evolução implementada por IA deve:
+  - atualizar o código da área afetada;
+  - atualizar o `agents.md` da mesma área (ou criar, se não existir);
+  - registrar o que mudou em versionamento (`CHANGELOG.md` ou seção de histórico equivalente).
+- Regra de coerência obrigatória:
+  - se a alteração impactar mais de uma área, todos os `agents.md` dessas áreas devem ser atualizados na mesma entrega.
+  - mudanças de regra global exigem atualização do `Agents.md` da raiz + `CHANGELOG.md`.
+- É proibido encerrar tarefa com mudança de código sem refletir a mudança nas instruções locais para IA.
+
+---
+
 ## 1. Stack & Ambiente
 
 | Item | Valor |
@@ -35,6 +49,9 @@ Bootstrap 4.6.2 JS     cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bu
 
 ```
 hub-marketing/
+├── Agents.md                  (Regra global e governança de IA)
+├── CHANGELOG.md               (Versionamento obrigatório de mudanças)
+├── checklist-qa-visual.md     (Checklist oficial de QA visual da Fase C)
 ├── index.html                  (Home, data-page="home")
 ├── admin/index.html            (Admin CRUD, data-page="admin")
 ├── perfil/index.html           (Perfil, data-page="perfil")
@@ -42,8 +59,15 @@ hub-marketing/
 ├── squads/index.html           (Cards de squads, data-page="squads")
 ├── formularios/index.html      (Formulários externos, data-page="formularios")
 ├── mesas/index.html            (Reserva de mesas, data-page="mesas")
+├── src/
+│   ├── agents.md               (Guia de estilização e pipeline SCSS)
+│   └── scss/
+│       ├── main.scss           (Entrypoint oficial de estilos)
+│       └── v1/                 (Fonte de verdade da estilização V1)
 ├── assets/
-│   ├── css/main.css            (Todos os estilos)
+│   ├── css/
+│   │   ├── main.css            (Somente compilado de src/scss/main.scss)
+│   │   └── agents.md           (Regras do artefato compilado)
 │   └── js/
 │       ├── main.js             (Módulo compartilhado — hub.auth, hub.nav, hub.utils, hub.sb)
 │       ├── admin.js            (CRUD completo)
@@ -58,6 +82,37 @@ hub-marketing/
 Ordem de carregamento: `main.js` → `[page].js`
 
 ---
+
+## 2.0. Publicação no Liferay (runtime real)
+
+- Os HTML do repositório mantêm imports de Bootstrap/jQuery/Sicoob Styles para simular ambiente local.
+- No ambiente Liferay 7.4 CE, essas dependências podem já existir globalmente no portal.
+- Estratégia recomendada de publicação:
+  1. subir `main.css` e os JS de página em **Documentos e Mídias** com versionamento;
+  2. referenciar por URL nas configurações de página (em vez de colar conteúdo completo);
+  3. manter `js-liferay/` e `build-liferay.sh` como fallback para cenários que ainda exigem script inline.
+- Qualquer mudança nesse fluxo deve ser documentada no `README.md`, `Agents.md` e `CHANGELOG.md`.
+
+---
+
+## 2.1. Governança de Estilos (SCSS → CSS)
+
+- Fonte única de verdade de estilos: `src/scss`.
+- `assets/css/main.css` é artefato compilado e **não pode** receber edição manual.
+- Toda alteração visual deve seguir o fluxo:
+  1. editar `src/scss/main.scss` e/ou partials em `src/scss/v1/*.scss`;
+  2. compilar para `assets/css/main.css`;
+  3. atualizar `src/agents.md` e `assets/css/agents.md` quando houver nova regra estrutural.
+- Regra de arquitetura:
+  - estilos gerais e de sistema devem ficar em camada ampla (`src/scss/v1/_global.scss`);
+  - a camada global está modularizada em `src/scss/v1/global/*.scss` e deve manter a ordem de importação;
+  - estilos específicos por página/contexto devem ficar em partial dedicado (`_perfil.scss`, `_squads.scss`, etc.).
+- Para novas páginas/dashboards:
+  - priorizar o kit `hub-std-*` da Fase C (`_expansion-standards.scss`);
+  - validar obrigatoriamente com `checklist-qa-visual.md`.
+- Em novas estilizações:
+  - priorizar classes e tokens já existentes no `sicoob-styles` antes de hardcode;
+  - preferir `--color-surface-*`, `--turq`, `--verdee`, `--verdem`, `--border-radius-*`, `--transition-*`, `--box-shadow-*`.
 
 ## 3. Padrão de Módulo JavaScript
 
@@ -693,7 +748,7 @@ RLS: TO anon
 
 #### `quick_links`, `forms`, `desks`, `reservations`, `squad_categories`
 
-Ver CLAUDE.md para schema completo destas tabelas.
+Ver `claude.md` para schema completo destas tabelas.
 
 ### Storage — Bucket `Avatars`
 
@@ -792,6 +847,14 @@ var users = results[0].data || [];
 14. **Testar dark mode** ao criar qualquer componente visual novo
 15. **Coluna Ações** sempre primeira nas tabelas admin
 16. **Toast para feedback** — usar `hub.utils.showToast()` para todas as notificações
+17. **`assets/css/main.css` nunca é editado manualmente** — sempre compilar a partir de `src/scss/main.scss`
+18. **Tudo que estiver em `assets/css/main.css` deve existir em `src/scss`**
+19. **Mudou código em uma área? Atualize o `agents.md` da área alterada**
+20. **Toda alteração feita por IA deve ter registro de versão** (`CHANGELOG.md` ou histórico equivalente)
+21. **Hub atual é baseline V1** — mudanças incrementais devem respeitar consistência visual dessa base
+22. **Estilos gerais em partial amplo e estilos específicos em partial por página/contexto**
+23. **Novas páginas devem usar classes `hub-std-*` da Fase C sempre que aplicável**
+24. **Toda mudança visual deve validar o `checklist-qa-visual.md`**
 
 ---
 

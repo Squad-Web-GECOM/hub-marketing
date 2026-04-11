@@ -489,6 +489,39 @@ Visível no perfil apenas para o próprio usuário ou admin/coord.
 
 ---
 
+## Segurança
+
+### Autenticação
+
+- O app **não usa JWT nativo do Supabase**. Autenticação é via SSO Liferay (`window.localPart` ou `Liferay.ThemeDisplay`) ou código de acesso.
+- O cache do localStorage é **re-validado contra o Liferay** a cada page load. Se `window.localPart` difere do `user_name` cacheado, o cache é invalidado.
+- O login secreto (triple-click) funciona **apenas em localhost e GitHub Pages** (`_isDevEnv`). No Liferay, o botão não é ativado.
+- Tentativas de login têm **throttle de 2 segundos** (`hub.utils.throttle('login', 2000)`).
+
+### XSS
+
+- `hub.utils.escapeHtml(str)` deve ser usado em **todo HTML gerado** com dados do banco.
+- `showToast()` usa `textContent` (não `innerHTML`) — seguro contra XSS.
+- `showConfirm()` usa `textContent` — seguro contra XSS.
+- Nunca usar `innerHTML` com dados não escapados. Preferir `textContent` ou `createElement`.
+
+### Validação de Inputs
+
+- Telefone: `^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$`
+- CEP: `^\d{5}-?\d{3}$`
+- Email: `^[^\s@]+@[^\s@]+\.[^\s@]+$`
+- Apelido: max 50 chars
+- Sobre mim: max 500 chars
+- Parâmetro `?u=` no perfil: sanitizado para `[a-z0-9.\-_]`, max 50 chars
+
+### RLS e Supabase
+
+- Todas as tabelas devem ter RLS habilitado com `SELECT` para anon.
+- Operações de escrita (INSERT/UPDATE/DELETE) devem ser protegidas por policies ou Edge Functions.
+- O app usa a **anon key** — nunca a service_role key no cliente.
+
+---
+
 ## Cuidados Importantes
 
 1. **Nunca usar `BASE_PATH` fora de `main.js`** — use `hub.config.basePath`

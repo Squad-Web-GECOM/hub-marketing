@@ -59,23 +59,23 @@
   // ====================================================================
   // GENERIC CRUD HELPERS
   // ====================================================================
+  var _currentSaveHandler = null;
+  var _currentConfirmHandler = null;
+
   function showEditModal(title, bodyHTML, onSave) {
     document.getElementById('edit-modal-title').textContent = title;
     var body = document.getElementById('edit-modal-body');
     body.innerHTML = bodyHTML;
-    // Volta scroll para o topo ao abrir o modal
     body.scrollTop = 0;
     document.getElementById('edit-modal-overlay').classList.add('show');
-    // Mostra preview dos ícones já preenchidos ao abrir o modal
     ICON_INPUT_IDS.forEach(function(id) {
       var inp = document.getElementById(id);
       if (inp && inp.value) updateIconPreview(id, inp.value.trim());
     });
     var saveBtn = document.getElementById('edit-modal-save');
-    var newBtn = saveBtn.cloneNode(true);
-    saveBtn.parentNode.replaceChild(newBtn, saveBtn);
-    newBtn.id = 'edit-modal-save';
-    newBtn.addEventListener('click', onSave);
+    if (_currentSaveHandler) saveBtn.removeEventListener('click', _currentSaveHandler);
+    _currentSaveHandler = onSave;
+    saveBtn.addEventListener('click', _currentSaveHandler);
   }
 
   function hideEditModal() {
@@ -83,16 +83,19 @@
   }
 
   function showConfirm(message, onConfirm) {
-    document.getElementById('confirm-modal-body').innerHTML = '<p>' + message + '</p>';
+    var confirmBody = document.getElementById('confirm-modal-body');
+    confirmBody.textContent = '';
+    var p = document.createElement('p');
+    p.textContent = message;
+    confirmBody.appendChild(p);
     document.getElementById('confirm-modal-overlay').classList.add('show');
     var okBtn = document.getElementById('confirm-modal-ok');
-    var newBtn = okBtn.cloneNode(true);
-    okBtn.parentNode.replaceChild(newBtn, okBtn);
-    newBtn.id = 'confirm-modal-ok';
-    newBtn.addEventListener('click', function() {
+    if (_currentConfirmHandler) okBtn.removeEventListener('click', _currentConfirmHandler);
+    _currentConfirmHandler = function() {
       document.getElementById('confirm-modal-overlay').classList.remove('show');
       onConfirm();
-    });
+    };
+    okBtn.addEventListener('click', _currentConfirmHandler);
   }
 
   // Helper: get org name from pre-loaded orgStructure
@@ -231,11 +234,25 @@
         '<div class="form-check mb-2"><input type="checkbox" class="form-check-input" id="eu-is-gestor"' + (u.is_gestor ? ' checked' : '') + '><label class="form-check-label" for="eu-is-gestor">Gestor</label></div>' : '');
 
     showEditModal('Editar Usuario: ' + u.nome, formHtml, async function() {
+      var emailVal = document.getElementById('eu-email').value.trim();
+      var telefoneVal = document.getElementById('eu-telefone').value.trim();
+      var cepVal = document.getElementById('eu-cep').value.trim();
+
+      if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        hub.utils.showToast('Email invalido', 'warning'); return;
+      }
+      if (telefoneVal && !/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(telefoneVal)) {
+        hub.utils.showToast('Telefone invalido. Use (XX) XXXXX-XXXX', 'warning'); return;
+      }
+      if (cepVal && !/^\d{5}-?\d{3}$/.test(cepVal)) {
+        hub.utils.showToast('CEP invalido. Use XXXXX-XXX', 'warning'); return;
+      }
+
       var updates = {
         nome: document.getElementById('eu-nome').value.trim(),
         apelido: document.getElementById('eu-apelido').value.trim(),
-        email: document.getElementById('eu-email').value.trim(),
-        telefone: document.getElementById('eu-telefone').value.trim(),
+        email: emailVal,
+        telefone: telefoneVal,
         aniversario: document.getElementById('eu-aniversario').value || null,
         endereco: document.getElementById('eu-endereco').value.trim(),
         bairro: document.getElementById('eu-bairro').value.trim(),
@@ -544,10 +561,8 @@
   };
 
   window._adminEditOrg = function(orgId) {
-    console.log('[Admin] _adminEditOrg called, id:', orgId, '| orgStructure.length:', orgStructure.length);
     var o = orgStructure.find(function(x) { return String(x.id) === String(orgId); });
     if (!o) {
-      console.warn('[Admin] Org not found in cache, re-fetching...');
       // Tenta recarregar orgStructure e tentar novamente
       hub.sb.from('org_structure').select('*').then(function(r) {
         if (r.data) {
@@ -570,7 +585,6 @@
       if (!nome) { hub.utils.showToast('Preencha o nome', 'warning'); return; }
 
       var res = await hub.sb.from('org_structure').update({ nome: nome }).eq('id', orgId).select();
-      console.log('[Admin] org_structure update result:', res);
       if (res.error) {
         hub.utils.showToast('Erro ao salvar: ' + res.error.message, 'error');
       } else {
@@ -1932,9 +1946,19 @@
     initIconesModal();
     initIconAutocomplete();
 
-    // Modal close: click outside + Escape
+    // Modal close: buttons + click outside + Escape
     var editOverlay    = document.getElementById('edit-modal-overlay');
     var confirmOverlay = document.getElementById('confirm-modal-overlay');
+
+    var btnCloseEdit = document.getElementById('btn-close-edit-modal');
+    var btnCancelEdit = document.getElementById('btn-cancel-edit-modal');
+    var btnCloseConfirm = document.getElementById('btn-close-confirm-modal');
+    var btnCancelConfirm = document.getElementById('btn-cancel-confirm-modal');
+
+    if (btnCloseEdit) btnCloseEdit.addEventListener('click', hideEditModal);
+    if (btnCancelEdit) btnCancelEdit.addEventListener('click', hideEditModal);
+    if (btnCloseConfirm) btnCloseConfirm.addEventListener('click', function() { confirmOverlay.classList.remove('show'); });
+    if (btnCancelConfirm) btnCancelConfirm.addEventListener('click', function() { confirmOverlay.classList.remove('show'); });
     if (editOverlay) {
       editOverlay.addEventListener('click', function(e) {
         if (e.target === editOverlay) hideEditModal();

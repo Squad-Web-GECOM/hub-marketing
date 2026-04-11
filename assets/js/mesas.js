@@ -63,7 +63,7 @@
       hub.utils.hideLoader();
     } catch (err) {
       console.error('Mesas: init error', err);
-      hub.utils.showToast('Falha ao iniciar. Verifique sua conexao.', 'danger');
+      hub.utils.showToast('Falha ao iniciar. Verifique sua conexao.', 'error');
       hub.utils.hideLoader();
     }
   }
@@ -690,7 +690,7 @@
       updateSuggestion();
     } catch (err) {
       console.error('Mesas: cancel error', err);
-      hub.utils.showToast('Nao foi possivel liberar a mesa.', 'danger');
+      hub.utils.showToast('Nao foi possivel liberar a mesa.', 'error');
     }
   }
 

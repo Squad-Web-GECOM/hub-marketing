@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://squad-web-gecom.github.io/sicoob-styles/sicoob-style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +18,7 @@
       <div class="spinner-border" role="status"></div>
     </div>
 
-    <div id="app-view" style="display:none;">
+    <div id="app-view" class="hub-app-view">
       <!-- Page header -->
       <div class="hub-page-header">
         <h1 class="hub-page-title"><i class="fa-solid fa-layer-group"></i> Squa<span class="script">ds</span></h1>
@@ -24,7 +26,7 @@
 
       <!-- Search bar -->
       <div class="hub-filter-bar">
-        <div class="hub-filter-group" style="flex:2;">
+        <div class="hub-filter-group hub-filter-group--grow-2">
           <label>Buscar</label>
           <div class="hub-search-box">
             <i class="fa-solid fa-search"></i>
@@ -34,8 +36,8 @@
       </div>
 
       <!-- Category filter buttons -->
-      <div class="mb-3" style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
-        <div id="category-buttons" class="d-flex flex-nowrap" style="gap:0.5rem; padding-bottom:4px;">
+      <div class="mb-3 hub-scroll-touch-x">
+        <div id="category-buttons" class="d-flex flex-nowrap hub-category-buttons-row">
           <!-- Rendered dynamically by JS -->
         </div>
       </div>
@@ -49,7 +51,7 @@
       </div>
 
       <!-- Empty state -->
-      <div id="empty-state" class="text-center py-5" style="display:none;">
+      <div id="empty-state" class="text-center py-5 squads-empty-state">
         <div class="mb-3">
           <i class="fa-solid fa-magnifying-glass fa-3x text-muted"></i>
         </div>

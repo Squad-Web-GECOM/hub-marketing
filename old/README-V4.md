@@ -1,5 +1,7 @@
 # 🚀 AGENDAMENTO DE MESAS v4.0 - INSTRUÇÕES DE IMPLEMENTAÇÃO
 
+> Arquivo histórico da release v4.2. Esta pasta é somente referência e não faz parte da base ativa da V1.
+
 ## 📦 ARQUIVOS ENTREGUES
 
 1. **agendamento-complete-v4.js** (1285 linhas) - JavaScript único consolidado
