@@ -24,6 +24,7 @@
 
 ## 3) Controle de acesso
 
+- Inicializa em `hub:ready`.
 - Bloqueio se não for `hub.auth.isAdminOrCoord()`.
 - Em bloqueio, exibe toast de acesso restrito e redireciona para home.
 
